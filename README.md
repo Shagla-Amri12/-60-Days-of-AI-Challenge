@@ -1,4 +1,3 @@
-# -60-Days-of-AI-Challenge
 # Day 1 - AI Personality Profile
 
 # 60 Days of AI Challenge
