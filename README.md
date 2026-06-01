@@ -93,19 +93,7 @@ I use AI to understand concepts, explore possibilities, improve decision-making,
 
 I treat AI as a collaborator that helps me build knowledge, solve problems, and develop systems rather than simply completing tasks.
 
----
 
-## Day 1 Assets
-
-### AI Personality Profile
-
-![AI Personality Profile](day1-profile.png)
-
-### AI Portrait
-
-![AI Portrait](day1-portrait.png)
-
----
 
 ## Day 1 Reflection
 
