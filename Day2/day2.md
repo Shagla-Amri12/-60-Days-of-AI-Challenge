@@ -29,4 +29,6 @@ Output:
 Complete system architecture, tech stack, database design, and deployment plan.
 
 
+(Day2-prompt.png)
+
 #PromptEngineering #ClaudeAI #60DaysClaudeChallenge
