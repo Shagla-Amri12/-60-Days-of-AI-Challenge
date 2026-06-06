@@ -25,7 +25,7 @@ One of the biggest insights from this project was that a resume's effectiveness 
 Created a reusable prompt that improves ATS compatibility, enhances recruiter readability, and helps job seekers present their qualifications more effectively.
 
 # SCREENSHOTS:
-[Resume](Resume-before_optimization.png)
-[Resume](Resume-after_optimization.png)
-[Resume](ATS_analysis.png)
+[Resume Before](Resume-before_optimization.png)
+[Resume After](Resume-after_optimization.png)
+[Analysis](ATS_analysis.png)
 
