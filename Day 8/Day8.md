@@ -57,10 +57,15 @@ This project demonstrated how AI can support not only coding but also planning, 
 # SCREENSHOTS:
 
 [EnviroHealth Overview](overview.png)
+
 [EnviroHealth Zone](zone.png)
+
 [EnviroHealth Health Impact](health_impact.png)
+
 [EnviroHealth Report Card](report_card.png)
+
 [EnviroHealth Recommendation](recommendation.png)
+
 [EnviroHealth Insights](insights.png)
 
 
