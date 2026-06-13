@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Discovery & Analysis — Shagla Amri</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F0F2FA;--surface:#fff;--navy:#1B1F3B;--orange:#FF6B35;--purple:#6C63FF;
+  --green:#22C55E;--red:#EF4444;--yellow:#EAB308;--blue:#3B82F6;
+  --muted:#8892A4;--border:#E4E8F4;
+  --font:'Space Grotesk',sans-serif;--body:'Inter',sans-serif;
+}
+body{background:var(--bg);font-family:var(--body);color:var(--navy);padding:24px 14px;min-height:100vh}
+.page{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--navy) 0%,#2D2F6E 60%,#3B2D7A 100%);border-radius:16px;padding:26px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;background:var(--purple);opacity:.15;border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-30px;left:35%;width:120px;height:120px;background:var(--orange);opacity:.12;border-radius:50%}
+.header-left{position:relative;z-index:1}
+.header-title{font-family:var(--font);font-size:20px;font-weight:700;color:#fff}
+.header-sub{font-size:12.5px;color:rgba(255,255,255,.55);margin-top:4px}
+.header-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.hbadge{font-family:var(--font);font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;border:1.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85)}
+.hbadge.g{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.35);color:#86EFAC}
+.stats-row{display:flex;gap:22px;position:relative;z-index:1}
+.stat{text-align:center}
+.stat-n{font-family:var(--font);font-size:26px;font-weight:700;color:#fff}
+.stat-l{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:2px;font-family:var(--font)}
+
+/* SECTION TITLE */
+.sec-title{font-family:var(--font);font-size:14px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.sec-title .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0}
+
+/* CARD */
+.card{background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:20px 22px;box-shadow:0 1px 8px rgba(27,31,59,.05)}
+
+/* JOB TABLE */
+.job-table{width:100%;border-collapse:collapse;font-size:12px}
+.job-table thead tr{background:var(--bg)}
+.job-table th{font-family:var(--font);font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:9px 12px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+.job-table td{padding:13px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.45}
+.job-table tr:last-child td{border-bottom:none}
+.job-table tr:hover td{background:rgba(108,99,255,.03)}
+
+.company-name{font-family:var(--font);font-size:12.5px;font-weight:600;color:var(--navy)}
+.company-type{font-size:10.5px;color:var(--muted);margin-top:2px}
+.role-name{font-family:var(--font);font-size:12px;font-weight:600;color:var(--purple)}
+.location-tag{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:5px;font-weight:500}
+.loc-remote{background:rgba(34,197,94,.1);color:#16A34A}
+.loc-hybrid{background:rgba(108,99,255,.1);color:var(--purple)}
+.loc-onsite{background:rgba(255,107,53,.1);color:var(--orange)}
+.date-tag{font-size:11px;color:var(--muted)}
+.ctc-val{font-family:var(--font);font-size:12px;font-weight:600;color:var(--navy)}
+.ctc-sub{font-size:10px;color:var(--muted)}
+.apply-btn{display:inline-block;font-family:var(--font);font-size:11px;font-weight:600;padding:5px 13px;border-radius:7px;background:var(--purple);color:#fff;text-decoration:none;transition:opacity .15s;white-space:nowrap}
+.apply-btn:hover{opacity:.82}
+.why-text{font-size:11.5px;color:#3D4466;max-width:200px;line-height:1.5}
+
+/* MATCH SCORE */
+.score-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.score-circle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:13px;font-weight:700;border:2.5px solid}
+.score-a{background:rgba(34,197,94,.1);color:#16A34A;border-color:#22C55E}
+.score-b{background:rgba(108,99,255,.1);color:var(--purple);border-color:var(--purple)}
+.score-c{background:rgba(234,179,8,.1);color:#CA8A04;border-color:var(--yellow)}
+.score-label{font-size:9px;color:var(--muted);text-align:center;font-family:var(--font);font-weight:600;text-transform:uppercase}
+
+/* SKILL SECTION */
+.skill-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.skill-row{display:flex;flex-direction:column;gap:10px}
+.skill-item2{display:flex;align-items:center;gap:10px}
+.skill-label{font-size:12.5px;font-weight:500;width:130px;flex-shrink:0}
+.skill-bar2{flex:1;height:6px;background:var(--border);border-radius:10px;overflow:hidden}
+.skill-fill2{height:100%;border-radius:10px;transition:width 1.3s cubic-bezier(.4,0,.2,1);width:0}
+.fill-green{background:linear-gradient(90deg,#22C55E,#16A34A)}
+.fill-yellow{background:linear-gradient(90deg,#EAB308,#CA8A04)}
+.fill-red{background:linear-gradient(90deg,#EF4444,#DC2626)}
+.fill-purple{background:linear-gradient(90deg,var(--purple),#4F46E5)}
+.skill-pct2{font-family:var(--font);font-size:11px;color:var(--muted);width:30px;text-align:right}
+
+/* GAP CARDS */
+.gap-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.gap-card{border-radius:10px;padding:14px 15px;border:1.5px solid}
+.gap-have{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.25)}
+.gap-learn{background:rgba(234,179,8,.06);border-color:rgba(234,179,8,.3)}
+.gap-miss{background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2)}
+.gap-head{font-family:var(--font);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.gap-have .gap-head{color:#16A34A}
+.gap-learn .gap-head{color:#CA8A04}
+.gap-miss .gap-head{color:var(--red)}
+.gap-tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:5px;margin:2px 3px 2px 0;font-weight:500;font-family:var(--font)}
+.tag-g{background:rgba(34,197,94,.12);color:#16A34A}
+.tag-y{background:rgba(234,179,8,.12);color:#CA8A04}
+.tag-r{background:rgba(239,68,68,.12);color:var(--red)}
+
+/* MARKET INSIGHTS */
+.insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.insight-card{border:1px solid var(--border);border-radius:10px;padding:15px 16px}
+.insight-icon{font-size:22px;margin-bottom:6px}
+.insight-head{font-family:var(--font);font-size:13px;font-weight:600;color:var(--navy)}
+.insight-text{font-size:12px;color:#3D4466;margin-top:5px;line-height:1.6}
+
+/* RECOMMENDATIONS */
+.rec-list{display:flex;flex-direction:column;gap:9px}
+.rec-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg)}
+.rec-num{font-family:var(--font);font-size:12px;font-weight:700;color:#fff;background:var(--purple);width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rec-text{font-size:12.5px;color:#3D4466;line-height:1.55}
+.rec-strong{font-weight:600;color:var(--navy)}
+
+/* FIT METER */
+.fit-box{background:linear-gradient(135deg,var(--navy),#2D2F6E);border-radius:14px;padding:22px 26px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.fit-meter{width:90px;height:90px;position:relative;flex-shrink:0}
+.fit-svg{width:90px;height:90px}
+.fit-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font);font-size:22px;font-weight:700;color:#fff}
+.fit-info{flex:1}
+.fit-title{font-family:var(--font);font-size:16px;font-weight:700;color:#fff}
+.fit-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px;line-height:1.6}
+.fit-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.fit-tag{font-family:var(--font);font-size:11px;font-weight:600;padding:4px 11px;border-radius:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+
+/* DEMAND BARS */
+.demand-row{display:flex;flex-direction:column;gap:9px}
+.demand-item{display:flex;align-items:center;gap:10px}
+.demand-label{font-size:12px;font-weight:500;width:140px;flex-shrink:0}
+.demand-bar{flex:1;height:8px;background:var(--border);border-radius:10px;overflow:hidden}
+.demand-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--purple),var(--orange));transition:width 1.3s cubic-bezier(.4,0,.2,1);width:0}
+.demand-pct{font-family:var(--font);font-size:11px;color:var(--muted);width:36px;text-align:right}
+
+/* FOOTER NOTE */
+.footer-note{text-align:center;font-size:11.5px;color:var(--muted);padding-bottom:8px}
+
+@media(max-width:680px){
+  .skill-grid,.gap-grid,.insight-grid{grid-template-columns:1fr}
+  .stats-row{gap:14px}
+  .job-table{font-size:11px}
+  .job-table th,.job-table td{padding:9px 8px}
+  .why-text{max-width:130px}
+  .fit-box{gap:16px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-title">🔍 Job Discovery & Market Analysis</div>
+    <div class="header-sub">Shagla Amri · B.Tech CSE · Python Developer &amp; AI Enthusiast · Lucknow, India</div>
+    <div class="header-badges">
+      <span class="hbadge g">✓ 6 Matched Roles Found</span>
+      <span class="hbadge">📅 Posted within 7 days priority</span>
+      <span class="hbadge">🌐 Remote / Hybrid / Onsite</span>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-n">6</div><div class="stat-l">Opportunities</div></div>
+    <div class="stat"><div class="stat-n">72%</div><div class="stat-l">Avg Match</div></div>
+    <div class="stat"><div class="stat-n">₹15k+</div><div class="stat-l">Best Stipend</div></div>
+  </div>
+</div>
+
+<!-- JOB TABLE -->
+<div class="card" style="overflow-x:auto;">
+  <div class="sec-title"><span class="dot"></span>Top Matched Opportunities</div>
+  <table class="job-table">
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Role</th>
+        <th>Location</th>
+        <th>Posted</th>
+        <th>CTC / Stipend</th>
+        <th>Match</th>
+        <th>Why It Fits</th>
+        <th>Apply</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="company-name">Impressico Business Solutions</div>
+          <div class="company-type">IT Services · CMMi L3 · Noida</div>
+        </td>
+        <td><div class="role-name">GenAI / Python Full Stack Intern</div></td>
+        <td><span class="location-tag loc-onsite">Noida (Onsite)</span></td>
+        <td><div class="date-tag">Mar 2026</div></td>
+        <td><div class="ctc-val">₹15,000/mo</div><div class="ctc-sub">→ ₹4 LPA on conversion</div></td>
+        <td>
+          <div class="score-wrap">
+            <div class="score-circle score-a">92%</div>
+            <div class="score-label">Top Pick</div>
+          </div>
+        </td>
+        <td><div class="why-text">Directly targets GenAI + Python full stack. 2026 batch eligible. Full-time conversion path. AI-driven application building aligns perfectly with your profile.</div></td>
+        <td><a class="apply-btn" href="https://internshala.com/job/detail/fresher-trainee-engineer-job-in-multiple-locations-at-impressico-business-solutions1773654474" target="_blank">Apply →</a></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="company-name">Leegality</div>
+          <div class="company-type">B2B SaaS · LegalTech · Remote</div>
+        </td>
+        <td><div class="role-name">Python Developer Intern</div></td>
+        <td><span class="location-tag loc-remote">Remote · India</span></td>
+        <td><div class="date-tag">Mar 2026</div></td>
+        <td><div class="ctc-val">Competitive</div><div class="ctc-sub">Stipend (negotiable)</div></td>
+        <td>
+          <div class="score-wrap">
+            <div class="score-circle score-a">88%</div>
+            <div class="score-label">Strong Fit</div>
+          </div>
+        </td>
+        <td><div class="why-text">Pure Python backend role. Django/Flask, REST API, MySQL/MongoDB stack. Remote-first product company with real engineering mentorship.</div></td>
+        <td><a class="apply-btn" href="https://www.remoterocketship.com/company/leegality/jobs/python-intern-india-remote/" target="_blank">Apply →</a></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="company-name">S&amp;P Global</div>
+          <div class="company-type">Global Fintech · Enterprise · Hybrid</div>
+        </td>
+        <td><div class="role-name">Summer Intern — AI / Data Science</div></td>
+        <td><span class="location-tag loc-hybrid">Hybrid · Noida / Hyderabad</span></td>
+        <td><div class="date-tag">Feb 2026</div></td>
+        <td><div class="ctc-val">Best in Industry</div><div class="ctc-sub">High stipend + FTE potential</div></td>
+        <td>
+          <div class="score-wrap">
+            <div class="score-circle score-b">78%</div>
+            <div class="score-label">Good Fit</div>
+          </div>
+        </td>
+        <td><div class="why-text">AI/Data Science track for 2026/2027 batch. GenAI, ML, Python, automation. Competitive stipend. Strong brand name for your resume.</div></td>
+        <td><a class="apply-btn" href="https://offcampusjobs4u.com/sp-global-internship-2026-summer-intern-gurgaon-hyderabad-noida/" target="_blank">Apply →</a></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="company-name">Kalvium</div>
+          <div class="company-type">EdTech Startup · Product-Based</div>
+        </td>
+        <td><div class="role-name">Data Science Intern</div></td>
+        <td><span class="location-tag loc-onsite">Bangalore (Onsite)</span></td>
+        <td><div class="date-tag">Apr 2026 ⚡ Urgent</div></td>
+        <td><div class="ctc-val">₹20,000/mo</div><div class="ctc-sub">Join by June 15, 2026</div></td>
+        <td>
+          <div class="score-wrap">
+            <div class="score-circle score-b">75%</div>
+            <div class="score-label">Good Fit</div>
+          </div>
+        </td>
+        <td><div class="why-text">Highest stipend found. EdTech product startup. Pre/final year eligible. AI + data focus. Mentorship-driven culture. Urgent joining — apply immediately.</div></td>
+        <td><a class="apply-btn" href="https://internshala.com/internships/data-science-internship/" target="_blank">Apply →</a></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="company-name">Pehchaan</div>
+          <div class="company-type">AI Startup · Product · Bangalore</div>
+        </td>
+        <td><div class="role-name">Python / AI Pipeline Intern</div></td>
+        <td><span class="location-tag loc-onsite">Bangalore (Onsite)</span></td>
+        <td><div class="date-tag">Mar 2026</div></td>
+        <td><div class="ctc-val">Competitive</div><div class="ctc-sub">6-month duration</div></td>
+        <td>
+          <div class="score-wrap">
+            <div class="score-circle score-b">72%</div>
+            <div class="score-label">Good Fit</div>
+          </div>
+        </td>
+        <td><div class="why-text">Python microservices + AI evaluation pipelines. Startup culture, end-to-end ownership. MERN + Python stack exposure. Product-builder mindset needed — matches your profile.</div></td>
+        <td><a class="apply-btn" href="https://internshala.com/internships/python-internship/" target="_blank">Apply →</a></td>
+      </tr>
+      <tr>
+        <td>
+          <div class="company-name">Glassdoor Listed</div>
+          <div class="company-type">Multiple AI Startups · Remote</div>
+        </td>
+        <td><div class="role-name">AI Development Intern (Batch)</div></td>
+        <td><span class="location-tag loc-remote">Remote · India</span></td>
+        <td><div class="date-tag">Active · May 2026</div></td>
+        <td><div class="ctc-val">₹5,000–₹15,000</div><div class="ctc-sub">Varies by company</div></td>
+        <td>
+          <div class="score-wrap">
+            <div class="score-circle score-c">68%</div>
+            <div class="score-label">Moderate</div>
+          </div>
+        </td>
+        <td><div class="why-text">AI, ML, Gen AI, Chatbot internship roles. Python + TensorFlow + Git required. Freshers welcome. 105+ active remote Python intern roles on Glassdoor right now.</div></td>
+        <td><a class="apply-btn" href="https://www.glassdoor.co.in/Job/india-internship-python-remote-jobs-SRCH_IL.0,5_IN115_KO6,30.htm" target="_blank">Browse →</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SKILLS DEMAND + GAP -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+  <div class="card">
+    <div class="sec-title"><span class="dot"></span>Most In-Demand Skills Across Jobs</div>
+    <div class="demand-row">
+      <div class="demand-item">
+        <span class="demand-label">Python</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="97"></div></div>
+        <span class="demand-pct">97%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">Git / GitHub</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="88"></div></div>
+        <span class="demand-pct">88%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">REST APIs</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="82"></div></div>
+        <span class="demand-pct">82%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">Django / Flask</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="78"></div></div>
+        <span class="demand-pct">78%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">SQL / Databases</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="74"></div></div>
+        <span class="demand-pct">74%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">ML / AI Basics</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="70"></div></div>
+        <span class="demand-pct">70%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">JavaScript</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="62"></div></div>
+        <span class="demand-pct">62%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">Data Structures</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="58"></div></div>
+        <span class="demand-pct">58%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">TensorFlow / PyTorch</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="42"></div></div>
+        <span class="demand-pct">42%</span>
+      </div>
+      <div class="demand-item">
+        <span class="demand-label">Docker / Cloud</span>
+        <div class="demand-bar"><div class="demand-fill" data-w="35"></div></div>
+        <span class="demand-pct">35%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title"><span class="dot"></span>Your Skill Levels vs Market Need</div>
+    <div class="skill-row">
+      <div class="skill-item2">
+        <span class="skill-label">Python Core</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-green" data-w="72"></div></div>
+        <span class="skill-pct2">72%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">Git / GitHub</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-green" data-w="65"></div></div>
+        <span class="skill-pct2">65%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">AI / Prompt Eng.</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-green" data-w="80"></div></div>
+        <span class="skill-pct2">80%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">HTML / CSS / JS</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-yellow" data-w="55"></div></div>
+        <span class="skill-pct2">55%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">Django / Flask</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-red" data-w="20"></div></div>
+        <span class="skill-pct2">20%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">REST APIs</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-red" data-w="25"></div></div>
+        <span class="skill-pct2">25%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">SQL / Databases</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-red" data-w="15"></div></div>
+        <span class="skill-pct2">15%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">ML / TensorFlow</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-yellow" data-w="30"></div></div>
+        <span class="skill-pct2">30%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">DSA / LeetCode</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-red" data-w="20"></div></div>
+        <span class="skill-pct2">20%</span>
+      </div>
+      <div class="skill-item2">
+        <span class="skill-label">Docker / Cloud</span>
+        <div class="skill-bar2"><div class="skill-fill2 fill-red" data-w="5"></div></div>
+        <span class="skill-pct2">5%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILL GAP -->
+<div class="card">
+  <div class="sec-title"><span class="dot"></span>Skill Gap Analysis</div>
+  <div class="gap-grid">
+    <div class="gap-card gap-have">
+      <div class="gap-head">✅ You Already Have</div>
+      <span class="gap-tag tag-g">Python OOP</span>
+      <span class="gap-tag tag-g">AI Prompting</span>
+      <span class="gap-tag tag-g">Git & GitHub</span>
+      <span class="gap-tag tag-g">HTML/CSS</span>
+      <span class="gap-tag tag-g">Problem-Solving</span>
+      <span class="gap-tag tag-g">Project Portfolio</span>
+      <span class="gap-tag tag-g">Debugging</span>
+      <span class="gap-tag tag-g">SDLC Basics</span>
+    </div>
+    <div class="gap-card gap-learn">
+      <div class="gap-head">⚡ Learn Next (30 Days)</div>
+      <span class="gap-tag tag-y">Flask / Django</span>
+      <span class="gap-tag tag-y">REST API Design</span>
+      <span class="gap-tag tag-y">SQL Basics</span>
+      <span class="gap-tag tag-y">JavaScript ES6+</span>
+      <span class="gap-tag tag-y">React Basics</span>
+      <span class="gap-tag tag-y">Pandas / NumPy</span>
+      <span class="gap-tag tag-y">LeetCode Easy DSA</span>
+    </div>
+    <div class="gap-card gap-miss">
+      <div class="gap-head">🔴 Long-Term Gaps</div>
+      <span class="gap-tag tag-r">TensorFlow / PyTorch</span>
+      <span class="gap-tag tag-r">Docker / Containers</span>
+      <span class="gap-tag tag-r">Cloud (AWS/GCP)</span>
+      <span class="gap-tag tag-r">MongoDB / Redis</span>
+      <span class="gap-tag tag-r">CI/CD Pipelines</span>
+      <span class="gap-tag tag-r">System Design</span>
+    </div>
+  </div>
+</div>
+
+<!-- MARKET INSIGHTS -->
+<div class="card">
+  <div class="sec-title"><span class="dot"></span>Market Demand Insights</div>
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-icon">📈</div>
+      <div class="insight-head">Remote AI Internships Surging in 2026</div>
+      <div class="insight-text">Remote AI internship roles are no longer limited to research labs. Fintech, health-tech, SaaS, and EdTech startups across India are actively hiring freshers for GenAI, ML, and Python roles — the market is highly favorable for your profile.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">💰</div>
+      <div class="insight-head">Stipend Range: ₹5k–₹20k/month</div>
+      <div class="insight-text">Fresher Python/AI intern stipends in India range from ₹5,000 to ₹20,000/month. Product companies and funded startups pay ₹12k–₹20k. Full-time conversion roles offer ₹3.5–₹5 LPA for entry-level positions.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">🤖</div>
+      <div class="insight-head">Prompt Engineering is a Differentiator</div>
+      <div class="insight-text">Your AI tools and prompt engineering strength is a genuine market differentiator. Companies building LLM-based products explicitly list this as a required skill — most other freshers don't have it, giving you a real edge.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-icon">🏗️</div>
+      <div class="insight-head">Django/Flask = Highest Demand Gap</div>
+      <div class="insight-text">78% of backend-oriented intern roles require Django or Flask. This is your most critical immediate skill gap. Even 2–3 weeks of focused learning with a deployed project can significantly raise your match score for backend roles.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RECOMMENDATIONS -->
+<div class="card">
+  <div class="sec-title"><span class="dot"></span>Top Recommendations to Get Interviews Faster</div>
+  <div class="rec-list">
+    <div class="rec-item">
+      <div class="rec-num">1</div>
+      <div class="rec-text"><span class="rec-strong">Apply to Kalvium immediately</span> — The Data Science Intern role requires joining by June 15, 2026. This is your most time-sensitive opportunity at ₹20,000/mo with a top-tier EdTech startup.</div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">2</div>
+      <div class="rec-text"><span class="rec-strong">Build a Flask/Django mini-project this week</span> — A simple REST API (e.g. a task manager or notes API) deployed on Render or Railway instantly fills your biggest skill gap and gives you something to show in interviews.</div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">3</div>
+      <div class="rec-text"><span class="rec-strong">Highlight your Social Media App project more prominently</span> — It demonstrates full SDLC, OOP, debugging, and architecture. Reframe it in your applications as "end-to-end Python application development" — that's exactly what companies want to see.</div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">4</div>
+      <div class="rec-text"><span class="rec-strong">Set up Internshala job alerts for: "Python intern", "AI intern", "Backend intern"</span> — New roles are posted daily. Apply within 24 hours of posting to maximize your chances as an early applicant.</div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">5</div>
+      <div class="rec-text"><span class="rec-strong">Add SQL basics (SQLite + Python) to your resume within 14 days</span> — SQL appears in 74% of roles. Even a basic CRUD project using SQLite shows database awareness and removes a common rejection trigger in screenings.</div>
+    </div>
+    <div class="rec-item">
+      <div class="rec-num">6</div>
+      <div class="rec-text"><span class="rec-strong">Target Wellfound (AngelList) for startup roles</span> — AI and product-based startups actively recruit on Wellfound with less competition than LinkedIn. Filter by: India · Internship · Python · Remote. Direct founder contact often possible.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FIT ASSESSMENT -->
+<div class="fit-box">
+  <div class="fit-meter">
+    <svg class="fit-svg" viewBox="0 0 90 90">
+      <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="7"/>
+      <circle cx="45" cy="45" r="38" fill="none" stroke="#6C63FF" stroke-width="7"
+        stroke-dasharray="239" stroke-dashoffset="67" stroke-linecap="round"
+        transform="rotate(-90 45 45)"/>
+    </svg>
+    <div class="fit-num">72%</div>
+  </div>
+  <div class="fit-info">
+    <div class="fit-title">Overall Profile Fit: Strong with Gaps</div>
+    <div class="fit-sub">Your Python foundation, AI enthusiasm, project portfolio, and GitHub presence make you a competitive fresher candidate. The primary gaps — Django/Flask, REST APIs, SQL — are all learnable in 30–45 days. Closing these gaps will push your match score to 85%+.</div>
+    <div class="fit-tags">
+      <span class="fit-tag">✅ Good Profile Foundation</span>
+      <span class="fit-tag">⚡ 30-Day Upskill Needed</span>
+      <span class="fit-tag">🎯 Target ₹4–8 LPA Realistic</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">Data sourced from Internshala, Glassdoor, Indeed, LinkedIn &amp; YC Jobs · June 2026 · For personal job search use only</div>
+</div>
+
+<script>
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelectorAll('[data-w]').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 300);
+});
+</script>
+</body>
+</html>

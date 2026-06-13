@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F8FC;
+    --surface: #FFFFFF;
+    --navy: #1B1F3B;
+    --orange: #FF6B35;
+    --purple: #6C63FF;
+    --muted: #8892A4;
+    --border: #E8EBF4;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: var(--font-body);
+    color: var(--navy);
+    min-height: 100vh;
+    padding: 32px 20px;
+  }
+
+  .card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--surface);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(27,31,59,0.10);
+  }
+
+  /* ── HEADER BANNER ── */
+  .banner {
+    background: linear-gradient(135deg, var(--navy) 0%, #2D2F6E 60%, #3B2D7A 100%);
+    padding: 48px 48px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    background: var(--purple);
+    opacity: 0.18;
+    border-radius: 50%;
+  }
+  .banner::after {
+    content: '';
+    position: absolute;
+    bottom: 30px; left: 30%;
+    width: 120px; height: 120px;
+    background: var(--orange);
+    opacity: 0.12;
+    border-radius: 50%;
+  }
+  .banner-inner {
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .avatar {
+    width: 110px; height: 110px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--purple), var(--orange));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 42px; font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    margin-bottom: -1px;
+    letter-spacing: -1px;
+  }
+  .banner-text { padding-bottom: 28px; }
+  .banner-name {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .banner-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.65);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+  .banner-badges {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+  }
+  .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.9);
+    font-size: 11.5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+  .badge.accent { background: rgba(255,107,53,0.25); border-color: rgba(255,107,53,0.4); color: #FFAA85; }
+
+  /* ── BODY ── */
+  .body {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    padding: 32px 28px;
+    border-right: 1px solid var(--border);
+  }
+  .section-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .info-block { margin-bottom: 28px; }
+  .info-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 10px;
+  }
+  .info-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .info-detail { flex: 1; }
+  .info-key { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+  .info-val { font-size: 13px; font-weight: 500; color: var(--navy); margin-top: 1px; }
+
+  /* Skill bars */
+  .skill-item { margin-bottom: 13px; }
+  .skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .skill-name { font-size: 12.5px; font-weight: 500; color: var(--navy); }
+  .skill-pct { font-size: 11px; color: var(--muted); font-family: var(--font-display); }
+  .skill-bar { height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; }
+  .skill-fill {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, var(--purple), var(--orange));
+    width: 0;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── MAIN ── */
+  .main { padding: 32px 36px; }
+  .section { margin-bottom: 32px; }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title span { color: var(--orange); }
+
+  /* About */
+  .about-text {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #3D4466;
+  }
+
+  /* Domains */
+  .domain-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .domain-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color .2s, box-shadow .2s;
+    cursor: default;
+  }
+  .domain-card:hover { border-color: var(--purple); box-shadow: 0 2px 16px rgba(108,99,255,.10); }
+  .domain-icon { font-size: 20px; margin-bottom: 6px; }
+  .domain-name { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: var(--navy); }
+  .domain-desc { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  /* Achievements */
+  .ach-list { list-style: none; }
+  .ach-list li {
+    font-size: 13px;
+    color: #3D4466;
+    padding: 7px 0 7px 20px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    line-height: 1.5;
+  }
+  .ach-list li:last-child { border-bottom: none; }
+  .ach-list li::before {
+    content: '';
+    position: absolute; left: 0; top: 14px;
+    width: 7px; height: 7px;
+    background: var(--orange);
+    border-radius: 50%;
+  }
+
+  /* Tech tags */
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    font-family: var(--font-display);
+    font-size: 12px; font-weight: 500;
+    padding: 5px 13px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    color: var(--navy);
+    background: var(--bg);
+    transition: border-color .2s, color .2s, background .2s;
+    cursor: default;
+  }
+  .tag:hover { border-color: var(--purple); color: var(--purple); background: rgba(108,99,255,.06); }
+  .tag.hot { border-color: rgba(255,107,53,.3); color: var(--orange); background: rgba(255,107,53,.05); }
+
+  /* Career goal strip */
+  .goal-strip {
+    background: linear-gradient(135deg, #1B1F3B, #2D2F6E);
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .goal-icon { font-size: 28px; }
+  .goal-text { }
+  .goal-heading { font-family: var(--font-display); font-size: 13.5px; font-weight: 600; color: #fff; }
+  .goal-sub { font-size: 12px; color: rgba(255,255,255,.55); margin-top: 3px; }
+  .goal-badge {
+    margin-left: auto; flex-shrink: 0;
+    background: var(--orange); color: #fff;
+    font-family: var(--font-display);
+    font-size: 11px; font-weight: 700;
+    padding: 5px 13px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 16px 36px;
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-left { font-size: 11.5px; color: var(--muted); }
+  .footer-links { display: flex; gap: 14px; }
+  .footer-link {
+    font-size: 11.5px; color: var(--purple);
+    font-weight: 500; text-decoration: none;
+    font-family: var(--font-display);
+  }
+
+  @media (max-width: 680px) {
+    .body { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    .banner { padding: 32px 24px 0; }
+    .main { padding: 24px 22px; }
+    .domain-grid { grid-template-columns: 1fr; }
+    .banner-name { font-size: 22px; }
+    .goal-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- BANNER -->
+  <div class="banner">
+    <div class="banner-inner">
+      <div class="avatar">AI</div>
+      <div class="banner-text">
+        <div class="banner-name">AI & Software Developer</div>
+        <div class="banner-title">Computer Science Student · India</div>
+        <div class="banner-badges">
+          <span class="badge accent">🤖 AI Enthusiast</span>
+          <span class="badge">🐍 Python</span>
+          <span class="badge">🌐 Web Dev</span>
+          <span class="badge">📁 Open to Work</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <div class="info-block">
+        <div class="section-label">Details</div>
+        <div class="info-row">
+          <div class="info-icon">📍</div>
+          <div class="info-detail">
+            <div class="info-key">Location</div>
+            <div class="info-val">India</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">🎓</div>
+          <div class="info-detail">
+            <div class="info-key">Status</div>
+            <div class="info-val">CS Student</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">⏱️</div>
+          <div class="info-detail">
+            <div class="info-key">Experience</div>
+            <div class="info-val">Early-Stage / Projects</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">💼</div>
+          <div class="info-detail">
+            <div class="info-key">Target Role</div>
+            <div class="info-val">Junior / Frontend / Full-Stack</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="section-label">Core Skills</div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Python</span><span class="skill-pct">72%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-w="72"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">HTML / CSS</span><span class="skill-pct">78%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-w="78"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">JavaScript</span><span class="skill-pct">55%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-w="55"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Git & GitHub</span><span class="skill-pct">65%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-w="65"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">AI / Prompt Eng.</span><span class="skill-pct">80%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-w="80"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-header"><span class="skill-name">Data Analysis</span><span class="skill-pct">50%</span></div>
+          <div class="skill-bar"><div class="skill-fill" data-w="50"></div></div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <div class="section">
+        <div class="section-title"><span>◈</span> About Me</div>
+        <p class="about-text">
+          A Computer Science student and self-driven builder at the intersection of Artificial Intelligence and modern web development. I learn by doing — shipping real projects, documenting the process, and constantly pushing the boundary of what I can build independently. My focus is on applying AI tools practically and developing full-stack capabilities that translate directly into production-ready work.
+        </p>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>◈</span> Domain Expertise</div>
+        <div class="domain-grid">
+          <div class="domain-card">
+            <div class="domain-icon">🤖</div>
+            <div class="domain-name">Artificial Intelligence</div>
+            <div class="domain-desc">AI tools, prompt engineering & LLM applications</div>
+          </div>
+          <div class="domain-card">
+            <div class="domain-icon">🌐</div>
+            <div class="domain-name">Web Development</div>
+            <div class="domain-desc">Frontend UI, responsive design & interactive apps</div>
+          </div>
+          <div class="domain-card">
+            <div class="domain-icon">💻</div>
+            <div class="domain-name">Software Development</div>
+            <div class="domain-desc">Python scripting, automation & backend basics</div>
+          </div>
+          <div class="domain-card">
+            <div class="domain-icon">📊</div>
+            <div class="domain-name">Data-Driven Apps</div>
+            <div class="domain-desc">Data analysis, visualization & ATS workflows</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>◈</span> Key Achievements</div>
+        <ul class="ach-list">
+          <li>Built and deployed multiple AI and development projects independently</li>
+          <li>Developed ATS resume optimization workflows with measurable results</li>
+          <li>Created a personal portfolio and branding system from scratch</li>
+          <li>Completed a multi-day AI learning and building challenge (daily commits)</li>
+          <li>Applied AI tools to solve real-world problems across multiple domains</li>
+          <li>Maintained structured project documentation and version control on GitHub</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>◈</span> Technologies</div>
+        <div class="tag-cloud">
+          <span class="tag hot">Python</span>
+          <span class="tag hot">Prompt Engineering</span>
+          <span class="tag">HTML5</span>
+          <span class="tag">CSS3</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag hot">AI Tools</span>
+          <span class="tag">Git</span>
+          <span class="tag">GitHub</span>
+          <span class="tag">UI/Frontend</span>
+          <span class="tag">Data Analysis</span>
+          <span class="tag">Resume Optimization</span>
+          <span class="tag">Portfolio Dev</span>
+        </div>
+      </div>
+
+      <div class="goal-strip">
+        <div class="goal-icon">🎯</div>
+        <div class="goal-text">
+          <div class="goal-heading">Career Goal: Junior / Full-Stack Developer</div>
+          <div class="goal-sub">Targeting ₹3–8 LPA · 90-day active job search · Open to remote & hybrid roles</div>
+        </div>
+        <div class="goal-badge">Available Now</div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span class="footer-left">Student · Independent Project Builder · India</span>
+    <div class="footer-links">
+      <a class="footer-link" href="https://github.com" target="_blank">GitHub →</a>
+      <a class="footer-link" href="https://linkedin.com" target="_blank">LinkedIn →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Animate skill bars on load
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.skill-fill').forEach(el => {
+        el.style.width = el.dataset.w + '%';
+      });
+    }, 300);
+  });
+</script>
+</body>
+</html>

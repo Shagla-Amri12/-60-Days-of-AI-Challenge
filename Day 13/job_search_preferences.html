@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Search Preferences</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F0F2FA;
+    --surface: #fff;
+    --navy: #1B1F3B;
+    --orange: #FF6B35;
+    --purple: #6C63FF;
+    --green: #22C55E;
+    --red: #EF4444;
+    --muted: #8892A4;
+    --border: #E4E8F4;
+    --font: 'Space Grotesk', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+  body { background: var(--bg); font-family: var(--body); color: var(--navy); padding: 28px 16px; min-height: 100vh; }
+
+  .page { max-width: 860px; margin: 0 auto; }
+
+  /* TOP BAR */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .topbar-left h1 { font-family: var(--font); font-size: 22px; font-weight: 700; color: var(--navy); }
+  .topbar-left p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .status-pill {
+    background: rgba(34,197,94,.12); color: #16A34A;
+    font-family: var(--font); font-size: 12px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid rgba(34,197,94,.25);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .status-pill::before { content: ''; width: 7px; height: 7px; background: #22C55E; border-radius: 50%; }
+
+  /* GRID */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .grid.full { grid-template-columns: 1fr; }
+
+  /* CARD */
+  .card {
+    background: var(--surface); border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 20px 22px;
+    box-shadow: 0 1px 8px rgba(27,31,59,.05);
+  }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .card-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .card-icon.purple { background: rgba(108,99,255,.1); }
+  .card-icon.orange { background: rgba(255,107,53,.1); }
+  .card-icon.green { background: rgba(34,197,94,.1); }
+  .card-icon.red { background: rgba(239,68,68,.1); }
+  .card-icon.blue { background: rgba(59,130,246,.1); }
+  .card-icon.yellow { background: rgba(234,179,8,.1); }
+  .card-title { font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--navy); }
+  .card-count { margin-left: auto; font-family: var(--font); font-size: 11px; font-weight: 600; color: var(--muted); background: var(--bg); padding: 3px 9px; border-radius: 10px; }
+
+  /* TAGS */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tag {
+    font-family: var(--font); font-size: 12px; font-weight: 500;
+    padding: 5px 12px; border-radius: 7px; border: 1.5px solid var(--border);
+    background: var(--bg); color: var(--navy);
+    display: flex; align-items: center; gap: 5px;
+    cursor: default; transition: all .15s;
+  }
+  .tag:hover { border-color: var(--purple); color: var(--purple); }
+  .tag.primary { background: rgba(108,99,255,.08); border-color: rgba(108,99,255,.3); color: var(--purple); }
+  .tag.orange { background: rgba(255,107,53,.08); border-color: rgba(255,107,53,.3); color: var(--orange); }
+  .tag.green { background: rgba(34,197,94,.08); border-color: rgba(34,197,94,.3); color: #16A34A; }
+  .tag.red { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.3); color: var(--red); }
+  .tag.dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* LOCATION BLOCKS */
+  .loc-list { display: flex; flex-direction: column; gap: 9px; }
+  .loc-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 9px;
+    border: 1.5px solid var(--border); background: var(--bg);
+  }
+  .loc-badge {
+    font-family: var(--font); font-size: 10px; font-weight: 700;
+    padding: 3px 9px; border-radius: 5px; text-transform: uppercase; letter-spacing: .5px;
+    flex-shrink: 0;
+  }
+  .loc-badge.primary { background: var(--purple); color: #fff; }
+  .loc-badge.secondary { background: rgba(108,99,255,.15); color: var(--purple); }
+  .loc-badge.optional { background: var(--border); color: var(--muted); }
+  .loc-text { font-size: 13px; font-weight: 500; color: var(--navy); }
+  .loc-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* SALARY */
+  .salary-box {
+    background: linear-gradient(135deg, var(--navy) 0%, #2D2F6E 100%);
+    border-radius: 12px; padding: 18px 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .salary-icon { font-size: 26px; }
+  .salary-label { font-family: var(--font); font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .8px; }
+  .salary-val { font-family: var(--font); font-size: 15px; font-weight: 700; color: #fff; margin-top: 3px; }
+  .salary-note { font-size: 11.5px; color: rgba(255,255,255,.45); margin-top: 3px; }
+
+  /* RECENCY */
+  .recency-strip {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border-radius: 10px;
+    background: rgba(34,197,94,.06); border: 1.5px solid rgba(34,197,94,.2);
+  }
+  .recency-icon { font-size: 22px; }
+  .recency-label { font-family: var(--font); font-size: 13px; font-weight: 600; color: #16A34A; }
+  .recency-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  /* PREFS LIST */
+  .pref-list { display: flex; flex-direction: column; gap: 8px; }
+  .pref-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12.5px; color: #3D4466; line-height: 1.5;
+  }
+  .pref-dot {
+    width: 18px; height: 18px; border-radius: 5px;
+    background: rgba(108,99,255,.1); color: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* SUMMARY STRIP */
+  .summary {
+    background: linear-gradient(135deg, #1B1F3B, #2D2F6E);
+    border-radius: 14px; padding: 20px 24px;
+    display: flex; gap: 32px; flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .sum-item { }
+  .sum-num { font-family: var(--font); font-size: 26px; font-weight: 700; color: #fff; }
+  .sum-label { font-size: 11.5px; color: rgba(255,255,255,.5); margin-top: 2px; font-family: var(--font); }
+  .sum-div { width: 1px; background: rgba(255,255,255,.1); align-self: stretch; }
+  .sum-cta {
+    margin-left: auto; align-self: center;
+    background: var(--orange); color: #fff;
+    font-family: var(--font); font-size: 12px; font-weight: 700;
+    padding: 9px 20px; border-radius: 8px;
+    border: none; cursor: pointer; letter-spacing: .3px;
+    transition: opacity .15s;
+  }
+  .sum-cta:hover { opacity: .88; }
+
+  .divider { height: 1px; background: var(--border); margin: 4px 0; }
+  .mt { margin-top: 16px; }
+
+  @media (max-width: 640px) {
+    .grid, .grid.three { grid-template-columns: 1fr; }
+    .summary { gap: 18px; }
+    .sum-div { display: none; }
+    .sum-cta { margin-left: 0; width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOP -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>🔍 Job Search Preferences</h1>
+      <p>Your active criteria · Last updated just now</p>
+    </div>
+    <div class="status-pill">Active · Searching</div>
+  </div>
+
+  <!-- SUMMARY BAR -->
+  <div class="summary" style="margin-bottom:20px;">
+    <div class="sum-item"><div class="sum-num">8</div><div class="sum-label">Target Roles</div></div>
+    <div class="sum-div"></div>
+    <div class="sum-item"><div class="sum-num">5</div><div class="sum-label">Company Types</div></div>
+    <div class="sum-div"></div>
+    <div class="sum-item"><div class="sum-num">5</div><div class="sum-label">Cities + Remote</div></div>
+    <div class="sum-div"></div>
+    <div class="sum-item"><div class="sum-num">7d</div><div class="sum-label">Max Posting Age</div></div>
+    <button class="sum-cta" onclick="alert('Connect your job board to start applying!')">Start Applying →</button>
+  </div>
+
+  <!-- ROW 1 -->
+  <div class="grid" style="margin-bottom:16px;">
+
+    <!-- Job Titles -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon purple">💼</div>
+        <span class="card-title">Desired Job Titles</span>
+        <span class="card-count">8 roles</span>
+      </div>
+      <div class="tag-list">
+        <span class="tag primary dot">Python Developer Intern</span>
+        <span class="tag primary dot">Software Developer Intern</span>
+        <span class="tag primary dot">AI/ML Intern</span>
+        <span class="tag primary dot">Data Analyst Intern</span>
+        <span class="tag primary dot">Backend Developer Intern</span>
+        <span class="tag primary dot">AI Engineer Intern</span>
+        <span class="tag primary dot">Junior Python Developer</span>
+        <span class="tag primary dot">Software Engineering Intern</span>
+      </div>
+    </div>
+
+    <!-- Company Types -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon orange">🏢</div>
+        <span class="card-title">Preferred Company Types</span>
+        <span class="card-count">5 types</span>
+      </div>
+      <div class="tag-list">
+        <span class="tag orange dot">Product-Based Companies</span>
+        <span class="tag orange dot">Startups</span>
+        <span class="tag orange dot">AI Companies</span>
+        <span class="tag orange dot">Technology Companies</span>
+        <span class="tag orange dot">Mid-Size Software Firms</span>
+      </div>
+      <div class="divider mt"></div>
+      <div style="margin-top:12px;">
+        <div class="card-header" style="margin-bottom:10px;">
+          <div class="card-icon red">🚫</div>
+          <span class="card-title">Excluded</span>
+        </div>
+        <div class="tag-list">
+          <span class="tag red dot">Sales-Focused Roles</span>
+          <span class="tag red dot">Non-Technical Roles</span>
+          <span class="tag red dot">BPO / Call Center</span>
+          <span class="tag red dot">Requires Prior Experience</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="grid three" style="margin-bottom:16px;">
+
+    <!-- Locations -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">📍</div>
+        <span class="card-title">Preferred Locations</span>
+      </div>
+      <div class="loc-list">
+        <div class="loc-item">
+          <div>
+            <span class="loc-badge primary">Primary</span>
+          </div>
+          <div>
+            <div class="loc-text">🌐 Remote</div>
+            <div class="loc-sub">Work from anywhere</div>
+          </div>
+        </div>
+        <div class="loc-item">
+          <div>
+            <span class="loc-badge secondary">Secondary</span>
+          </div>
+          <div>
+            <div class="loc-text">🏠 Hybrid — India</div>
+            <div class="loc-sub">Flexible in-office days</div>
+          </div>
+        </div>
+        <div class="loc-item">
+          <div>
+            <span class="loc-badge optional">Optional</span>
+          </div>
+          <div>
+            <div class="loc-text">Onsite Cities</div>
+            <div class="loc-sub">Bangalore · Hyderabad · Pune · Noida</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Salary -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">💰</div>
+        <span class="card-title">Salary Expectation</span>
+      </div>
+      <div class="salary-box">
+        <div class="salary-icon">🎯</div>
+        <div>
+          <div class="salary-label">Expectation</div>
+          <div class="salary-val">Competitive Stipend</div>
+          <div class="salary-note">Open to negotiation based on role & growth</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="recency-strip">
+          <div class="recency-icon">⏰</div>
+          <div>
+            <div class="recency-label">Last 7 Days Only</div>
+            <div class="recency-sub">Fresh postings · No stale listings</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon yellow">🛠️</div>
+        <span class="card-title">Tech Stack Focus</span>
+      </div>
+      <div class="tag-list">
+        <span class="tag green dot">Python</span>
+        <span class="tag green dot">AI / LLMs</span>
+        <span class="tag green dot">Automation</span>
+        <span class="tag green dot">Web Development</span>
+        <span class="tag green dot">Data Analysis</span>
+        <span class="tag green dot">Machine Learning</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3 -->
+  <div class="grid full">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon purple">✨</div>
+        <span class="card-title">Additional Preferences</span>
+      </div>
+      <div class="pref-list">
+        <div class="pref-item"><div class="pref-dot">✓</div> Internship or fresher-friendly roles — no experience gatekeeping</div>
+        <div class="pref-item"><div class="pref-dot">✓</div> Opportunities with mentorship, structured onboarding, and active learning culture</div>
+        <div class="pref-item"><div class="pref-dot">✓</div> Roles primarily using Python, AI tools, automation, web development, or data work</div>
+        <div class="pref-item"><div class="pref-dot">✓</div> ATS-friendly application process — straightforward forms, no broken portals</div>
+        <div class="pref-item"><div class="pref-dot">✓</div> Companies with genuine growth opportunities and internal mobility pathways</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
