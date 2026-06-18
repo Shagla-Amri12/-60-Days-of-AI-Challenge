@@ -1,0 +1,453 @@
+
+<h2 class="sr-only">AI Portfolio Sprint Dashboard — 18 June 2026</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.tab-nav{display:flex;border-bottom:0.5px solid var(--color-border-tertiary);overflow-x:auto;gap:0;margin-bottom:0}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;padding:10px 14px;font-size:14px;font-weight:400;color:var(--color-text-secondary);cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;margin-bottom:-0.5px;font-family:inherit}
+.tab-btn:hover{color:var(--color-text-primary)}
+.tab-btn.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tcnt{display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;padding:1px 7px;border-radius:999px;margin-left:6px;background:var(--color-background-secondary);color:var(--color-text-tertiary)}
+.tab-btn.active .tcnt{background:var(--color-background-info);color:var(--color-text-info)}
+.panel{display:none;padding:1.25rem 0 1rem}.panel.active{display:block}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem}
+.section-label{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin:1.25rem 0 .6rem}
+.section-label:first-child{margin-top:0}
+.action-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;margin-bottom:6px;transition:background .1s;user-select:none}
+.action-row:hover{background:var(--color-background-secondary)}
+.action-row.done{opacity:.45}
+.action-row.done .task-name{text-decoration:line-through;color:var(--color-text-tertiary)}
+.action-row.hidden{display:none}
+.chkbox{width:18px;height:18px;border-radius:4px;border:0.5px solid var(--color-border-secondary);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;background:var(--color-background-primary)}
+.chkbox.on{background:var(--color-background-success);border-color:var(--color-border-success)}
+.flt-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.flt{font-family:inherit;font-size:13px;padding:4px 12px;border:0.5px solid var(--color-border-secondary);border-radius:999px;background:none;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.flt.active,.flt:hover{border-color:var(--color-border-primary);color:var(--color-text-primary)}
+.risk-card{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:var(--border-radius-md);margin-bottom:8px}
+.risk-card.severity-high{border:0.5px solid var(--color-border-danger);background:var(--color-background-danger)}
+.risk-card.severity-med{border:0.5px solid var(--color-border-warning);background:var(--color-background-warning)}
+.risk-card.severity-conflict{border:0.5px solid var(--color-border-info);background:var(--color-background-info)}
+.q-card{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);margin-bottom:8px;transition:opacity .2s}
+.q-card.resolved{opacity:.4}
+.q-card.resolved .q-text{text-decoration:line-through;color:var(--color-text-tertiary)}
+.resolve-btn{font-family:inherit;font-size:12px;padding:3px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:none;color:var(--color-text-secondary);cursor:pointer;margin-top:8px;transition:all .15s}
+.resolve-btn:hover,.resolve-btn.done{border-color:var(--color-border-success);color:var(--color-text-success);background:var(--color-background-success)}
+.tl-col{display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0}
+.tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tl-line{width:0.5px;background:var(--color-border-tertiary);flex:1;min-height:18px}
+.ring-svg{transform:rotate(-90deg);display:block}
+#ring-arc{transition:stroke-dashoffset .65s cubic-bezier(.4,0,.2,1),stroke .3s}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr!important}.ring-cell{grid-column:span 2!important}.meta-row{flex-direction:column;gap:4px}}
+</style>
+
+<div style="padding: .75rem 0 0;">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:1rem;">
+    <div>
+      <div style="font-size:13px;color:var(--color-text-tertiary);margin-bottom:3px;">18 June 2026 · 3-week sprint</div>
+      <div style="font-size:18px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:8px;">
+        <i class="ti ti-rocket" aria-hidden="true" style="font-size:18px;"></i>
+        AI Portfolio + GitHub + LinkedIn Growth Plan
+      </div>
+    </div>
+    <span style="font-size:12px;font-weight:500;padding:4px 12px;border-radius:999px;background:var(--color-background-success);color:var(--color-text-success);display:flex;align-items:center;gap:5px;">
+      <i class="ti ti-player-play" aria-hidden="true" style="font-size:12px;"></i> Sprint active
+    </span>
+  </div>
+
+  <div class="stats-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:1.25rem;">
+
+    <div class="ring-cell metric" style="display:flex;align-items:center;gap:14px;grid-column:span 1;">
+      <div style="position:relative;width:64px;height:64px;flex-shrink:0;">
+        <svg class="ring-svg" width="64" height="64" viewBox="0 0 64 64" aria-label="Sprint health ring">
+          <circle cx="32" cy="32" r="26" fill="none" stroke="var(--color-border-tertiary)" stroke-width="6"/>
+          <circle id="ring-arc" cx="32" cy="32" r="26" fill="none" stroke="var(--color-text-info)" stroke-width="6" stroke-linecap="round" stroke-dasharray="163" stroke-dashoffset="163"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;line-height:1.1;">
+          <div id="ring-pct" style="font-size:14px;font-weight:500;color:var(--color-text-primary);">0%</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);">Sprint health</div>
+        <div id="done-label" style="font-size:12px;color:var(--color-text-secondary);margin-top:2px;">0 / 10 tasks done</div>
+        <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:3px;">Check actions to track</div>
+      </div>
+    </div>
+
+    <div class="metric">
+      <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Final draft deadline</div>
+      <div style="font-size:28px;font-weight:500;color:var(--color-text-primary);line-height:1;">12</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px;">days · end of June</div>
+    </div>
+
+    <div class="metric">
+      <div style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">GitHub cleanup</div>
+      <div style="font-size:28px;font-weight:500;color:var(--color-text-danger);line-height:1;">5</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px;">days · urgent</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('summary',this)" aria-controls="panel-summary">
+    <i class="ti ti-layout-grid" aria-hidden="true"></i> Summary
+  </button>
+  <button class="tab-btn" onclick="showTab('actions',this)" aria-controls="panel-actions">
+    <i class="ti ti-checkbox" aria-hidden="true"></i> Action items <span class="tcnt">10</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('risks',this)" aria-controls="panel-risks">
+    <i class="ti ti-alert-triangle" aria-hidden="true"></i> Risks &amp; blockers <span class="tcnt">7</span>
+  </button>
+  <button class="tab-btn" onclick="showTab('questions',this)" aria-controls="panel-questions">
+    <i class="ti ti-help-circle" aria-hidden="true"></i> Open questions <span class="tcnt" id="q-count">3</span>
+  </button>
+</div>
+
+<!-- SUMMARY -->
+<div id="panel-summary" class="panel active">
+  <div class="card" style="margin-bottom:12px;font-size:14px;color:var(--color-text-secondary);line-height:1.75;">
+    A 3-week sprint to build an AI portfolio, improve GitHub documentation quality, and maintain consistent LinkedIn posting. Two core projects identified. Recurring blockers include incomplete projects, slow documentation, and uncertainty about prioritising projects vs. certifications. Final portfolio draft due end of month.
+  </div>
+
+  <div class="section-label">Core projects</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
+    <div class="card" style="border-top:2px solid var(--color-border-info);border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <i class="ti ti-chart-bar" aria-hidden="true" style="color:var(--color-text-info);font-size:16px;"></i>
+        <span style="font-size:14px;font-weight:500;color:var(--color-text-primary);">Python data analysis</span>
+      </div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">Complete analysis + visualisation before starting the next project.</div>
+      <div style="margin-top:10px;font-size:11px;font-weight:500;padding:2px 8px;display:inline-block;border-radius:var(--border-radius-md);background:var(--color-background-info);color:var(--color-text-info);">Week 1 focus candidate</div>
+    </div>
+    <div class="card" style="border-top:2px solid var(--color-border-success);border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <i class="ti ti-robot" aria-hidden="true" style="color:var(--color-text-success);font-size:16px;"></i>
+        <span style="font-size:14px;font-weight:500;color:var(--color-text-primary);">AI automation project</span>
+      </div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">Built using Claude custom skills. To start after data analysis is complete.</div>
+      <div style="margin-top:10px;font-size:11px;font-weight:500;padding:2px 8px;display:inline-block;border-radius:var(--border-radius-md);background:var(--color-background-success);color:var(--color-text-success);">Week 2 – 3</div>
+    </div>
+  </div>
+
+  <div class="section-label">Deadline timeline</div>
+  <div class="card">
+    <div style="display:flex;gap:12px;margin-bottom:0;">
+      <div class="tl-col"><div class="tl-dot" style="background:var(--color-text-danger);"></div><div class="tl-line"></div></div>
+      <div style="padding-bottom:18px;">
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-danger);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;">Within 5 days · June 23</div>
+        <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);">GitHub cleanup</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:0;">
+      <div class="tl-col"><div class="tl-dot" style="background:var(--color-text-warning);"></div><div class="tl-line"></div></div>
+      <div style="padding-bottom:18px;">
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-warning);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;">Every evening · Ongoing</div>
+        <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);">LinkedIn updates</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <div class="tl-col"><div class="tl-dot" style="background:var(--color-text-success);"></div></div>
+      <div>
+        <div style="font-size:11px;font-weight:500;color:var(--color-text-success);margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em;">End of month · June 30</div>
+        <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);">Final portfolio draft</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Success metrics</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    <div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-secondary);">
+      <i class="ti ti-check" aria-hidden="true" style="color:var(--color-text-success);"></i> 3 complete projects
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-secondary);">
+      <i class="ti ti-check" aria-hidden="true" style="color:var(--color-text-success);"></i> Better README quality
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-secondary);">
+      <i class="ti ti-check" aria-hidden="true" style="color:var(--color-text-success);"></i> Regular posting (GitHub + LinkedIn)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-secondary);">
+      <i class="ti ti-check" aria-hidden="true" style="color:var(--color-text-success);"></i> Portfolio ready for internship applications
+    </div>
+  </div>
+</div>
+
+<!-- ACTION ITEMS -->
+<div id="panel-actions" class="panel">
+  <div class="flt-row">
+    <button class="flt active" onclick="filterTasks('all',this)">All (10)</button>
+    <button class="flt" onclick="filterTasks('high',this)"><i class="ti ti-point-filled" style="color:var(--color-text-danger);vertical-align:-2px;" aria-hidden="true"></i> High (4)</button>
+    <button class="flt" onclick="filterTasks('medium',this)"><i class="ti ti-point-filled" style="color:var(--color-text-warning);vertical-align:-2px;" aria-hidden="true"></i> Medium (5)</button>
+    <button class="flt" onclick="filterTasks('low',this)"><i class="ti ti-point-filled" style="color:var(--color-text-success);vertical-align:-2px;" aria-hidden="true"></i> Low (1)</button>
+  </div>
+
+  <div id="action-list">
+    <div class="action-row" data-p="high" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">GitHub cleanup — remove incomplete/outdated repos, organise profile</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-danger);color:var(--color-text-danger);">High</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-calendar" aria-hidden="true" style="font-size:12px;"></i> Within 5 days</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="high" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Select one project only for Week 1 — data analysis or automation, not both</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-danger);color:var(--color-text-danger);">High</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-clock" aria-hidden="true" style="font-size:12px;"></i> Immediately</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="high" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Create a reusable README template for all portfolio projects</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-danger);color:var(--color-text-danger);">High</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-calendar" aria-hidden="true" style="font-size:12px;"></i> Within 5 days</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="high" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Finalise portfolio draft — all projects, READMEs, GitHub profile</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-danger);color:var(--color-text-danger);">High</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-calendar" aria-hidden="true" style="font-size:12px;"></i> End of month</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="medium" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Update LinkedIn profile for consistency with portfolio direction</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-warning);color:var(--color-text-warning);">Medium</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-clock" aria-hidden="true" style="font-size:12px;"></i> Every evening</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="medium" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Build Python data analysis project — finish analysis + visualisation first</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-warning);color:var(--color-text-warning);">Medium</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-calendar" aria-hidden="true" style="font-size:12px;"></i> End of month</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="medium" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Build AI automation project using Claude custom skills</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-warning);color:var(--color-text-warning);">Medium</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-calendar" aria-hidden="true" style="font-size:12px;"></i> End of month</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="medium" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Upload daily challenge progress to GitHub consistently</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-warning);color:var(--color-text-warning);">Medium</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-refresh" aria-hidden="true" style="font-size:12px;"></i> Daily / ongoing</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="medium" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Post learning summaries on LinkedIn each evening</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-warning);color:var(--color-text-warning);">Medium</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-refresh" aria-hidden="true" style="font-size:12px;"></i> Daily / ongoing</span>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" data-p="low" onclick="toggleTask(this)">
+      <div class="chkbox" aria-hidden="true"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="task-name" style="font-size:14px;color:var(--color-text-primary);line-height:1.45;">Block 1 hour daily in calendar for documentation</div>
+        <div class="meta-row" style="display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-success);color:var(--color-text-success);">Low</span>
+          <span style="font-size:12px;color:var(--color-text-tertiary);display:flex;align-items:center;gap:4px;"><i class="ti ti-refresh" aria-hidden="true" style="font-size:12px;"></i> Daily / ongoing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RISKS & BLOCKERS -->
+<div id="panel-risks" class="panel">
+  <div class="section-label" style="margin-top:0;">Risks</div>
+
+  <div class="risk-card severity-high">
+    <i class="ti ti-flame" aria-hidden="true" style="font-size:18px;color:var(--color-text-danger);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-danger);margin-bottom:4px;">Burnout from posting daily</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">LinkedIn updates planned every evening. Sustainability not confirmed — risk of losing consistency mid-sprint if pace is too aggressive.</div>
+    </div>
+    <span style="flex-shrink:0;font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-danger);color:var(--color-text-danger);align-self:flex-start;">High</span>
+  </div>
+
+  <div class="risk-card severity-high">
+    <i class="ti ti-files" aria-hidden="true" style="font-size:18px;color:var(--color-text-danger);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-danger);margin-bottom:4px;">Too many unfinished projects</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">Previously started ideas left incomplete. Starting multiple projects simultaneously is the identified root cause.</div>
+    </div>
+    <span style="flex-shrink:0;font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-danger);color:var(--color-text-danger);align-self:flex-start;">High</span>
+  </div>
+
+  <div class="risk-card severity-high">
+    <i class="ti ti-trending-down" aria-hidden="true" style="font-size:18px;color:var(--color-text-danger);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-danger);margin-bottom:4px;">Losing consistency over the 3-week sprint</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">No accountability mechanism discussed. Sprint health could degrade without a daily check-in habit or external accountability partner.</div>
+    </div>
+    <span style="flex-shrink:0;font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-danger);color:var(--color-text-danger);align-self:flex-start;">High</span>
+  </div>
+
+  <div class="risk-card severity-med">
+    <i class="ti ti-clock" aria-hidden="true" style="font-size:18px;color:var(--color-text-warning);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-warning);margin-bottom:4px;">GitHub documentation takes too much time</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">Current blocker — overhead may slow project delivery. README template is the proposed mitigation but hasn't been created yet.</div>
+    </div>
+    <span style="flex-shrink:0;font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-warning);color:var(--color-text-warning);align-self:flex-start;">Medium</span>
+  </div>
+
+  <div class="section-label">Unresolved conflicts</div>
+
+  <div class="risk-card severity-conflict">
+    <i class="ti ti-git-merge" aria-hidden="true" style="font-size:18px;color:var(--color-text-info);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-info);margin-bottom:4px;">Projects vs. certifications — no decision made</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">Whether to prioritise project-building or certifications remains unresolved. This blocks Week 2 and Week 3 planning.</div>
+    </div>
+    <span style="flex-shrink:0;font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-info);color:var(--color-text-info);align-self:flex-start;">Conflict</span>
+  </div>
+
+  <div class="risk-card severity-conflict">
+    <i class="ti ti-arrows-exchange" aria-hidden="true" style="font-size:18px;color:var(--color-text-info);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-info);margin-bottom:4px;">Daily posting vs. burnout risk</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">LinkedIn updates planned every evening, but burnout from daily posting is a listed risk. These directly contradict each other and haven't been resolved.</div>
+    </div>
+    <span style="flex-shrink:0;font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-info);color:var(--color-text-info);align-self:flex-start;">Conflict</span>
+  </div>
+
+  <div class="risk-card severity-conflict">
+    <i class="ti ti-scale" aria-hidden="true" style="font-size:18px;color:var(--color-text-info);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div style="font-size:14px;font-weight:500;color:var(--color-text-info);margin-bottom:4px;">3 projects target vs. one-at-a-time rule</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55;">Success metric requires 3 complete projects, but the plan says to select only one for Week 1. Sequencing across the 3 weeks is not explicitly defined.</div>
+    </div>
+    <span style="flex-shrink:0;font-size:11px;font-weight:500;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-info);color:var(--color-text-info);align-self:flex-start;">Conflict</span>
+  </div>
+</div>
+
+<!-- OPEN QUESTIONS -->
+<div id="panel-questions" class="panel">
+  <div style="font-size:14px;color:var(--color-text-secondary);line-height:1.65;margin-bottom:1rem;">3 open questions from the planning session. Mark as resolved when a decision is made.</div>
+
+  <div class="q-card" id="q1">
+    <i class="ti ti-help-circle" aria-hidden="true" style="font-size:20px;color:var(--color-text-info);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div class="q-text" style="font-size:14px;font-weight:500;color:var(--color-text-primary);line-height:1.5;">Which project should become the portfolio highlight?</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px;line-height:1.5;">Depends on outcome quality and recruiter relevance — not yet decided.</div>
+      <button class="resolve-btn" onclick="resolveQ('q1',this)">Mark as resolved</button>
+    </div>
+  </div>
+
+  <div class="q-card" id="q2">
+    <i class="ti ti-help-circle" aria-hidden="true" style="font-size:20px;color:var(--color-text-info);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div class="q-text" style="font-size:14px;font-weight:500;color:var(--color-text-primary);line-height:1.5;">What skills do recruiters notice most?</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px;line-height:1.5;">Needs research into current hiring trends for AI/data roles.</div>
+      <button class="resolve-btn" onclick="resolveQ('q2',this)">Mark as resolved</button>
+    </div>
+  </div>
+
+  <div class="q-card" id="q3">
+    <i class="ti ti-help-circle" aria-hidden="true" style="font-size:20px;color:var(--color-text-info);flex-shrink:0;margin-top:1px;"></i>
+    <div>
+      <div class="q-text" style="font-size:14px;font-weight:500;color:var(--color-text-primary);line-height:1.5;">How much time should be spent on certifications vs. projects?</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px;line-height:1.5;">Directly linked to the projects vs. certifications conflict — unresolved.</div>
+      <button class="resolve-btn" onclick="resolveQ('q3',this)">Mark as resolved</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function updateRing() {
+  var total = 10;
+  var done = document.querySelectorAll('.chkbox.on').length;
+  var pct = Math.round((done / total) * 100);
+  var circ = 163;
+  var offset = circ - (pct / 100) * circ;
+  var arc = document.getElementById('ring-arc');
+  arc.setAttribute('stroke-dashoffset', offset);
+  if (pct >= 60) {
+    arc.setAttribute('stroke', 'var(--color-text-success)');
+  } else if (pct >= 30) {
+    arc.setAttribute('stroke', 'var(--color-text-warning)');
+  } else {
+    arc.setAttribute('stroke', 'var(--color-text-info)');
+  }
+  document.getElementById('ring-pct').textContent = pct + '%';
+  document.getElementById('done-label').textContent = done + ' / ' + total + ' tasks done';
+}
+
+function toggleTask(row) {
+  var chk = row.querySelector('.chkbox');
+  chk.classList.toggle('on');
+  if (chk.classList.contains('on')) {
+    chk.innerHTML = '<i class="ti ti-check" style="font-size:12px;color:var(--color-text-success);" aria-hidden="true"></i>';
+  } else {
+    chk.innerHTML = '';
+  }
+  row.classList.toggle('done');
+  updateRing();
+}
+
+function filterTasks(p, btn) {
+  document.querySelectorAll('.flt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.action-row').forEach(function(row) {
+    if (p === 'all' || row.dataset.p === p) {
+      row.classList.remove('hidden');
+    } else {
+      row.classList.add('hidden');
+    }
+  });
+}
+
+var resolvedCount = 0;
+function resolveQ(id, btn) {
+  var card = document.getElementById(id);
+  var isNowResolving = !card.classList.contains('resolved');
+  card.classList.toggle('resolved');
+  var icon = card.querySelector('.ti-help-circle');
+  if (icon) icon.className = isNowResolving ? 'ti ti-circle-check' : 'ti ti-help-circle';
+  btn.textContent = isNowResolving ? 'Undo' : 'Mark as resolved';
+  btn.classList.toggle('done', isNowResolving);
+  resolvedCount += isNowResolving ? 1 : -1;
+  var remaining = 3 - resolvedCount;
+  document.getElementById('q-count').textContent = remaining;
+}
+</script>
