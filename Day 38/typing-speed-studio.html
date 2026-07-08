@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Typing Speed Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#11131a;
+  --panel:#171a23;
+  --panel-2:#1e2230;
+  --hairline:#2a2f3f;
+  --paper:#eae6da;
+  --paper-dim:#a9a596;
+  --brass:#c99a53;
+  --brass-bright:#e0b876;
+  --good:#7fb88f;
+  --bad:#d4736a;
+  --extra:#8a7bbf;
+  --shadow: 0 20px 60px -20px rgba(0,0,0,.6);
+  --radius:14px;
+  --font-display:'Fraunces', serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+  --type-size:1.55rem;
+}
+[data-theme="light"]{
+  --ink:#f4f1ea;
+  --panel:#fffdf8;
+  --panel-2:#efe9db;
+  --hairline:#ddd5c1;
+  --paper:#20221f;
+  --paper-dim:#8b8672;
+  --shadow: 0 20px 50px -25px rgba(60,50,30,.35);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--font-body);
+  min-height:100vh;
+  transition:background .4s ease,color .4s ease;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(201,154,83,.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(127,184,143,.06), transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+.wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:28px 24px 80px;}
+
+/* ---------- Header ---------- */
+header.top{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:28px; gap:16px; flex-wrap:wrap;
+}
+.brand{display:flex; align-items:center; gap:12px;}
+.brand .mark{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(155deg, var(--brass-bright), var(--brass));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono); font-weight:700; color:#1a1206; font-size:1.1rem;
+  box-shadow: 0 8px 20px -8px rgba(201,154,83,.6);
+}
+.brand h1{
+  font-family:var(--font-display); font-weight:600; font-size:1.4rem; margin:0; letter-spacing:.2px;
+}
+.brand .tag{font-size:.72rem; color:var(--paper-dim); letter-spacing:.14em; text-transform:uppercase; margin-top:2px;}
+.top-controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+.icon-btn{
+  background:var(--panel); border:1px solid var(--hairline); color:var(--paper);
+  width:38px;height:38px; border-radius:10px; cursor:pointer; display:flex;align-items:center;justify-content:center;
+  transition:.2s; font-size:1rem;
+}
+.icon-btn:hover{border-color:var(--brass); color:var(--brass-bright);}
+.icon-btn.active{border-color:var(--brass); background:rgba(201,154,83,.12); color:var(--brass-bright);}
+
+/* ---------- Control deck ---------- */
+.deck{
+  background:var(--panel); border:1px solid var(--hairline); border-radius:var(--radius);
+  padding:16px 18px; margin-bottom:20px; box-shadow:var(--shadow);
+}
+.deck-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;}
+.mode-group{display:flex; gap:6px; flex-wrap:wrap;}
+.chip{
+  background:transparent; border:1px solid var(--hairline); color:var(--paper-dim);
+  padding:7px 14px; border-radius:999px; font-size:.82rem; cursor:pointer; font-family:var(--font-body); font-weight:500;
+  transition:.15s;
+}
+.chip:hover{color:var(--paper); border-color:var(--brass);}
+.chip.selected{background:var(--brass); border-color:var(--brass); color:#1a1206; font-weight:700;}
+.sub-options{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;}
+.sub-options .chip.small{padding:5px 12px; font-size:.78rem;}
+.custom-input-row{margin-top:10px; display:none;}
+.custom-input-row.show{display:block;}
+.custom-input-row textarea{
+  width:100%; min-height:70px; background:var(--panel-2); border:1px solid var(--hairline);
+  border-radius:10px; color:var(--paper); font-family:var(--font-mono); font-size:.9rem; padding:10px; resize:vertical;
+}
+.deck-divider{height:1px; background:var(--hairline); margin:12px 0;}
+
+/* ---------- Stat bar ---------- */
+.statbar{
+  display:flex; gap:0; margin-bottom:18px; background:var(--panel); border:1px solid var(--hairline);
+  border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);
+}
+.stat{
+  flex:1; padding:14px 10px; text-align:center; border-right:1px solid var(--hairline); position:relative;
+}
+.stat:last-child{border-right:none;}
+.stat .val{font-family:var(--font-mono); font-size:1.5rem; font-weight:700; color:var(--brass-bright); line-height:1.1;}
+.stat .lbl{font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--paper-dim); margin-top:4px;}
+.progress-track{height:4px; background:var(--panel-2); position:relative;}
+.progress-fill{height:100%; background:linear-gradient(90deg, var(--brass), var(--brass-bright)); width:0%; transition:width .15s linear;}
+
+/* ---------- Typing stage ---------- */
+.stage{
+  background:var(--panel); border:1px solid var(--hairline); border-radius:var(--radius);
+  padding:36px 40px; margin-bottom:20px; box-shadow:var(--shadow); position:relative; min-height:180px;
+}
+.stage.focus-mode .textline.dim{opacity:.12;}
+.stage.zen-badge::before{
+  content:"ZEN"; position:absolute; top:14px; right:18px; font-family:var(--font-mono); font-size:.65rem;
+  letter-spacing:.2em; color:var(--brass); opacity:.7;
+}
+#textDisplay{
+  font-family:var(--font-mono); font-size:var(--type-size); line-height:1.9; letter-spacing:.2px;
+  color:var(--paper-dim); user-select:none; word-wrap:break-word;
+}
+#textDisplay span.correct{color:var(--paper);}
+#textDisplay span.incorrect{color:var(--bad); background:rgba(212,115,106,.15); border-radius:3px;}
+#textDisplay span.extra{color:var(--extra); text-decoration:underline; text-decoration-style:wavy;}
+#textDisplay span.current{
+  border-left:2px solid var(--brass-bright); animation:blink 1s step-end infinite;
+}
+@keyframes blink{ 50%{border-color:transparent;} }
+#hiddenInput{
+  position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;
+}
+.stage-hint{
+  margin-top:18px; font-size:.78rem; color:var(--paper-dim); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+}
+.stage-hint kbd{
+  background:var(--panel-2); border:1px solid var(--hairline); border-radius:5px; padding:1px 6px; font-family:var(--font-mono); font-size:.75rem;
+}
+.overlay-msg{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px;
+  background:rgba(17,19,26,.85); border-radius:var(--radius); z-index:5;
+}
+[data-theme="light"] .overlay-msg{background:rgba(244,241,234,.9);}
+.overlay-msg h3{font-family:var(--font-display); font-size:1.4rem; margin:0;}
+.overlay-msg button{
+  background:var(--brass); border:none; color:#1a1206; padding:9px 20px; border-radius:8px; font-weight:700; cursor:pointer; font-family:var(--font-body);
+}
+
+/* ---------- Action row ---------- */
+.actions{display:flex; gap:10px; justify-content:center; margin-bottom:8px;}
+.action-btn{
+  background:var(--panel); border:1px solid var(--hairline); color:var(--paper); padding:10px 18px;
+  border-radius:10px; cursor:pointer; font-family:var(--font-body); font-weight:600; font-size:.85rem; display:flex; align-items:center; gap:6px;
+  transition:.2s;
+}
+.action-btn:hover{border-color:var(--brass); color:var(--brass-bright);}
+.action-btn.primary{background:var(--brass); border-color:var(--brass); color:#1a1206;}
+.action-btn.primary:hover{background:var(--brass-bright); color:#1a1206;}
+
+/* ---------- History ---------- */
+.history-panel{
+  background:var(--panel); border:1px solid var(--hairline); border-radius:var(--radius); padding:20px 22px; margin-top:24px; box-shadow:var(--shadow);
+}
+.history-panel h2{font-family:var(--font-display); font-size:1.1rem; margin:0 0 14px;}
+.history-list{display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto;}
+.history-row{
+  display:grid; grid-template-columns:1fr 70px 70px 70px 90px; gap:10px; font-size:.82rem;
+  padding:8px 10px; border-radius:8px; align-items:center;
+}
+.history-row:nth-child(odd){background:var(--panel-2);}
+.history-row span.hwpm{color:var(--brass-bright); font-family:var(--font-mono); font-weight:700;}
+.history-row .hmeta{color:var(--paper-dim); font-size:.75rem;}
+.streak-row{display:flex; gap:18px; margin-top:14px; flex-wrap:wrap;}
+.streak-chip{
+  background:var(--panel-2); border:1px solid var(--hairline); border-radius:10px; padding:10px 16px; text-align:center; min-width:90px;
+}
+.streak-chip .n{font-family:var(--font-mono); font-weight:700; color:var(--brass-bright); font-size:1.3rem;}
+.streak-chip .l{font-size:.68rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:.08em;}
+
+/* ---------- Modal / Dashboard ---------- */
+.modal-back{
+  position:fixed; inset:0; background:rgba(8,9,13,.72); backdrop-filter:blur(4px); z-index:50;
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.modal-back.show{display:flex;}
+.dash{
+  background:var(--panel); border:1px solid var(--hairline); border-radius:18px; padding:30px 34px; max-width:920px; width:100%;
+  max-height:88vh; overflow-y:auto; box-shadow:0 40px 100px -30px rgba(0,0,0,.7);
+  animation:riseIn .35s cubic-bezier(.2,.9,.3,1);
+}
+@keyframes riseIn{from{opacity:0; transform:translateY(18px) scale(.98);} to{opacity:1; transform:none;}}
+.dash h2{font-family:var(--font-display); font-size:1.6rem; margin:0 0 4px;}
+.dash .sub{color:var(--paper-dim); font-size:.85rem; margin-bottom:20px;}
+.dash-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;}
+.dash-stat{background:var(--panel-2); border:1px solid var(--hairline); border-radius:12px; padding:14px; text-align:center;}
+.dash-stat .v{font-family:var(--font-mono); font-size:1.5rem; font-weight:700; color:var(--brass-bright);}
+.dash-stat .l{font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--paper-dim); margin-top:3px;}
+.dash-section{margin-bottom:22px;}
+.dash-section h3{font-size:.9rem; text-transform:uppercase; letter-spacing:.08em; color:var(--brass); margin:0 0 10px; font-family:var(--font-body);}
+.graph-box{background:var(--panel-2); border:1px solid var(--hairline); border-radius:12px; padding:14px;}
+.badges-row{display:flex; gap:10px; flex-wrap:wrap;}
+.badge{
+  background:var(--panel-2); border:1px solid var(--hairline); border-radius:10px; padding:10px 14px; display:flex; gap:8px; align-items:center; font-size:.8rem;
+}
+.badge.earned{border-color:var(--brass); color:var(--brass-bright);}
+.badge .ic{font-size:1.1rem;}
+.heatmap{display:flex; flex-wrap:wrap; gap:6px;}
+.hk{
+  font-family:var(--font-mono); font-size:.75rem; padding:5px 9px; border-radius:6px; background:var(--panel-2); border:1px solid var(--hairline);
+}
+.summary-box{background:var(--panel-2); border:1px solid var(--hairline); border-radius:12px; padding:16px 18px; font-size:.88rem; line-height:1.7;}
+.summary-box b{color:var(--brass-bright);}
+.dash-close{
+  position:sticky; bottom:0; display:flex; gap:10px; justify-content:flex-end; padding-top:14px; margin-top:6px; background:var(--panel);
+}
+
+/* ---------- Settings drawer ---------- */
+.drawer-back{position:fixed; inset:0; background:rgba(8,9,13,.5); z-index:60; display:none;}
+.drawer-back.show{display:block;}
+.drawer{
+  position:fixed; top:0; right:-360px; width:340px; height:100%; background:var(--panel); border-left:1px solid var(--hairline);
+  z-index:61; padding:24px; transition:right .3s ease; overflow-y:auto;
+}
+.drawer.show{right:0;}
+.drawer h3{font-family:var(--font-display); margin-top:0;}
+.setting-row{margin-bottom:20px;}
+.setting-row label{font-size:.8rem; color:var(--paper-dim); text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:8px;}
+.theme-swatches{display:flex; gap:8px;}
+.swatch{width:34px;height:34px;border-radius:8px;cursor:pointer;border:2px solid transparent;}
+.swatch.active{border-color:var(--brass-bright);}
+.font-controls{display:flex; align-items:center; gap:10px;}
+.font-controls button{
+  width:32px;height:32px;border-radius:8px;background:var(--panel-2); border:1px solid var(--hairline); color:var(--paper); cursor:pointer;
+}
+.toggle-row{display:flex; justify-content:space-between; align-items:center;}
+.switch{position:relative; width:42px; height:24px;}
+.switch input{opacity:0; width:0; height:0;}
+.slider{position:absolute; inset:0; background:var(--panel-2); border:1px solid var(--hairline); border-radius:20px; cursor:pointer; transition:.2s;}
+.slider::before{content:""; position:absolute; width:16px;height:16px; left:3px; top:3px; background:var(--paper-dim); border-radius:50%; transition:.2s;}
+input:checked + .slider{background:var(--brass); border-color:var(--brass);}
+input:checked + .slider::before{transform:translateX(18px); background:#1a1206;}
+
+footer.foot{text-align:center; color:var(--paper-dim); font-size:.75rem; margin-top:30px;}
+
+@media (max-width:760px){
+  .stage{padding:22px 18px;}
+  #textDisplay{font-size:1.2rem;}
+  .statbar{flex-wrap:wrap;}
+  .stat{flex:1 1 33%; border-bottom:1px solid var(--hairline);}
+  .dash-grid{grid-template-columns:repeat(2,1fr);}
+  .history-row{grid-template-columns:1fr 60px 60px; font-size:.75rem;}
+  .history-row .hmeta, .history-row .hextra{display:none;}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001s !important; transition-duration:.001s !important;}
+}
+</style>
+</head>
+<body data-theme="dark">
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark">TS</div>
+      <div>
+        <h1>Typing Speed Studio</h1>
+        <div class="tag">Precision practice, general English</div>
+      </div>
+    </div>
+    <div class="top-controls">
+      <button class="icon-btn" id="soundBtn" title="Toggle sound">🔊</button>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme">🌙</button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <div class="deck">
+    <div class="deck-row">
+      <div class="mode-group" id="modeGroup">
+        <button class="chip selected" data-mode="time">Time</button>
+        <button class="chip" data-mode="words">Words</button>
+        <button class="chip" data-mode="quote">Quote</button>
+        <button class="chip" data-mode="custom">Custom Text</button>
+        <button class="chip" data-mode="adaptive">Adaptive</button>
+        <button class="chip" data-mode="zen">Zen</button>
+      </div>
+      <div class="mode-group">
+        <button class="chip small" id="focusToggle" style="font-size:.78rem;">👁 Focus Mode: Off</button>
+      </div>
+    </div>
+    <div class="sub-options" id="subOptions"></div>
+    <div class="custom-input-row" id="customRow">
+      <textarea id="customText" placeholder="Paste or type the passage you want to practice on..."></textarea>
+    </div>
+  </div>
+
+  <div class="statbar" id="statbar">
+    <div class="stat"><div class="val" id="statWpm">0</div><div class="lbl">WPM</div></div>
+    <div class="stat"><div class="val" id="statRaw">0</div><div class="lbl">Raw WPM</div></div>
+    <div class="stat"><div class="val" id="statCpm">0</div><div class="lbl">CPM</div></div>
+    <div class="stat"><div class="val" id="statAcc">100%</div><div class="lbl">Accuracy</div></div>
+    <div class="stat"><div class="val" id="statTime">0s</div><div class="lbl">Elapsed</div></div>
+    <div class="stat"><div class="val" id="statMistakes">0</div><div class="lbl">Mistakes</div></div>
+    <div class="stat"><div class="val" id="statStreak">0</div><div class="lbl">Streak</div></div>
+    <div class="stat"><div class="val" id="statRemaining">—</div><div class="lbl">Remaining</div></div>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="stage" id="stage" style="margin-top:20px;">
+    <div id="textDisplay"></div>
+    <input id="hiddenInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div class="overlay-msg" id="overlayMsg" style="display:none;">
+      <h3 id="overlayTitle">Paused</h3>
+      <button id="overlayResume">Resume</button>
+    </div>
+    <div class="stage-hint">
+      <span>Click the text and start typing to begin. <kbd>Esc</kbd> pause · <kbd>Tab</kbd>+<kbd>Enter</kbd> restart</span>
+      <span id="modeLabel">Time · 30s</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="action-btn" id="restartBtn">↻ Restart</button>
+    <button class="action-btn" id="pauseBtn">⏸ Pause</button>
+    <button class="action-btn primary" id="newTextBtn">⟳ New Passage</button>
+  </div>
+
+  <div class="history-panel">
+    <h2>Session History</h2>
+    <div class="streak-row">
+      <div class="streak-chip"><div class="n" id="bestWpm">0</div><div class="l">Best WPM</div></div>
+      <div class="streak-chip"><div class="n" id="bestAcc">0%</div><div class="l">Best Accuracy</div></div>
+      <div class="streak-chip"><div class="n" id="dayStreak">0</div><div class="l">Day Streak</div></div>
+      <div class="streak-chip"><div class="n" id="totalSessions">0</div><div class="l">Total Sessions</div></div>
+    </div>
+    <div class="history-list" id="historyList" style="margin-top:16px;"></div>
+  </div>
+
+  <footer class="foot">Typing Speed Studio — practice runs are stored only in this browser.</footer>
+</div>
+
+<!-- Results Dashboard -->
+<div class="modal-back" id="dashBack">
+  <div class="dash" id="dashContent"></div>
+</div>
+
+<!-- Settings drawer -->
+<div class="drawer-back" id="drawerBack"></div>
+<div class="drawer" id="drawer">
+  <h3>Settings</h3>
+  <div class="setting-row">
+    <label>Theme accent</label>
+    <div class="theme-swatches" id="swatches"></div>
+  </div>
+  <div class="setting-row">
+    <label>Font size</label>
+    <div class="font-controls">
+      <button id="fontMinus">A-</button>
+      <span id="fontVal">1.55rem</span>
+      <button id="fontPlus">A+</button>
+    </div>
+  </div>
+  <div class="setting-row toggle-row">
+    <label style="margin:0;">Sound effects</label>
+    <label class="switch"><input type="checkbox" id="soundToggle" checked><span class="slider"></span></label>
+  </div>
+  <div class="setting-row toggle-row">
+    <label style="margin:0;">Dark mode</label>
+    <label class="switch"><input type="checkbox" id="darkToggle" checked><span class="slider"></span></label>
+  </div>
+  <div class="setting-row">
+    <button class="action-btn" id="clearHistoryBtn" style="width:100%; justify-content:center;">Clear History</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= Passage banks (General English) ================= */
+const PASSAGES = {
+  easy: [
+    "The sun rose slowly over the quiet town, painting the sky in soft shades of pink and gold. Birds began to sing as people opened their windows to greet the morning air.",
+    "She walked to the store to buy some bread and milk. On her way back, she stopped to pet a friendly dog that was sitting outside a small cafe.",
+    "Learning to type well takes practice every day. The more you type, the faster and more accurate you will become over time.",
+    "It was a calm evening by the lake. The water was still, and the trees around it were reflected perfectly on the surface like a painting.",
+    "He packed his bag for the trip and checked the weather one more time. It looked like it would be a bright and pleasant day for travel."
+  ],
+  medium: [
+    "The history of human communication is a story of constant reinvention, from cave paintings and smoke signals to printed books and instant digital messages that cross the globe in seconds.",
+    "Economic growth depends on a complex interaction between innovation, labor, capital, and the policies that governments choose to encourage or restrict certain kinds of investment and trade.",
+    "Climate scientists have spent decades gathering evidence from ice cores, ocean temperatures, and atmospheric samples to understand how the planet's climate has shifted over long periods of time.",
+    "The novel's protagonist wrestled with a quiet, persistent doubt about whether the choices she had made were truly her own, or simply the product of everyone else's expectations.",
+    "Modern architecture often balances the competing demands of aesthetics, sustainability, and cost, forcing designers to make difficult compromises that shape how a building will be used for decades."
+  ],
+  hard: [
+    "Notwithstanding the considerable ambiguity inherent in early diplomatic correspondence, historians have painstakingly reconstructed a coherent narrative by cross-referencing fragmentary archives scattered across multiple continents.",
+    "The epistemological implications of quantum indeterminacy continue to provoke fierce debate among physicists and philosophers, particularly regarding the extent to which observation genuinely influences underlying reality.",
+    "Bureaucratic inertia, compounded by jurisdictional overlap and chronic underfunding, has repeatedly undermined efforts to implement coordinated infrastructure reforms across neighboring municipalities.",
+    "Her argument hinged on a subtle but consequential distinction between correlation and causation, a distinction frequently elided in popular discourse surrounding public health statistics.",
+    "The manuscript's marginalia, rendered in a nearly illegible cursive, suggest that the author revised his thesis substantially after encountering criticism from contemporaries he rarely acknowledged."
+  ]
+};
+
+const QUOTES = [
+  "The only way to do great work is to love what you do.",
+  "In the middle of difficulty lies opportunity.",
+  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+  "The future belongs to those who believe in the beauty of their dreams.",
+  "It does not matter how slowly you go as long as you do not stop.",
+  "Whether you think you can or you think you cannot, you are right.",
+  "The best way to predict the future is to create it.",
+  "Do not watch the clock. Do what it does. Keep going."
+];
+
+const WORD_POOL = "the quick brown fox jumps over lazy dog time flows like river through mountains and valleys people often forget how much practice matters when learning new skill every single day brings fresh chance to improve slightly beyond where started yesterday morning afternoon evening night light dark quiet loud simple complex modern ancient story path road journey mind body work rest focus clarity purpose growth change balance rhythm pattern habit routine goal dream vision hope courage patience wisdom knowledge insight wonder curiosity adventure discovery science nature history culture language music art design build create shape form structure system order chaos energy motion stillness silence sound word letter number code logic reason emotion feeling thought idea concept theory practice".split(" ");
+
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function shuffle(arr){const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;}
+
+function genWords(count, difficulty){
+  let pool = WORD_POOL;
+  let words = [];
+  for(let i=0;i<count;i++){ words.push(pick(pool)); }
+  return words.join(" ");
+}
+
+function genTimeText(difficulty){
+  // generate a long stream of words/sentences to cover any duration
+  const bank = PASSAGES[difficulty] || PASSAGES.medium;
+  let text = shuffle(bank).join(" ") + " " + genWords(60, difficulty) + " " + shuffle(bank).join(" ") + " " + genWords(60, difficulty);
+  return text;
+}
+
+function genQuote(){ return pick(QUOTES); }
+
+/* ================= State ================= */
+const state = {
+  mode: "time",
+  timeLen: 30,
+  wordLen: 25,
+  difficulty: "medium",
+  focusMode: false,
+  text: "",
+  words: [],
+  typed: "",
+  chars: [], // {char, status: 'pending'|'correct'|'incorrect'|'extra'}
+  startedAt: null,
+  pausedTotal: 0,
+  pauseStart: null,
+  running: false,
+  paused: false,
+  finished: false,
+  timerId: null,
+  elapsedSec: 0,
+  mistakes: 0,
+  currentStreak: 0,
+  bestStreakThisRun: 0,
+  wpmSamples: [], // {t, wpm, raw}
+  keyErrors: {}, // char -> count
+  correctCount:0, incorrectCount:0, extraCount:0, missedCount:0,
+  totalKeystrokes:0
+};
+
+let soundOn = true;
+let audioCtx = null;
+function beep(freq, dur){
+  if(!soundOn) return;
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.frequency.value = freq;
+    o.type = "sine";
+    g.gain.value = 0.05;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    o.stop(audioCtx.currentTime + dur);
+  }catch(e){}
+}
+
+/* ================= DOM refs ================= */
+const textDisplay = document.getElementById('textDisplay');
+const hiddenInput = document.getElementById('hiddenInput');
+const stage = document.getElementById('stage');
+const subOptions = document.getElementById('subOptions');
+const customRow = document.getElementById('customRow');
+const customText = document.getElementById('customText');
+const modeLabel = document.getElementById('modeLabel');
+const overlayMsg = document.getElementById('overlayMsg');
+const overlayTitle = document.getElementById('overlayTitle');
+const progressFill = document.getElementById('progressFill');
+
+const statWpm = document.getElementById('statWpm');
+const statRaw = document.getElementById('statRaw');
+const statCpm = document.getElementById('statCpm');
+const statAcc = document.getElementById('statAcc');
+const statTime = document.getElementById('statTime');
+const statMistakes = document.getElementById('statMistakes');
+const statStreak = document.getElementById('statStreak');
+const statRemaining = document.getElementById('statRemaining');
+
+/* ================= Mode UI ================= */
+const SUBS = {
+  time: [15,30,60,120].map(v=>({label:v+"s", val:v})),
+  words: [25,50,100,250].map(v=>({label:v, val:v})),
+  quote: [],
+  custom: [],
+  adaptive: [],
+  zen: []
+};
+
+function renderSubOptions(){
+  subOptions.innerHTML = "";
+  customRow.classList.remove('show');
+  if(state.mode === 'time'){
+    SUBS.time.forEach(o=>{
+      const b = document.createElement('button');
+      b.className = 'chip small' + (o.val===state.timeLen?' selected':'');
+      b.textContent = o.label;
+      b.onclick=()=>{ state.timeLen=o.val; renderSubOptions(); newPassage(); };
+      subOptions.appendChild(b);
+    });
+  } else if(state.mode === 'words'){
+    SUBS.words.forEach(o=>{
+      const b = document.createElement('button');
+      b.className = 'chip small' + (o.val===state.wordLen?' selected':'');
+      b.textContent = o.label + " words";
+      b.onclick=()=>{ state.wordLen=o.val; renderSubOptions(); newPassage(); };
+      subOptions.appendChild(b);
+    });
+  } else if(state.mode === 'custom'){
+    customRow.classList.add('show');
+  }
+  updateModeLabel();
+}
+
+function updateModeLabel(){
+  let lbl = "";
+  if(state.mode==='time') lbl = `Time · ${state.timeLen}s`;
+  else if(state.mode==='words') lbl = `Words · ${state.wordLen}`;
+  else if(state.mode==='quote') lbl = `Quote`;
+  else if(state.mode==='custom') lbl = `Custom Text`;
+  else if(state.mode==='adaptive') lbl = `Adaptive · ${state.difficulty}`;
+  else if(state.mode==='zen') lbl = `Zen · Untimed`;
+  modeLabel.textContent = lbl;
+}
+
+document.getElementById('modeGroup').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.chip');
+  if(!btn) return;
+  document.querySelectorAll('#modeGroup .chip').forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.mode = btn.dataset.mode;
+  renderSubOptions();
+  newPassage();
+});
+
+document.getElementById('focusToggle').addEventListener('click', function(){
+  state.focusMode = !state.focusMode;
+  this.textContent = "👁 Focus Mode: " + (state.focusMode? "On":"Off");
+  this.classList.toggle('selected', state.focusMode);
+  renderText();
+});
+
+customText.addEventListener('input', ()=>{
+  if(state.mode==='custom'){ /* wait for explicit new passage to avoid mid-type reset */ }
+});
+customText.addEventListener('blur', ()=>{
+  if(state.mode==='custom' && customText.value.trim().length>10){ newPassage(); }
+});
+
+/* ================= Passage generation ================= */
+function newPassage(){
+  resetSession();
+  if(state.mode==='time'){
+    state.difficulty = pick(['easy','medium','hard']);
+    state.text = genTimeText(state.difficulty);
+  } else if(state.mode==='words'){
+    state.text = genWords(state.wordLen, 'medium');
+  } else if(state.mode==='quote'){
+    state.text = genQuote();
+  } else if(state.mode==='custom'){
+    state.text = customText.value.trim() || "Type your custom passage in the box above, then click here to begin.";
+  } else if(state.mode==='adaptive'){
+    state.difficulty = getAdaptiveDifficulty();
+    state.text = genWords(40, state.difficulty) + ". " + pick(PASSAGES[state.difficulty]);
+  } else if(state.mode==='zen'){
+    state.difficulty = 'medium';
+    state.text = genTimeText('medium');
+  }
+  state.chars = state.text.split("").map(c=>({char:c, status:'pending'}));
+  renderText();
+  updateStatsDisplay();
+  updateModeLabel();
+}
+
+function getAdaptiveDifficulty(){
+  const hist = loadHistory().filter(h=>h.mode==='adaptive');
+  if(hist.length===0) return 'easy';
+  const last = hist[hist.length-1];
+  if(last.wpm > 65 && last.accuracy > 96) return 'hard';
+  if(last.wpm > 40 && last.accuracy > 92) return 'medium';
+  return 'easy';
+}
+
+/* ================= Rendering ================= */
+function renderText(){
+  let html = "";
+  const lineBreakEvery = state.focusMode ? getCurrentLineWindow() : null;
+  state.chars.forEach((c, i)=>{
+    let cls = "";
+    if(c.status==='correct') cls='correct';
+    else if(c.status==='incorrect') cls='incorrect';
+    else if(c.status==='extra') cls='extra';
+    if(i === state.typed.length) cls += ' current';
+    let dimCls = "";
+    if(state.focusMode){
+      const cur = state.typed.length;
+      if(i < cur-40 || i > cur+80) dimCls = ' dim';
+    }
+    const ch = c.char === ' ' ? '&nbsp;' : escapeHtml(c.char);
+    html += `<span class="${cls}${dimCls}">${ch}</span>`;
+  });
+  textDisplay.innerHTML = html;
+  const cur = textDisplay.querySelector('.current');
+  if(cur && state.focusMode){ cur.scrollIntoView({block:'center', inline:'center', behavior:'smooth'}); }
+}
+function getCurrentLineWindow(){ return null; }
+function escapeHtml(s){ return s.replace(/[&<>]/g, t=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[t])); }
+
+/* ================= Session lifecycle ================= */
+function resetSession(){
+  clearInterval(state.timerId);
+  state.typed = "";
+  state.startedAt = null;
+  state.pausedTotal = 0;
+  state.pauseStart = null;
+  state.running = false;
+  state.paused = false;
+  state.finished = false;
+  state.elapsedSec = 0;
+  state.mistakes = 0;
+  state.currentStreak = 0;
+  state.bestStreakThisRun = 0;
+  state.wpmSamples = [];
+  state.keyErrors = {};
+  state.correctCount = state.incorrectCount = state.extraCount = state.missedCount = 0;
+  state.totalKeystrokes = 0;
+  overlayMsg.style.display = 'none';
+  progressFill.style.width = '0%';
+  updateStatsDisplay();
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+}
+
+function startSession(){
+  if(state.running) return;
+  state.running = true;
+  state.startedAt = Date.now();
+  state.timerId = setInterval(tick, 200);
+}
+
+function tick(){
+  if(state.paused || state.finished) return;
+  const now = Date.now();
+  state.elapsedSec = (now - state.startedAt - state.pausedTotal)/1000;
+  const {wpm, raw} = computeWpm();
+  state.wpmSamples.push({t: state.elapsedSec, wpm, raw});
+  updateStatsDisplay();
+  if(state.mode==='time' && state.elapsedSec >= state.timeLen){
+    finishSession();
+  }
+}
+
+function computeWpm(){
+  const minutes = Math.max(state.elapsedSec/60, 1/600);
+  const correctChars = state.correctCount;
+  const wpm = Math.round((correctChars/5)/minutes);
+  const rawChars = state.correctCount + state.incorrectCount + state.extraCount;
+  const raw = Math.round((rawChars/5)/minutes);
+  return {wpm: clampWpm(wpm), raw: clampWpm(raw)};
+}
+function clampWpm(v){ if(!isFinite(v) || v<0) return 0; return Math.min(v, 400); }
+
+function updateStatsDisplay(){
+  const {wpm, raw} = computeWpm();
+  statWpm.textContent = wpm;
+  statRaw.textContent = raw;
+  statCpm.textContent = Math.round(wpm*5);
+  const totalTyped = state.correctCount+state.incorrectCount;
+  const acc = totalTyped>0 ? Math.round((state.correctCount/totalTyped)*100) : 100;
+  statAcc.textContent = acc + "%";
+  statTime.textContent = Math.floor(state.elapsedSec) + "s";
+  statMistakes.textContent = state.mistakes;
+  statStreak.textContent = state.currentStreak;
+
+  let remaining = "—", pct = 0;
+  if(state.mode==='time'){
+    remaining = Math.max(0, Math.ceil(state.timeLen - state.elapsedSec)) + "s";
+    pct = Math.min(100, (state.elapsedSec/state.timeLen)*100);
+  } else if(state.mode==='words' || state.mode==='quote' || state.mode==='custom' || state.mode==='adaptive'){
+    remaining = Math.max(0, state.text.length - state.typed.length) + " chars";
+    pct = Math.min(100, (state.typed.length/state.text.length)*100);
+  } else if(state.mode==='zen'){
+    remaining = "∞";
+    pct = 0;
+  }
+  statRemaining.textContent = remaining;
+  progressFill.style.width = pct + "%";
+}
+
+function finishSession(){
+  if(state.finished) return;
+  state.finished = true;
+  state.running = false;
+  clearInterval(state.timerId);
+  beep(880, .12);
+  const result = buildResult();
+  saveResult(result);
+  renderDashboard(result);
+  showDashboard();
+}
+
+function buildResult(){
+  const {wpm, raw} = computeWpm();
+  const totalTyped = state.correctCount+state.incorrectCount;
+  const accuracy = totalTyped>0 ? Math.round((state.correctCount/totalTyped)*1000)/10 : 100;
+  // consistency: coefficient of variation of wpm samples (lower better) -> express as 100 - normalized stddev
+  let consistency = 100;
+  if(state.wpmSamples.length>3){
+    const vals = state.wpmSamples.map(s=>s.wpm).filter(v=>v>0);
+    if(vals.length>3){
+      const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+      const variance = vals.reduce((a,b)=>a+Math.pow(b-mean,2),0)/vals.length;
+      const stddev = Math.sqrt(variance);
+      const cv = mean>0 ? stddev/mean : 0;
+      consistency = Math.max(0, Math.round(100 - cv*100));
+    }
+  }
+  const missed = Math.max(0, state.text.length - state.chars.filter(c=>c.status!=='pending').length);
+  return {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    mode: state.mode,
+    subOption: state.mode==='time'? state.timeLen : (state.mode==='words'? state.wordLen: null),
+    difficulty: state.difficulty,
+    wpm, raw, accuracy, consistency,
+    duration: Math.round(state.elapsedSec*10)/10,
+    mistakes: state.mistakes,
+    correct: state.correctCount, incorrect: state.incorrectCount, extra: state.extraCount, missed,
+    bestStreak: state.bestStreakThisRun,
+    keyErrors: {...state.keyErrors},
+    wpmSamples: state.wpmSamples.slice(-60)
+  };
+}
+
+/* ================= History / storage ================= */
+const HIST_KEY = 'tss_history_v1';
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(HIST_KEY)) || []; }catch(e){ return []; }
+}
+function saveResult(r){
+  const hist = loadHistory();
+  hist.push(r);
+  if(hist.length>300) hist.shift();
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+  updateStreakUi();
+  renderHistoryList();
+}
+function updateStreakUi(){
+  const hist = loadHistory();
+  document.getElementById('totalSessions').textContent = hist.length;
+  const bestWpm = hist.reduce((m,h)=>Math.max(m,h.wpm),0);
+  const bestAcc = hist.reduce((m,h)=>Math.max(m,h.accuracy),0);
+  document.getElementById('bestWpm').textContent = bestWpm;
+  document.getElementById('bestAcc').textContent = bestAcc+"%";
+  document.getElementById('dayStreak').textContent = computeDayStreak(hist);
+}
+function computeDayStreak(hist){
+  if(hist.length===0) return 0;
+  const days = new Set(hist.map(h=> new Date(h.date).toDateString()));
+  let streak = 0;
+  let d = new Date();
+  while(true){
+    if(days.has(d.toDateString())){ streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+function renderHistoryList(){
+  const hist = loadHistory().slice().reverse().slice(0,20);
+  const list = document.getElementById('historyList');
+  if(hist.length===0){ list.innerHTML = '<div class="hmeta" style="padding:10px;">No sessions yet — finish a run to see it here.</div>'; return; }
+  list.innerHTML = hist.map(h=>{
+    const d = new Date(h.date);
+    return `<div class="history-row">
+      <span class="hmeta">${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · ${capitalize(h.mode)}</span>
+      <span class="hwpm">${h.wpm} wpm</span>
+      <span class="hmeta">${h.accuracy}%</span>
+      <span class="hmeta">${h.consistency}% cons.</span>
+      <span class="hmeta">${h.duration}s</span>
+    </div>`;
+  }).join("");
+}
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/* ================= Dashboard ================= */
+const ACHIEVEMENTS = [
+  {id:'first', ic:'🎯', label:'First Run', test:(r,hist)=>hist.length>=1},
+  {id:'wpm60', ic:'⚡', label:'60+ WPM', test:(r)=>r.wpm>=60},
+  {id:'wpm100', ic:'🚀', label:'100+ WPM', test:(r)=>r.wpm>=100},
+  {id:'acc100', ic:'🎯', label:'Perfect Accuracy', test:(r)=>r.accuracy>=100},
+  {id:'acc98', ic:'✨', label:'98%+ Accuracy', test:(r)=>r.accuracy>=98},
+  {id:'consist90', ic:'🎼', label:'Steady Rhythm', test:(r)=>r.consistency>=90},
+  {id:'streak5', ic:'🔥', label:'5-Day Streak', test:(r,hist)=>computeDayStreak(hist)>=5},
+  {id:'marathon', ic:'🏁', label:'120s Marathon', test:(r)=>r.mode==='time' && r.subOption>=120},
+];
+
+function renderDashboard(r){
+  const hist = loadHistory();
+  const percentile = estimatePercentile(r.wpm);
+  const dashContent = document.getElementById('dashContent');
+  const strengths = [];
+  const weaknesses = [];
+  if(r.accuracy>=97) strengths.push("high accuracy"); else weaknesses.push("accuracy under pressure");
+  if(r.consistency>=85) strengths.push("steady, even rhythm"); else weaknesses.push("inconsistent pacing");
+  if(r.wpm>=60) strengths.push("strong raw speed"); else weaknesses.push("overall typing speed");
+  const topErrors = Object.entries(r.keyErrors).sort((a,b)=>b[1]-a[1]).slice(0,6);
+
+  const badgesHtml = ACHIEVEMENTS.map(a=>{
+    const earned = a.test(r, hist);
+    return `<div class="badge ${earned?'earned':''}"><span class="ic">${a.ic}</span>${a.label}</div>`;
+  }).join("");
+
+  const graphSvg = buildWpmGraph(r.wpmSamples);
+  const heatmapHtml = topErrors.length? topErrors.map(([k,v])=>`<span class="hk">${escapeHtml(k==='\u0020'?'space':k)} × ${v}</span>`).join("") : '<span class="hmeta">No repeated mistakes — clean run.</span>';
+
+  dashContent.innerHTML = `
+    <h2>Session Complete</h2>
+    <div class="sub">${capitalize(r.mode)} mode${r.subOption? ' · '+r.subOption: ''} · ${new Date(r.date).toLocaleString()}</div>
+    <div class="dash-grid">
+      <div class="dash-stat"><div class="v">${r.wpm}</div><div class="l">WPM</div></div>
+      <div class="dash-stat"><div class="v">${r.raw}</div><div class="l">Raw WPM</div></div>
+      <div class="dash-stat"><div class="v">${r.accuracy}%</div><div class="l">Accuracy</div></div>
+      <div class="dash-stat"><div class="v">${r.consistency}%</div><div class="l">Consistency</div></div>
+      <div class="dash-stat"><div class="v">${r.correct}</div><div class="l">Correct Chars</div></div>
+      <div class="dash-stat"><div class="v">${r.incorrect}</div><div class="l">Incorrect</div></div>
+      <div class="dash-stat"><div class="v">${r.extra}</div><div class="l">Extra</div></div>
+      <div class="dash-stat"><div class="v">${r.missed}</div><div class="l">Missed</div></div>
+      <div class="dash-stat"><div class="v">${r.duration}s</div><div class="l">Duration</div></div>
+      <div class="dash-stat"><div class="v">${r.mistakes}</div><div class="l">Mistakes</div></div>
+      <div class="dash-stat"><div class="v">${r.bestStreak}</div><div class="l">Best Streak</div></div>
+      <div class="dash-stat"><div class="v">${percentile}th</div><div class="l">Percentile Est.</div></div>
+    </div>
+    <div class="dash-section">
+      <h3>WPM Over Time</h3>
+      <div class="graph-box">${graphSvg}</div>
+    </div>
+    <div class="dash-section">
+      <h3>Commonly Mistyped Keys</h3>
+      <div class="heatmap">${heatmapHtml}</div>
+    </div>
+    <div class="dash-section">
+      <h3>Achievements</h3>
+      <div class="badges-row">${badgesHtml}</div>
+    </div>
+    <div class="dash-section">
+      <h3>Performance Summary</h3>
+      <div class="summary-box">
+        Strengths: <b>${strengths.length? strengths.join(', '): 'building a baseline'}</b>.<br>
+        Focus areas: <b>${weaknesses.length? weaknesses.join(', '): 'none obvious — nice run'}</b>.<br>
+        ${topErrors.length? `You most often mistype <b>${escapeHtml(topErrors[0][0]===' '?'space':topErrors[0][0])}</b>. Slowing slightly on those keys should raise accuracy fastest.` : 'No recurring mistyped keys detected this run.'}
+        ${r.consistency<80? ' Your pace varies noticeably through the passage — try holding a steady rhythm instead of bursts.' : ''}
+      </div>
+    </div>
+    <div class="dash-close">
+      <button class="action-btn" id="dashRepeat">↻ Same Settings</button>
+      <button class="action-btn primary" id="dashClose">Continue</button>
+    </div>
+  `;
+  document.getElementById('dashClose').onclick = hideDashboard;
+  document.getElementById('dashRepeat').onclick = ()=>{ hideDashboard(); newPassage(); };
+}
+
+function estimatePercentile(wpm){
+  // rough normal-ish curve centered at 45 wpm, sd 18
+  const mean=45, sd=18;
+  const z = (wpm-mean)/sd;
+  const p = 0.5*(1+erf(z/Math.SQRT2));
+  return Math.max(1, Math.min(99, Math.round(p*100)));
+}
+function erf(x){
+  const sign = x<0?-1:1; x=Math.abs(x);
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const t=1/(1+p*x);
+  const y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+
+function buildWpmGraph(samples){
+  if(!samples || samples.length<2) return '<div class="hmeta">Not enough data for a graph.</div>';
+  const w=760, h=180, pad=24;
+  const maxWpm = Math.max(...samples.map(s=>Math.max(s.wpm,s.raw)), 10);
+  const maxT = samples[samples.length-1].t || 1;
+  const pts = samples.map(s=>{
+    const x = pad + (s.t/maxT)*(w-2*pad);
+    const y = h-pad - (s.wpm/maxWpm)*(h-2*pad);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const ptsRaw = samples.map(s=>{
+    const x = pad + (s.t/maxT)*(w-2*pad);
+    const y = h-pad - (s.raw/maxWpm)*(h-2*pad);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">
+    <polyline points="${ptsRaw}" fill="none" stroke="#8a7bbf" stroke-width="1.5" opacity=".5"/>
+    <polyline points="${pts}" fill="none" stroke="#c99a53" stroke-width="2.5"/>
+  </svg>`;
+}
+
+function showDashboard(){ document.getElementById('dashBack').classList.add('show'); }
+function hideDashboard(){ document.getElementById('dashBack').classList.remove('show'); hiddenInput.focus(); }
+
+/* ================= Typing engine ================= */
+stage.addEventListener('click', ()=>{ if(!state.paused) hiddenInput.focus(); });
+hiddenInput.addEventListener('focus', ()=>{ if(state.paused) resumeSession(); });
+
+hiddenInput.addEventListener('keydown', (e)=>{
+  if(state.finished) return;
+  if(e.key === 'Escape'){ togglePause(); e.preventDefault(); return; }
+  if(e.key === 'Tab'){ e.preventDefault(); restartSameSettings(); return; }
+  if(state.paused) return;
+
+  if(e.key === 'Backspace'){
+    if(state.typed.length>0){
+      const idx = state.typed.length-1;
+      state.typed = state.typed.slice(0,-1);
+      if(idx < state.chars.length){ state.chars[idx].status='pending'; }
+      renderText();
+    }
+    e.preventDefault();
+    return;
+  }
+  if(e.key.length !== 1) return; // ignore control keys
+  e.preventDefault();
+
+  if(!state.running) startSession();
+
+  const idx = state.typed.length;
+  state.totalKeystrokes++;
+  if(idx < state.chars.length){
+    const expected = state.chars[idx].char;
+    if(e.key === expected){
+      state.chars[idx].status = 'correct';
+      state.correctCount++;
+      state.currentStreak++;
+      state.bestStreakThisRun = Math.max(state.bestStreakThisRun, state.currentStreak);
+      beep(600,.03);
+    } else {
+      state.chars[idx].status = 'incorrect';
+      state.incorrectCount++;
+      state.mistakes++;
+      state.currentStreak = 0;
+      state.keyErrors[expected] = (state.keyErrors[expected]||0)+1;
+      beep(180,.06);
+    }
+  } else {
+    // extra characters beyond passage (words/quote/custom without extension)
+    state.chars.push({char:e.key, status:'extra'});
+    state.extraCount++;
+    state.mistakes++;
+    state.currentStreak = 0;
+  }
+  state.typed += e.key;
+  renderText();
+  updateStatsDisplay();
+
+  const isFiniteText = state.mode==='words'||state.mode==='quote'||state.mode==='custom'||state.mode==='adaptive';
+  if(isFiniteText && state.typed.length >= state.text.length){
+    finishSession();
+  }
+});
+
+function togglePause(){
+  if(!state.running || state.finished) return;
+  if(state.paused) resumeSession(); else pauseSession();
+}
+function pauseSession(){
+  state.paused = true;
+  state.pauseStart = Date.now();
+  overlayTitle.textContent = 'Paused';
+  overlayMsg.style.display = 'flex';
+  document.getElementById('pauseBtn').textContent = '▶ Resume';
+}
+function resumeSession(){
+  if(!state.paused) return;
+  state.paused = false;
+  state.pausedTotal += Date.now() - state.pauseStart;
+  overlayMsg.style.display = 'none';
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+  hiddenInput.focus();
+}
+document.getElementById('overlayResume').addEventListener('click', resumeSession);
+document.getElementById('pauseBtn').addEventListener('click', togglePause);
+document.getElementById('restartBtn').addEventListener('click', restartSameSettings);
+document.getElementById('newTextBtn').addEventListener('click', newPassage);
+function restartSameSettings(){ resetSession(); state.chars = state.text.split("").map(c=>({char:c,status:'pending'})); renderText(); updateStatsDisplay(); hiddenInput.focus(); }
+
+/* ================= Theme / settings ================= */
+const themeBtn = document.getElementById('themeBtn');
+const soundBtn = document.getElementById('soundBtn');
+const settingsBtn = document.getElementById('settingsBtn');
+const drawer = document.getElementById('drawer');
+const drawerBack = document.getElementById('drawerBack');
+
+function setTheme(light){
+  document.body.setAttribute('data-theme', light? 'light':'dark');
+  themeBtn.textContent = light? '☀':'🌙';
+  document.getElementById('darkToggle').checked = !light;
+  localStorage.setItem('tss_theme', light?'light':'dark');
+}
+themeBtn.addEventListener('click', ()=> setTheme(document.body.getAttribute('data-theme')!=='light'));
+document.getElementById('darkToggle').addEventListener('change', (e)=> setTheme(!e.target.checked));
+
+soundBtn.addEventListener('click', ()=>{ soundOn=!soundOn; soundBtn.textContent = soundOn?'🔊':'🔇'; document.getElementById('soundToggle').checked = soundOn; });
+document.getElementById('soundToggle').addEventListener('change', (e)=>{ soundOn = e.target.checked; soundBtn.textContent = soundOn?'🔊':'🔇'; });
+
+settingsBtn.addEventListener('click', ()=>{ drawer.classList.add('show'); drawerBack.classList.add('show'); });
+drawerBack.addEventListener('click', ()=>{ drawer.classList.remove('show'); drawerBack.classList.remove('show'); });
+
+const ACCENTS = ['#c99a53','#7fb88f','#8a7bbf','#d4736a','#5b9bd5'];
+const swatchesEl = document.getElementById('swatches');
+ACCENTS.forEach(c=>{
+  const s = document.createElement('div');
+  s.className = 'swatch'; s.style.background = c;
+  if(c==='#c99a53') s.classList.add('active');
+  s.onclick = ()=>{
+    document.documentElement.style.setProperty('--brass', c);
+    document.documentElement.style.setProperty('--brass-bright', c);
+    document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));
+    s.classList.add('active');
+  };
+  swatchesEl.appendChild(s);
+});
+
+let fontSize = 1.55;
+document.getElementById('fontPlus').addEventListener('click', ()=>{ fontSize=Math.min(2.4, fontSize+0.15); applyFont(); });
+document.getElementById('fontMinus').addEventListener('click', ()=>{ fontSize=Math.max(0.9, fontSize-0.15); applyFont(); });
+function applyFont(){ document.documentElement.style.setProperty('--type-size', fontSize.toFixed(2)+'rem'); document.getElementById('fontVal').textContent = fontSize.toFixed(2)+'rem'; }
+
+document.getElementById('clearHistoryBtn').addEventListener('click', ()=>{
+  if(confirm('Clear all saved session history? This cannot be undone.')){
+    localStorage.removeItem(HIST_KEY);
+    updateStreakUi();
+    renderHistoryList();
+  }
+});
+
+/* ================= Init ================= */
+(function init(){
+  const savedTheme = localStorage.getItem('tss_theme');
+  setTheme(savedTheme === 'light');
+  renderSubOptions();
+  newPassage();
+  updateStreakUi();
+  renderHistoryList();
+  hiddenInput.focus();
+})();
+
+})();
+</script>
+</body>
+</html>
