@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Green Room — Mock Interview Coach</title>
+<style>
+  :root{
+    --ink:#1B2430;
+    --ink-soft:#2E3A47;
+    --paper:#F6F3EC;
+    --paper-dim:#EDE8DC;
+    --amber:#D98A2B;
+    --amber-soft:#F1C98A;
+    --slate:#7C8894;
+    --line:#D9D2C2;
+    --good:#4C7A57;
+    --warn:#B5541E;
+    --shadow: 0 12px 30px -14px rgba(27,36,48,0.35);
+    --radius: 14px;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --mono: 'SF Mono', 'Courier New', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(217,138,43,0.07), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(27,36,48,0.05), transparent 45%);
+  }
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:36px 22px 80px;
+  }
+
+  /* ---------- Header / stage marquee ---------- */
+  .stage{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:28px;
+    gap:16px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .brand-mark{
+    width:38px;height:38px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--amber-soft), var(--amber) 65%, #a8631a 100%);
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.25), 0 4px 10px rgba(217,138,43,0.35);
+    flex-shrink:0;
+  }
+  .brand h1{
+    font-family:var(--serif);
+    font-size:22px;
+    margin:0;
+    letter-spacing:0.2px;
+  }
+  .brand p{
+    margin:2px 0 0;
+    font-size:12.5px;
+    color:var(--slate);
+    letter-spacing:0.4px;
+    text-transform:uppercase;
+  }
+  .stage-status{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--slate);
+    text-align:right;
+    line-height:1.5;
+  }
+  .stage-status .dot{
+    display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--slate); margin-right:6px;
+  }
+  .stage-status.live .dot{background:var(--warn); animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.35;}}
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:28px;
+    margin-bottom:22px;
+    animation:rise 0.5s ease both;
+  }
+  @keyframes rise{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ---------- Setup screen ---------- */
+  .setup-title{
+    font-family:var(--serif);
+    font-size:26px;
+    margin:0 0 6px;
+  }
+  .setup-sub{
+    color:var(--slate);
+    font-size:14.5px;
+    margin:0 0 22px;
+    line-height:1.5;
+  }
+  label.field-label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+  textarea, input[type=text], input[type=password]{
+    width:100%;
+    font-family:var(--sans);
+    font-size:15px;
+    padding:13px 14px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    background:var(--paper-dim);
+    color:var(--ink);
+    resize:vertical;
+    transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea:focus, input:focus{
+    outline:none;
+    border-color:var(--amber);
+    box-shadow:0 0 0 3px rgba(217,138,43,0.15);
+    background:#fff;
+  }
+  .field{margin-bottom:20px;}
+  .field small{color:var(--slate); font-size:12px; display:block; margin-top:6px;}
+  .row-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:600px){.row-2{grid-template-columns:1fr;}}
+
+  select{
+    width:100%;
+    font-family:var(--sans);
+    font-size:15px;
+    padding:13px 14px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    background:var(--paper-dim);
+    color:var(--ink);
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:14.5px;
+    padding:13px 24px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.2s;
+  }
+  .btn-primary{
+    background:var(--ink);
+    color:var(--paper);
+    box-shadow:0 6px 16px -6px rgba(27,36,48,0.5);
+  }
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 8px 20px -6px rgba(27,36,48,0.6);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-primary:disabled{opacity:0.5; cursor:not-allowed; transform:none;}
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    border:1.5px solid var(--line);
+  }
+  .btn-ghost:hover{border-color:var(--ink-soft);}
+  .btn-amber{
+    background:var(--amber);
+    color:#fff;
+    box-shadow:0 6px 16px -6px rgba(217,138,43,0.6);
+  }
+  .btn-amber:hover{transform:translateY(-1px);}
+
+  .btn-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:6px;}
+
+  /* ---------- Interview / chat screen ---------- */
+  .progress-ladder{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:20px;
+  }
+  .rung{
+    flex:1;
+    height:5px;
+    border-radius:3px;
+    background:var(--line);
+    transition:background 0.3s;
+  }
+  .rung.done{background:var(--amber);}
+  .rung.active{background:var(--ink-soft);}
+
+  .chat-log{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    margin-bottom:18px;
+  }
+  .msg{
+    max-width:82%;
+    padding:14px 16px;
+    border-radius:14px;
+    font-size:15px;
+    line-height:1.55;
+    animation:rise 0.35s ease both;
+    white-space:pre-wrap;
+  }
+  .msg.interviewer{
+    align-self:flex-start;
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    border-bottom-left-radius:4px;
+  }
+  .msg.interviewer .role-tag{
+    display:block;
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--amber);
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:5px;
+  }
+  .msg.candidate{
+    align-self:flex-end;
+    background:var(--ink);
+    color:var(--paper);
+    border-bottom-right-radius:4px;
+  }
+  .msg.candidate .role-tag{
+    display:block;
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--amber-soft);
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:5px;
+  }
+
+  .typing{
+    display:flex; gap:4px; align-self:flex-start; padding:14px 16px;
+  }
+  .typing span{
+    width:6px;height:6px;border-radius:50%;background:var(--slate);
+    animation:bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2){animation-delay:0.15s;}
+  .typing span:nth-child(3){animation-delay:0.3s;}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0); opacity:0.4;} 40%{transform:translateY(-4px); opacity:1;}}
+
+  .composer{
+    display:flex;
+    gap:10px;
+    align-items:flex-end;
+  }
+  .composer textarea{flex:1; min-height:52px;}
+
+  /* ---------- Report ---------- */
+  .report-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+    padding-bottom:20px;
+    border-bottom:1px dashed var(--line);
+  }
+  .score-badge{
+    text-align:center;
+    flex-shrink:0;
+  }
+  .score-num{
+    font-family:var(--serif);
+    font-size:44px;
+    font-weight:700;
+    color:var(--ink);
+    line-height:1;
+  }
+  .score-num span{font-size:20px; color:var(--slate); font-weight:400;}
+  .score-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--slate);
+    margin-top:4px;
+  }
+  .verdict-pill{
+    display:inline-block;
+    font-size:12.5px;
+    font-weight:600;
+    padding:5px 12px;
+    border-radius:20px;
+    background:rgba(76,122,87,0.12);
+    color:var(--good);
+    margin-top:8px;
+  }
+  .report-section-title{
+    font-family:var(--serif);
+    font-size:17px;
+    margin:24px 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .report-section-title.strength::before{content:"＋"; color:var(--good); font-weight:700;}
+  .report-section-title.weakness::before{content:"−"; color:var(--warn); font-weight:700;}
+  ul.report-list{margin:0; padding-left:0; list-style:none;}
+  ul.report-list li{
+    padding:9px 0 9px 20px;
+    border-bottom:1px solid var(--paper-dim);
+    position:relative;
+    font-size:14.5px;
+    line-height:1.5;
+  }
+  ul.report-list li::before{
+    content:"";
+    position:absolute; left:0; top:16px;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--amber);
+  }
+  .qa-review{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    background:var(--paper-dim);
+  }
+  .qa-review .q{font-weight:600; font-size:14px; margin-bottom:6px;}
+  .qa-review .fb{font-size:13.5px; color:var(--ink-soft); line-height:1.5;}
+
+  /* ---------- Misc ---------- */
+  .empty{
+    text-align:center;
+    color:var(--slate);
+    font-size:14px;
+    padding:30px 10px;
+  }
+  .error-box{
+    background:rgba(181,84,30,0.1);
+    border:1px solid rgba(181,84,30,0.3);
+    color:var(--warn);
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:13.5px;
+    margin-bottom:16px;
+  }
+  .hidden{display:none !important;}
+
+  /* ---------- Docs panel ---------- */
+  .docs{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#fff;
+    overflow:hidden;
+  }
+  .docs summary{
+    cursor:pointer;
+    padding:16px 20px;
+    font-family:var(--serif);
+    font-size:15.5px;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--paper-dim);
+  }
+  .docs summary::-webkit-details-marker{display:none;}
+  .docs summary::after{content:"▾"; color:var(--slate); transition:transform 0.2s;}
+  .docs[open] summary::after{transform:rotate(180deg);}
+  .docs-body{
+    padding:20px 24px 26px;
+    font-size:14px;
+    line-height:1.65;
+    color:var(--ink-soft);
+  }
+  .docs-body h4{
+    font-family:var(--sans);
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--amber);
+    margin:20px 0 8px;
+  }
+  .docs-body h4:first-child{margin-top:0;}
+  .docs-body pre{
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px;
+    font-size:12px;
+    overflow-x:auto;
+    white-space:pre-wrap;
+  }
+  .docs-body code{font-family:var(--mono); font-size:12.5px;}
+
+  footer.credits{
+    text-align:center;
+    color:var(--slate);
+    font-size:12px;
+    margin-top:30px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="stage">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <h1>The Green Room</h1>
+        <p>Mock Interview Coach</p>
+      </div>
+    </div>
+    <div class="stage-status" id="stageStatus">
+      <span class="dot"></span>setup
+    </div>
+  </div>
+
+  <!-- SCREEN 1: SETUP -->
+  <div class="card" id="setupScreen">
+    <h2 class="setup-title">Step into the room</h2>
+    <p class="setup-sub">Describe the role you're preparing for. I'll run a focused mock interview, then hand you a written report — strengths, gaps, and a readiness score — at the end.</p>
+
+    <div class="field">
+      <label class="field-label" for="apiKey">Anthropic API key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-...">
+      <small>Used only in your browser to call the Claude API directly. Never stored or sent anywhere else.</small>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="roleInput">Target role &amp; context</label>
+      <textarea id="roleInput" rows="4" placeholder="e.g. Senior Product Manager at a mid-size fintech startup. I have 6 years of experience in B2B SaaS, moving from an IC role into more strategic ownership. Job description mentions cross-functional leadership and pricing strategy."></textarea>
+      <small>Paste a job title, a full job description, or just describe the role and your background — the more context, the sharper the questions.</small>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label class="field-label" for="levelSelect">Experience level</label>
+        <select id="levelSelect">
+          <option value="entry-level">Entry-level / new grad</option>
+          <option value="mid-level" selected>Mid-level (3–7 yrs)</option>
+          <option value="senior">Senior / lead</option>
+          <option value="executive">Executive / director+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label" for="lengthSelect">Interview length</label>
+        <select id="lengthSelect">
+          <option value="4">Quick — 4 questions</option>
+          <option value="6" selected>Standard — 6 questions</option>
+          <option value="8">Thorough — 8 questions</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="setupError"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="startBtn">Begin mock interview →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: INTERVIEW -->
+  <div class="card hidden" id="interviewScreen">
+    <div class="progress-ladder" id="progressLadder"></div>
+    <div class="chat-log" id="chatLog"></div>
+    <div id="interviewError"></div>
+    <div class="composer">
+      <textarea id="answerInput" placeholder="Type your answer here…" rows="2"></textarea>
+      <button class="btn btn-primary" id="sendBtn">Send</button>
+    </div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-ghost" id="endEarlyBtn">End interview now &amp; get my report</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: REPORT -->
+  <div class="card hidden" id="reportScreen"></div>
+
+  <div class="btn-row hidden" id="restartRow" style="margin-bottom:26px;">
+    <button class="btn btn-ghost" id="restartBtn">Start a new mock interview</button>
+  </div>
+
+  <details class="docs">
+    <summary>How this was built</summary>
+    <div class="docs-body">
+      <h4>System prompt design</h4>
+      <p>The assistant's "brain" is a single system prompt that fixes it into one role: a friendly, encouraging senior interviewer conducting a realistic mock interview for the role and level the candidate describes. It's told explicitly to ask one question at a time, tailor questions to the pasted role/JD (mixing behavioral and role-specific technical questions), keep acknowledgments brief so the candidate does most of the talking, and never break character mid-interview. A hard structural rule — reply only with the next question, nothing else, until told the interview is ending — keeps the conversation predictable enough for the UI to render as a clean chat.</p>
+      <p>For the final turn, the same prompt switches modes: it's instructed to synthesize the whole transcript into strict JSON (score out of 100, verdict line, 3–5 strengths, 3–5 growth areas, and per-question feedback) so the app can render it as a structured report instead of more chat text. Edge cases are handled directly in the prompt: vague or off-topic role descriptions get a best-effort interpretation rather than a refusal; very short or empty candidate answers are noted as a weakness instead of causing the interviewer to stall; and the model is told to never fabricate praise it can't back up with something the candidate actually said.</p>
+
+      <h4>UI decisions</h4>
+      <p>The interface is built around a "green room" metaphor — the quiet space before you go on stage — rather than a generic chatbot shell, to keep the tone calm and encouraging instead of clinical. Three screens map to the natural arc of a real interview: setup (waiting room), a chat-style live interview with a visible progress ladder so nerves have something concrete to track, and a report screen styled like a printed evaluation sheet with a large score, a verdict pill, and separate strength/growth columns so feedback reads as coaching, not just a grade.</p>
+      <p>Motion is deliberately restrained: messages rise in gently, a three-dot typing indicator stands in for the interviewer "thinking," and the progress rungs fill in amber as questions are answered — everything else stays still so the one signature element (the ladder) carries the pacing cue.</p>
+
+      <h4>Ideas for future extensions</h4>
+      <p>Tools: connect a resume-parsing step (PDF upload) so questions are grounded in the candidate's actual experience, not just their self-description; add a web-search tool so the interviewer can reference realistic, current interview questions for a specific company.</p>
+      <p>Memory: persist past sessions (with the user's consent, in real backend storage rather than browser storage) so the coach can track score trends across multiple mock interviews and target previously weak areas first.</p>
+      <p>Multi-step workflows: branch into a two-stage flow — a resume/JD gap analysis before the interview even starts, then a follow-up "rewrite this answer with me" coaching turn after the report, so the report becomes a starting point for iteration rather than a dead end.</p>
+
+      <h4>Raw system prompt (for reference)</h4>
+      <pre id="promptPreview"></pre>
+    </div>
+  </details>
+
+  <footer class="credits">Runs entirely in your browser · calls the Claude API directly · no data stored server-side</footer>
+</div>
+
+<script>
+/* ---------------- System prompt ---------------- */
+function buildSystemPrompt(roleContext, level, totalQuestions){
+  return `You are "The Green Room" mock interview coach — an experienced, friendly, and encouraging senior interviewer with 15+ years of cross-industry hiring experience. Your job in this session is to run ONE realistic mock interview and then deliver ONE structured written report.
+
+CANDIDATE CONTEXT
+- Target role / job description as described by the candidate: """${roleContext}"""
+- Self-reported experience level: ${level}
+- The interview should consist of exactly ${totalQuestions} questions total, mixing:
+  - behavioral questions (using the role and level to pick realistic scenarios)
+  - role-specific or technical questions appropriate to that role and level
+  - at least one question probing a likely weak spot given the role description
+
+SCOPE AND BOUNDARIES
+- Stay strictly in the mock-interview coaching domain. If the candidate goes off-topic, gently steer back to the interview.
+- Never provide the "correct" answer before the candidate has attempted the question.
+- Do not fabricate specific praise or criticism about facts the candidate never stated. Base all feedback only on what they actually wrote.
+- Keep a warm, encouraging tone throughout — this is practice, not a real gatekeeping interview. Never be harsh or discouraging, but do be honest about gaps.
+- If the candidate's described role/context is vague, make a reasonable best-effort interpretation and proceed rather than refusing or over-asking for clarification.
+- If a candidate's answer is empty, extremely short, or clearly a placeholder, treat that as a data point for "growth areas" in the final report rather than stalling the interview — move on to the next question.
+
+CONVERSATION PROTOCOL (STRICT)
+- You will be given the running transcript of the interview so far as the conversation history.
+- On every turn EXCEPT the final report turn: reply with ONLY the next single interview question. No preamble, no acknowledgment of the previous answer beyond at most one short warm sentence (e.g. "Good, thanks for sharing that."), no numbering, no meta-commentary, no markdown formatting. Just natural spoken-style interviewer text.
+- Ask only ONE question per turn. Never ask multiple questions at once.
+- Do not repeat a question type you've already asked. Vary behavioral, situational, and technical/role-specific framing across the ${totalQuestions} questions.
+- When you are explicitly told "This is the final message. The interview is now over. Generate the final report." — switch modes completely and respond with STRICT JSON ONLY (no markdown fences, no prose before or after) matching exactly this shape:
+{
+  "score": <integer 0-100>,
+  "verdict": "<one short sentence, encouraging but honest overall assessment>",
+  "strengths": ["<3-5 specific strengths, each grounded in something the candidate actually said>"],
+  "growth_areas": ["<3-5 specific, actionable growth areas, each grounded in the transcript>"],
+  "question_feedback": [
+    {"question": "<the question asked>", "feedback": "<2-3 sentence specific feedback on that answer>"}
+  ]
+}
+- The question_feedback array must contain one entry per question actually asked in the transcript, in order.
+- Never include any text outside the JSON object on the final turn.
+- Never break character or mention you are an AI language model during the interview questions themselves.`;
+}
+
+/* ---------------- State ---------------- */
+let state = {
+  apiKey: '',
+  roleContext: '',
+  level: '',
+  totalQuestions: 6,
+  askedCount: 0,
+  transcript: [], // {role: 'interviewer'|'candidate', text}
+  systemPrompt: '',
+  busy: false
+};
+
+const el = id => document.getElementById(id);
+
+document.addEventListener('DOMContentLoaded', () => {
+  el('startBtn').addEventListener('click', startInterview);
+  el('sendBtn').addEventListener('click', sendAnswer);
+  el('endEarlyBtn').addEventListener('click', () => finishInterview(true));
+  el('restartBtn').addEventListener('click', resetAll);
+  el('answerInput').addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      sendAnswer();
+    }
+  });
+});
+
+function setStatus(text, live){
+  const s = el('stageStatus');
+  s.className = 'stage-status' + (live ? ' live' : '');
+  s.innerHTML = '<span class="dot"></span>' + text;
+}
+
+/* ---------------- Screen 1: setup ---------------- */
+async function startInterview(){
+  const apiKey = el('apiKey').value.trim();
+  const roleContext = el('roleInput').value.trim();
+  const level = el('levelSelect').value;
+  const totalQuestions = parseInt(el('lengthSelect').value, 10);
+  const errBox = el('setupError');
+  errBox.innerHTML = '';
+
+  if(!apiKey){
+    errBox.innerHTML = '<div class="error-box">Add your Anthropic API key to begin.</div>';
+    return;
+  }
+  if(!roleContext){
+    errBox.innerHTML = '<div class="error-box">Describe the role you\\'re preparing for — even a job title works.</div>';
+    return;
+  }
+
+  state.apiKey = apiKey;
+  state.roleContext = roleContext;
+  state.level = level;
+  state.totalQuestions = totalQuestions;
+  state.systemPrompt = buildSystemPrompt(roleContext, level, totalQuestions);
+  el('promptPreview').textContent = state.systemPrompt;
+
+  el('startBtn').disabled = true;
+  el('startBtn').textContent = 'Opening the room…';
+
+  el('setupScreen').classList.add('hidden');
+  el('interviewScreen').classList.remove('hidden');
+  buildLadder();
+  setStatus('interview live', true);
+
+  showTyping();
+  try{
+    const firstQuestion = await callClaude([{role:'user', content:'This is the start of the interview. Ask the first question now.'}]);
+    hideTyping();
+    addMessage('interviewer', firstQuestion.trim());
+    state.transcript.push({role:'interviewer', text: firstQuestion.trim()});
+    state.askedCount = 1;
+    updateLadder();
+  }catch(e){
+    hideTyping();
+    showInterviewError(e.message);
+  }
+}
+
+/* ---------------- Screen 2: interview ---------------- */
+function buildLadder(){
+  const ladder = el('progressLadder');
+  ladder.innerHTML = '';
+  for(let i=0;i<state.totalQuestions;i++){
+    const r = document.createElement('div');
+    r.className = 'rung';
+    ladder.appendChild(r);
+  }
+}
+function updateLadder(){
+  const rungs = el('progressLadder').children;
+  for(let i=0;i<rungs.length;i++){
+    rungs[i].className = 'rung' + (i < state.askedCount - 1 ? ' done' : (i === state.askedCount - 1 ? ' active' : ''));
+  }
+}
+
+function addMessage(role, text){
+  const log = el('chatLog');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const tag = document.createElement('span');
+  tag.className = 'role-tag';
+  tag.textContent = role === 'interviewer' ? 'Interviewer' : 'You';
+  div.appendChild(tag);
+  const body = document.createElement('span');
+  body.textContent = text;
+  div.appendChild(body);
+  log.appendChild(div);
+  div.scrollIntoView({behavior:'smooth', block:'end'});
+}
+
+function showTyping(){
+  const log = el('chatLog');
+  const t = document.createElement('div');
+  t.className = 'typing';
+  t.id = 'typingIndicator';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  log.appendChild(t);
+  t.scrollIntoView({behavior:'smooth', block:'end'});
+}
+function hideTyping(){
+  const t = el('typingIndicator');
+  if(t) t.remove();
+}
+
+function showInterviewError(msg){
+  el('interviewError').innerHTML = '<div class="error-box">Something went wrong: ' + escapeHtml(msg) + '. Check your API key and try again.</div>';
+}
+
+async function sendAnswer(){
+  if(state.busy) return;
+  const input = el('answerInput');
+  const text = input.value.trim();
+  if(!text) return;
+  el('interviewError').innerHTML = '';
+
+  addMessage('candidate', text);
+  state.transcript.push({role:'candidate', text});
+  input.value = '';
+
+  if(state.askedCount >= state.totalQuestions){
+    finishInterview(false);
+    return;
+  }
+
+  state.busy = true;
+  el('sendBtn').disabled = true;
+  showTyping();
+  try{
+    const nextQuestion = await callClaude(transcriptToMessages().concat([{role:'user', content:'Continue the interview. Ask the next question now.'}]));
+    hideTyping();
+    addMessage('interviewer', nextQuestion.trim());
+    state.transcript.push({role:'interviewer', text: nextQuestion.trim()});
+    state.askedCount++;
+    updateLadder();
+  }catch(e){
+    hideTyping();
+    showInterviewError(e.message);
+  }finally{
+    state.busy = false;
+    el('sendBtn').disabled = false;
+  }
+}
+
+function transcriptToMessages(){
+  // Map our transcript into alternating user/assistant messages for the API.
+  // interviewer = assistant, candidate = user
+  return state.transcript.map(t => ({
+    role: t.role === 'interviewer' ? 'assistant' : 'user',
+    content: t.text
+  }));
+}
+
+/* ---------------- Screen 3: report ---------------- */
+async function finishInterview(early){
+  if(state.busy) return;
+  state.busy = true;
+  el('sendBtn').disabled = true;
+  el('endEarlyBtn').disabled = true;
+  setStatus('scoring…', true);
+  showTyping();
+
+  try{
+    const raw = await callClaude(transcriptToMessages().concat([{role:'user', content:'This is the final message. The interview is now over. Generate the final report.'}]));
+    hideTyping();
+    const report = parseReportJSON(raw);
+    renderReport(report);
+    el('interviewScreen').classList.add('hidden');
+    el('reportScreen').classList.remove('hidden');
+    el('restartRow').classList.remove('hidden');
+    setStatus('report ready', false);
+  }catch(e){
+    hideTyping();
+    showInterviewError('Could not generate your report — ' + e.message);
+    setStatus('interview live', true);
+  }finally{
+    state.busy = false;
+    el('sendBtn').disabled = false;
+    el('endEarlyBtn').disabled = false;
+  }
+}
+
+function parseReportJSON(raw){
+  let cleaned = raw.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  try{
+    return JSON.parse(cleaned);
+  }catch(e){
+    // best-effort: find the first { ... last }
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if(start !== -1 && end !== -1){
+      return JSON.parse(cleaned.slice(start, end+1));
+    }
+    throw new Error('the report response was not valid JSON');
+  }
+}
+
+function renderReport(report){
+  const screen = el('reportScreen');
+  const score = Math.max(0, Math.min(100, parseInt(report.score,10) || 0));
+  let html = '';
+  html += '<div class="report-header">';
+  html += '  <div>';
+  html += '    <h2 class="setup-title">Your interview report</h2>';
+  html += '    <p class="setup-sub" style="margin-bottom:0;">' + escapeHtml(report.verdict || '') + '</p>';
+  html += '    <span class="verdict-pill">' + scoreWord(score) + '</span>';
+  html += '  </div>';
+  html += '  <div class="score-badge"><div class="score-num">' + score + '<span>/100</span></div><div class="score-label">Readiness score</div></div>';
+  html += '</div>';
+
+  html += '<h3 class="report-section-title strength">Strengths</h3><ul class="report-list">';
+  (report.strengths||[]).forEach(s => html += '<li>' + escapeHtml(s) + '</li>');
+  html += '</ul>';
+
+  html += '<h3 class="report-section-title weakness">Growth areas</h3><ul class="report-list">';
+  (report.growth_areas||[]).forEach(s => html += '<li>' + escapeHtml(s) + '</li>');
+  html += '</ul>';
+
+  html += '<h3 class="report-section-title" style="margin-top:28px;">Question-by-question review</h3>';
+  (report.question_feedback||[]).forEach(qf => {
+    html += '<div class="qa-review"><div class="q">' + escapeHtml(qf.question||'') + '</div><div class="fb">' + escapeHtml(qf.feedback||'') + '</div></div>';
+  });
+
+  screen.innerHTML = html;
+}
+
+function scoreWord(score){
+  if(score >= 85) return 'Interview-ready';
+  if(score >= 70) return 'Nearly there';
+  if(score >= 50) return 'Needs more reps';
+  return 'Keep practicing';
+}
+
+/* ---------------- Helpers ---------------- */
+function resetAll(){
+  state = {apiKey: el('apiKey').value, roleContext:'', level:'', totalQuestions:6, askedCount:0, transcript:[], systemPrompt:'', busy:false};
+  el('chatLog').innerHTML = '';
+  el('reportScreen').innerHTML = '';
+  el('roleInput').value = '';
+  el('setupError').innerHTML = '';
+  el('interviewError').innerHTML = '';
+  el('startBtn').disabled = false;
+  el('startBtn').textContent = 'Begin mock interview →';
+  el('reportScreen').classList.add('hidden');
+  el('interviewScreen').classList.add('hidden');
+  el('restartRow').classList.add('hidden');
+  el('setupScreen').classList.remove('hidden');
+  setStatus('setup', false);
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str == null ? '' : String(str);
+  return d.innerHTML;
+}
+
+async function callClaude(messages){
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': state.apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: state.systemPrompt,
+      messages: messages
+    })
+  });
+
+  if(!response.ok){
+    let detail = '';
+    try{ const j = await response.json(); detail = j.error && j.error.message ? j.error.message : JSON.stringify(j); }catch(e){}
+    throw new Error('API error (' + response.status + ')' + (detail ? ': ' + detail : ''));
+  }
+
+  const data = await response.json();
+  const textBlock = (data.content||[]).find(b => b.type === 'text');
+  if(!textBlock) throw new Error('no text returned by the model');
+  return textBlock.text;
+}
+</script>
+</body>
+</html>
