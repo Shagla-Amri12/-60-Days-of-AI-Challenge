@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Financial Command Center — Student Edition</title>
+<style>
+  :root{
+    --bg:#0f1016;
+    --bg-panel:#171925;
+    --bg-panel-2:#1e2130;
+    --bg-raised:#252a3d;
+    --line:#2c2f42;
+    --text:#eef0f7;
+    --text-dim:#9296ac;
+    --text-faint:#5d6178;
+    --amber:#ffb703;
+    --amber-dim:#8a6a1f;
+    --mint:#6fcf97;
+    --coral:#ff6b6b;
+    --sky:#5aa9e6;
+    --radius:14px;
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+    --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  }
+  html.light{
+    --bg:#f5f4f0;
+    --bg-panel:#ffffff;
+    --bg-panel-2:#faf9f6;
+    --bg-raised:#ffffff;
+    --line:#e3e1da;
+    --text:#1b1c22;
+    --text-dim:#5b5d6b;
+    --text-faint:#8b8d99;
+    --shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  html,body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--amber); color:#1a1400; }
+  a{color:inherit;}
+  button{font-family:inherit;}
+  .app{
+    display:grid;
+    grid-template-columns:240px 1fr;
+    min-height:100vh;
+  }
+  /* SIDEBAR */
+  .sidebar{
+    background:var(--bg-panel);
+    border-right:1px solid var(--line);
+    padding:22px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    margin:4px 6px 22px 6px;
+  }
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(155deg,var(--amber),#c98f00);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display); font-weight:700; color:#1a1400; font-size:17px;
+    flex-shrink:0;
+  }
+  .brand-text{font-family:var(--font-display); font-size:15.5px; line-height:1.15; font-weight:700; letter-spacing:.2px;}
+  .brand-text span{display:block; font-family:var(--font-body); font-weight:500; font-size:10.5px; color:var(--text-faint); letter-spacing:.6px; text-transform:uppercase; margin-top:2px;}
+  .nav-item{
+    display:flex; align-items:center; gap:11px;
+    padding:9px 12px; border-radius:9px;
+    color:var(--text-dim); cursor:pointer; font-size:13.6px; font-weight:500;
+    border:1px solid transparent;
+    transition:background .15s, color .15s;
+    user-select:none;
+  }
+  .nav-item .ic{width:17px;text-align:center;font-size:14px;flex-shrink:0;}
+  .nav-item:hover{background:var(--bg-panel-2); color:var(--text);}
+  .nav-item.active{background:var(--bg-raised); color:var(--amber); border-color:var(--line);}
+  .nav-group-label{
+    font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-faint);
+    margin:16px 12px 6px 12px; font-weight:700;
+  }
+  .sidebar-foot{
+    margin-top:auto; padding:12px 6px 4px 6px; font-size:11px; color:var(--text-faint);
+    border-top:1px solid var(--line); padding-top:14px;
+  }
+
+  /* MAIN */
+  .main{padding:26px 34px 60px 34px; max-width:1180px;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    margin-bottom:26px;
+  }
+  .topbar h1{font-family:var(--font-display); font-size:26px; margin:0; font-weight:700;}
+  .topbar .sub{color:var(--text-dim); font-size:13px; margin-top:3px;}
+  .top-actions{display:flex; gap:10px; align-items:center;}
+  .icon-btn{
+    background:var(--bg-panel); border:1px solid var(--line); color:var(--text-dim);
+    width:38px; height:38px; border-radius:10px; cursor:pointer; font-size:15px;
+    display:flex; align-items:center; justify-content:center; transition:.15s;
+  }
+  .icon-btn:hover{color:var(--text); border-color:var(--amber);}
+  .btn{
+    background:var(--amber); color:#1a1400; border:none; padding:9px 16px; border-radius:9px;
+    font-weight:700; font-size:13px; cursor:pointer; transition:transform .1s, filter .15s;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn:active{transform:scale(.97);}
+  .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--text);}
+  .btn.small{padding:6px 11px; font-size:12px;}
+  .btn.danger{background:var(--coral); color:#2b0505;}
+
+  .section{display:none; animation:fade .35s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .grid{display:grid; gap:16px;}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:1000px){
+    .grid.cols-4{grid-template-columns:repeat(2,1fr);}
+    .grid.cols-3{grid-template-columns:repeat(2,1fr);}
+  }
+
+  .card{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px;
+  }
+  .card h3{margin:0 0 12px 0; font-size:14px; font-family:var(--font-display); font-weight:700;}
+  .card .hint{font-size:11.5px; color:var(--text-faint); margin-top:2px;}
+
+  .stat-card{position:relative; overflow:hidden;}
+  .stat-label{font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.6px; font-weight:700;}
+  .stat-value{font-family:var(--font-mono); font-size:26px; font-weight:600; margin-top:6px;}
+  .stat-delta{font-size:12px; margin-top:6px; font-weight:600;}
+  .stat-delta.up{color:var(--mint);}
+  .stat-delta.down{color:var(--coral);}
+
+  /* JAR SIGNATURE ELEMENT */
+  .jar-wrap{display:flex; align-items:center; gap:26px; flex-wrap:wrap;}
+  .jar-figure{flex-shrink:0; text-align:center;}
+  .jar-caption{font-size:12px; color:var(--text-dim); margin-top:8px; max-width:150px;}
+  .jar-caption b{color:var(--text);}
+  .jar-stats{flex:1; min-width:220px; display:flex; flex-direction:column; gap:10px;}
+  .jar-row{display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px dashed var(--line);}
+  .jar-row:last-child{border-bottom:none;}
+  .jar-row .v{font-family:var(--font-mono); font-weight:600;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; color:var(--text-faint); font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:8px 10px; border-bottom:1px solid var(--line);}
+  td{padding:9px 10px; border-bottom:1px solid var(--line);}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600;}
+  .tag.food{background:#3a2b12; color:#ffb703;}
+  .tag.fun{background:#2a1230; color:#d093ff;}
+  .tag.transport{background:#0f2b3a; color:#5aa9e6;}
+  .tag.subs{background:#2a0f14; color:#ff8787;}
+  .tag.other{background:#1a1e2e; color:#9296ac;}
+  html.light .tag{filter:none;}
+
+  .progress{height:9px; border-radius:6px; background:var(--bg-raised); overflow:hidden; border:1px solid var(--line);}
+  .progress > div{height:100%; border-radius:6px; transition:width .5s ease;}
+
+  .budget-row{margin-bottom:16px;}
+  .budget-row .top{display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;}
+  .budget-row .top .amt{font-family:var(--font-mono); color:var(--text-dim);}
+
+  input, select{
+    background:var(--bg-raised); border:1px solid var(--line); color:var(--text);
+    padding:8px 10px; border-radius:8px; font-size:13px; font-family:inherit; width:100%;
+  }
+  input:focus, select:focus{outline:none; border-color:var(--amber);}
+  label{font-size:11.5px; color:var(--text-dim); font-weight:600; display:block; margin-bottom:5px;}
+  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
+  .form-row.single{grid-template-columns:1fr;}
+
+  .health-ring-wrap{display:flex; align-items:center; gap:24px; flex-wrap:wrap;}
+  .health-badge{font-size:13px; font-weight:700; padding:5px 12px; border-radius:20px; display:inline-block;}
+  .health-good{background:#123a24; color:var(--mint);}
+  .health-mid{background:#3a2b12; color:var(--amber);}
+  .health-bad{background:#3a1414; color:var(--coral);}
+
+  .insight{
+    display:flex; gap:12px; padding:12px 14px; border-radius:10px; background:var(--bg-panel-2);
+    border:1px solid var(--line); margin-bottom:10px; font-size:13px; line-height:1.5;
+  }
+  .insight .ic{font-size:17px; flex-shrink:0;}
+  .insight b{color:var(--text);}
+
+  .list-empty{color:var(--text-faint); font-size:13px; padding:20px 0; text-align:center;}
+
+  .checklist label{display:flex; align-items:flex-start; gap:9px; font-size:13.5px; color:var(--text); font-weight:400; margin-bottom:10px; cursor:pointer;}
+  .checklist input[type=checkbox]{width:auto; margin-top:2px; accent-color:var(--amber);}
+  .checklist .done{color:var(--text-faint); text-decoration:line-through;}
+
+  .tip-card{border-left:3px solid var(--amber); padding-left:12px;}
+
+  .sim-output{
+    background:var(--bg-panel-2); border:1px solid var(--line); border-radius:10px; padding:16px;
+    margin-top:14px; font-size:13px;
+  }
+  .sim-output .big{font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--amber); margin:6px 0;}
+
+  .divider{height:1px; background:var(--line); margin:22px 0;}
+
+  ::-webkit-scrollbar{width:9px; height:9px;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:6px;}
+
+  @media print{
+    .sidebar, .topbar .top-actions, .no-print{display:none !important;}
+    .app{display:block;}
+    .section{display:none;}
+    .section.print-active{display:block !important;}
+    body{background:white; color:black;}
+    .card{border:1px solid #ccc; break-inside:avoid;}
+  }
+
+  @media(max-width:860px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:relative; height:auto; flex-direction:row; flex-wrap:wrap; overflow-x:auto;}
+    .brand{margin-bottom:0;}
+    .nav-group-label{display:none;}
+    .main{padding:20px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">₹</div>
+      <div class="brand-text">Command Center<span>Student Edition</span></div>
+    </div>
+
+    <div class="nav-item active" data-target="overview"><span class="ic">◈</span> Overview</div>
+
+    <div class="nav-group-label">Money In / Out</div>
+    <div class="nav-item" data-target="income"><span class="ic">↓</span> Allowance & Income</div>
+    <div class="nav-item" data-target="expenses"><span class="ic">↑</span> Expenses</div>
+    <div class="nav-item" data-target="budgets"><span class="ic">▤</span> Budgets</div>
+    <div class="nav-item" data-target="subs"><span class="ic">↻</span> Subscriptions</div>
+
+    <div class="nav-group-label">Grow</div>
+    <div class="nav-item" data-target="goals"><span class="ic">★</span> Savings Goals</div>
+    <div class="nav-item" data-target="cashflow"><span class="ic">∿</span> Cash Flow</div>
+
+    <div class="nav-group-label">Understand</div>
+    <div class="nav-item" data-target="health"><span class="ic">♥</span> Health Score</div>
+    <div class="nav-item" data-target="insights"><span class="ic">✦</span> Insights</div>
+    <div class="nav-item" data-target="simulator"><span class="ic">≈</span> What-If Simulator</div>
+
+    <div class="nav-group-label">Wrap Up</div>
+    <div class="nav-item" data-target="reports"><span class="ic">▦</span> Reports</div>
+    <div class="nav-item" data-target="learn"><span class="ic">◍</span> Tips & Resources</div>
+
+    <div class="sidebar-foot">Data stays in this browser tab only — nothing is uploaded.</div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">Overview</h1>
+        <div class="sub" id="pageSub">Your whole financial picture, at a glance.</div>
+      </div>
+      <div class="top-actions no-print">
+        <button class="icon-btn" id="printBtn" title="Print report">⎙</button>
+        <button class="icon-btn" id="themeBtn" title="Toggle light/dark">☾</button>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section class="section active" id="sec-overview">
+      <div class="grid cols-4" style="margin-bottom:16px;">
+        <div class="card stat-card">
+          <div class="stat-label">Monthly Allowance</div>
+          <div class="stat-value" id="ov-income">₹0</div>
+          <div class="stat-delta up">Fixed monthly inflow</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-label">Spent this month</div>
+          <div class="stat-value" id="ov-spent">₹0</div>
+          <div class="stat-delta" id="ov-spent-delta">—</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-label">Left to spend</div>
+          <div class="stat-value" id="ov-left">₹0</div>
+          <div class="stat-delta" id="ov-left-note">—</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-label">Saved this month</div>
+          <div class="stat-value" id="ov-saved">₹0</div>
+          <div class="stat-delta up">Toward your goals</div>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>The Allowance Jar</h3>
+          <div class="jar-wrap">
+            <div class="jar-figure">
+              <svg width="120" height="150" viewBox="0 0 120 150">
+                <defs>
+                  <clipPath id="jarClip">
+                    <path d="M30 40 L28 130 Q28 142 40 142 L80 142 Q92 142 92 130 L90 40 Z"/>
+                  </clipPath>
+                </defs>
+                <path d="M30 40 L28 130 Q28 142 40 142 L80 142 Q92 142 92 130 L90 40 Z" fill="none" stroke="var(--line)" stroke-width="3"/>
+                <rect x="26" y="26" width="68" height="16" rx="4" fill="none" stroke="var(--line)" stroke-width="3"/>
+                <g clip-path="url(#jarClip)">
+                  <rect id="jarFill" x="26" y="150" width="68" height="0" fill="var(--amber)"/>
+                </g>
+                <text id="jarPct" x="60" y="95" text-anchor="middle" font-family="ui-monospace,monospace" font-size="20" font-weight="700" fill="var(--text)">0%</text>
+              </svg>
+            </div>
+            <div class="jar-caption" id="jarCaption">Set your allowance and log expenses to fill the jar.</div>
+            <div class="jar-stats">
+              <div class="jar-row"><span>Days left this month</span><span class="v" id="ov-daysleft">—</span></div>
+              <div class="jar-row"><span>Safe to spend / day</span><span class="v" id="ov-perday">₹0</span></div>
+              <div class="jar-row"><span>Biggest expense category</span><span class="v" id="ov-topcat">—</span></div>
+              <div class="jar-row"><span>Financial health score</span><span class="v" id="ov-healthmini">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Spending by category</h3>
+          <div id="ov-catchart"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Recent activity</h3>
+          <table id="ov-recent"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th style="text-align:right">Amount</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="card">
+          <h3>Top insight right now</h3>
+          <div id="ov-topinsight"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INCOME -->
+    <section class="section" id="sec-income">
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Set up your allowance & income</h3>
+          <div class="form-row">
+            <div><label>Monthly allowance (₹)</label><input type="number" id="in-allowance" placeholder="e.g. 8000"></div>
+            <div><label>Allowance day of month</label><input type="number" id="in-allowday" min="1" max="28" placeholder="e.g. 1"></div>
+          </div>
+          <div class="form-row">
+            <div><label>Part-time / gig income (₹/mo, optional)</label><input type="number" id="in-parttime" placeholder="e.g. 0"></div>
+            <div><label>Other income (₹/mo, optional)</label><input type="number" id="in-other" placeholder="e.g. 0"></div>
+          </div>
+          <button class="btn" id="in-save">Save income details</button>
+          <p class="hint">This total becomes your monthly budget baseline everywhere in the dashboard.</p>
+        </div>
+        <div class="card">
+          <h3>Income breakdown</h3>
+          <div id="in-breakdown"></div>
+          <div class="divider"></div>
+          <div class="stat-label">Total monthly income</div>
+          <div class="stat-value" id="in-total">₹0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPENSES -->
+    <section class="section" id="sec-expenses">
+      <div class="grid cols-2" style="align-items:start;">
+        <div class="card">
+          <h3>Log an expense</h3>
+          <div class="form-row">
+            <div><label>Description</label><input type="text" id="ex-desc" placeholder="e.g. Canteen lunch"></div>
+            <div><label>Amount (₹)</label><input type="number" id="ex-amt" placeholder="e.g. 120"></div>
+          </div>
+          <div class="form-row">
+            <div><label>Category</label>
+              <select id="ex-cat">
+                <option value="food">Food & Canteen</option>
+                <option value="transport">Transport</option>
+                <option value="fun">Fun & Social</option>
+                <option value="subs">Subscriptions</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div><label>Date</label><input type="date" id="ex-date"></div>
+          </div>
+          <button class="btn" id="ex-add">Add expense</button>
+        </div>
+        <div class="card">
+          <h3>This month's spending</h3>
+          <div class="stat-value" id="ex-total" style="margin-bottom:10px;">₹0</div>
+          <div id="ex-catbars"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="card">
+        <h3>All expenses</h3>
+        <table id="ex-table"><thead><tr><th>Date</th><th>Description</th><th>Category</th><th style="text-align:right">Amount</th><th class="no-print"></th></tr></thead><tbody></tbody></table>
+        <div class="list-empty" id="ex-empty" style="display:none;">No expenses logged yet. Add your first one above.</div>
+      </div>
+    </section>
+
+    <!-- BUDGETS -->
+    <section class="section" id="sec-budgets">
+      <div class="grid cols-2" style="align-items:start;">
+        <div class="card">
+          <h3>Set category budgets</h3>
+          <p class="hint" style="margin-bottom:12px;">Give each category a monthly ceiling. We'll warn you before you blow past it.</p>
+          <div id="budget-inputs"></div>
+          <button class="btn" id="budget-save" style="margin-top:10px;">Save budgets</button>
+        </div>
+        <div class="card">
+          <h3>Budget progress</h3>
+          <div id="budget-progress"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBSCRIPTIONS -->
+    <section class="section" id="sec-subs">
+      <div class="grid cols-2" style="align-items:start;">
+        <div class="card">
+          <h3>Add a subscription</h3>
+          <div class="form-row">
+            <div><label>Name</label><input type="text" id="sub-name" placeholder="e.g. Spotify"></div>
+            <div><label>Monthly cost (₹)</label><input type="number" id="sub-cost" placeholder="e.g. 119"></div>
+          </div>
+          <button class="btn" id="sub-add">Add subscription</button>
+        </div>
+        <div class="card">
+          <h3>Subscription load</h3>
+          <div class="stat-value" id="sub-total">₹0/mo</div>
+          <div class="hint" id="sub-pct-note">—</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="card">
+        <h3>Active subscriptions</h3>
+        <table id="sub-table"><thead><tr><th>Name</th><th style="text-align:right">Monthly cost</th><th style="text-align:right">Yearly cost</th><th class="no-print"></th></tr></thead><tbody></tbody></table>
+        <div class="list-empty" id="sub-empty" style="display:none;">No subscriptions added yet.</div>
+      </div>
+    </section>
+
+    <!-- GOALS -->
+    <section class="section" id="sec-goals">
+      <div class="grid cols-2" style="align-items:start;">
+        <div class="card">
+          <h3>Create a savings goal</h3>
+          <div class="form-row">
+            <div><label>Goal name</label><input type="text" id="goal-name" placeholder="e.g. New headphones"></div>
+            <div><label>Target amount (₹)</label><input type="number" id="goal-target" placeholder="e.g. 3000"></div>
+          </div>
+          <div class="form-row">
+            <div><label>Already saved (₹)</label><input type="number" id="goal-saved" placeholder="e.g. 500"></div>
+            <div><label>Target date</label><input type="date" id="goal-date"></div>
+          </div>
+          <button class="btn" id="goal-add">Add goal</button>
+        </div>
+        <div class="card">
+          <h3>How your goals are pacing</h3>
+          <div id="goal-pace"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="grid cols-3" id="goal-cards"></div>
+    </section>
+
+    <!-- CASH FLOW -->
+    <section class="section" id="sec-cashflow">
+      <div class="card">
+        <h3>Monthly cash flow</h3>
+        <div id="cashflow-chart"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="grid cols-3">
+        <div class="card">
+          <div class="stat-label">Total in</div>
+          <div class="stat-value" id="cf-in">₹0</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Total out</div>
+          <div class="stat-value" id="cf-out">₹0</div>
+        </div>
+        <div class="card">
+          <div class="stat-label">Net</div>
+          <div class="stat-value" id="cf-net">₹0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HEALTH SCORE -->
+    <section class="section" id="sec-health">
+      <div class="card">
+        <h3>Your financial health score</h3>
+        <div class="health-ring-wrap">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="var(--line)" stroke-width="12"/>
+            <circle id="health-arc" cx="70" cy="70" r="60" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" transform="rotate(-90 70 70)"/>
+            <text id="health-num" x="70" y="78" text-anchor="middle" font-family="ui-monospace,monospace" font-size="30" font-weight="700" fill="var(--text)">0</text>
+          </svg>
+          <div>
+            <div class="health-badge health-mid" id="health-badge">Getting started</div>
+            <p class="hint" style="max-width:340px; margin-top:10px; font-size:13px;" id="health-desc">Add income and a few expenses to calculate your score.</p>
+          </div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="card">
+        <h3>Score breakdown</h3>
+        <div id="health-breakdown"></div>
+      </div>
+    </section>
+
+    <!-- INSIGHTS -->
+    <section class="section" id="sec-insights">
+      <div class="card">
+        <h3>AI-generated recommendations</h3>
+        <div id="insights-list"></div>
+      </div>
+    </section>
+
+    <!-- SIMULATOR -->
+    <section class="section" id="sec-simulator">
+      <div class="grid cols-2" style="align-items:start;">
+        <div class="card">
+          <h3>What if I cut a category?</h3>
+          <label>Category to reduce</label>
+          <select id="sim-cat">
+            <option value="food">Food & Canteen</option>
+            <option value="transport">Transport</option>
+            <option value="fun">Fun & Social</option>
+            <option value="subs">Subscriptions</option>
+            <option value="other">Other</option>
+          </select>
+          <label style="margin-top:10px;">Reduce by (%)</label>
+          <input type="range" id="sim-pct" min="0" max="100" value="20">
+          <div class="hint" id="sim-pct-label">20%</div>
+          <div class="sim-output" id="sim-output-1"></div>
+        </div>
+        <div class="card">
+          <h3>What if my allowance changes?</h3>
+          <label>New monthly allowance (₹)</label>
+          <input type="number" id="sim-allowance" placeholder="e.g. 9000">
+          <div class="sim-output" id="sim-output-2"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="card">
+        <h3>Savings goal calculator</h3>
+        <div class="form-row">
+          <div><label>Target amount (₹)</label><input type="number" id="calc-target" placeholder="e.g. 5000"></div>
+          <div><label>Months to save</label><input type="number" id="calc-months" placeholder="e.g. 5"></div>
+        </div>
+        <button class="btn small" id="calc-run">Calculate</button>
+        <div class="sim-output" id="calc-output"></div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="section" id="sec-reports">
+      <div class="card no-print">
+        <h3>Printable monthly report</h3>
+        <p class="hint">Click print to generate a clean PDF/paper copy of this month's summary — everything below is included.</p>
+        <button class="btn" id="report-print">Print this report</button>
+      </div>
+      <div class="divider"></div>
+      <div class="card" id="report-body">
+        <h3>Monthly Summary — <span id="rep-month"></span></h3>
+        <div id="rep-content"></div>
+      </div>
+    </section>
+
+    <!-- LEARN -->
+    <section class="section" id="sec-learn">
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Quick tips for students</h3>
+          <div class="tip-card" style="margin-bottom:14px;"><b>Pay yourself first.</b><br><span class="hint">Move a small fixed amount to savings the day your allowance lands, before you spend on anything else.</span></div>
+          <div class="tip-card" style="margin-bottom:14px;"><b>Use the 50/30/20 idea loosely.</b><br><span class="hint">Roughly 50% needs, 30% wants, 20% savings — adjust the split to fit a student budget.</span></div>
+          <div class="tip-card" style="margin-bottom:14px;"><b>Audit subscriptions monthly.</b><br><span class="hint">Small recurring charges are the easiest overspending to miss.</span></div>
+          <div class="tip-card"><b>Track before you cut.</b><br><span class="hint">You can't fix what you haven't measured — log every expense for at least 2 weeks.</span></div>
+        </div>
+        <div class="card">
+          <h3>Monthly financial checklist</h3>
+          <div class="checklist" id="checklist"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Useful resources</h3>
+          <ul style="font-size:13px; line-height:2; padding-left:18px; margin:0;">
+            <li>Your college's student financial aid or counseling office</li>
+            <li>A basic banking app with spend notifications turned on</li>
+            <li>A shared spreadsheet with roommates for split expenses</li>
+            <li>Campus library workshops on personal finance, if offered</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Prompts to explore with Claude</h3>
+          <ul style="font-size:13px; line-height:1.9; padding-left:18px; margin:0;">
+            <li>"Help me build a realistic weekly food budget on my allowance."</li>
+            <li>"Which of my subscriptions are worth keeping as a student?"</li>
+            <li>"Explain compound interest using my own savings goal as an example."</li>
+            <li>"Suggest a side-income idea that fits a student schedule."</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- STATE (in-memory only, per skill guidance no localStorage in artifacts) ----------
+  const state = {
+    income: { allowance: 8000, allowday: 1, parttime: 0, other: 0 },
+    expenses: [
+      { id: 1, desc: "Canteen lunch", amt: 140, cat: "food", date: isoDaysAgo(1) },
+      { id: 2, desc: "Auto to campus", amt: 60, cat: "transport", date: isoDaysAgo(2) },
+      { id: 3, desc: "Movie with friends", amt: 350, cat: "fun", date: isoDaysAgo(4) },
+      { id: 4, desc: "Netflix", amt: 149, cat: "subs", date: isoDaysAgo(6) },
+      { id: 5, desc: "Groceries snacks", amt: 220, cat: "food", date: isoDaysAgo(8) }
+    ],
+    budgets: { food: 2000, transport: 800, fun: 1200, subs: 400, other: 600 },
+    subs: [
+      { id: 1, name: "Netflix", cost: 149 },
+      { id: 2, name: "Spotify", cost: 119 }
+    ],
+    goals: [
+      { id: 1, name: "New headphones", target: 3000, saved: 900, date: addMonths(3) }
+    ],
+    checklist: {}
+  };
+  let nextExpId = 6, nextSubId = 3, nextGoalId = 2;
+
+  const CAT_LABEL = { food:"Food & Canteen", transport:"Transport", fun:"Fun & Social", subs:"Subscriptions", other:"Other" };
+  const CAT_COLOR = { food:"#ffb703", transport:"#5aa9e6", fun:"#d093ff", subs:"#ff8787", other:"#9296ac" };
+
+  function isoDaysAgo(n){ const d = new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+  function addMonths(n){ const d = new Date(); d.setMonth(d.getMonth()+n); return d.toISOString().slice(0,10); }
+  function fmt(n){ n = Math.round(n||0); return "₹" + n.toLocaleString("en-IN"); }
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+  // ---------- NAV ----------
+  const navItems = document.querySelectorAll(".nav-item");
+  const sections = document.querySelectorAll(".section");
+  const titles = {
+    overview:["Overview","Your whole financial picture, at a glance."],
+    income:["Allowance & Income","Set up where your money comes from."],
+    expenses:["Expenses","Log and review every rupee going out."],
+    budgets:["Budgets","Set ceilings so spending doesn't creep up."],
+    subs:["Subscriptions","Every recurring charge, in one place."],
+    goals:["Savings Goals","What you're working toward, and how close you are."],
+    cashflow:["Cash Flow","Money in versus money out, month by month."],
+    health:["Financial Health Score","A single number for how your money is doing."],
+    insights:["Insights","Recommendations based on your actual numbers."],
+    simulator:["What-If Simulator","Test changes before you make them."],
+    reports:["Reports","A clean summary you can print or save."],
+    learn:["Tips & Resources","Habits, checklists, and things worth reading."]
+  };
+  navItems.forEach(item=>{
+    item.addEventListener("click", ()=>{
+      navItems.forEach(n=>n.classList.remove("active"));
+      item.classList.add("active");
+      const target = item.dataset.target;
+      sections.forEach(s=>s.classList.remove("active"));
+      document.getElementById("sec-"+target).classList.add("active");
+      document.getElementById("pageTitle").textContent = titles[target][0];
+      document.getElementById("pageSub").textContent = titles[target][1];
+      renderAll();
+    });
+  });
+
+  // ---------- THEME ----------
+  document.getElementById("themeBtn").addEventListener("click", ()=>{
+    document.documentElement.classList.toggle("light");
+    const btn = document.getElementById("themeBtn");
+    btn.textContent = document.documentElement.classList.contains("light") ? "☀" : "☾";
+  });
+  document.getElementById("printBtn").addEventListener("click", ()=> window.print());
+  document.getElementById("report-print").addEventListener("click", ()=> window.print());
+
+  // ---------- DERIVED HELPERS ----------
+  function totalIncome(){ return (+state.income.allowance||0) + (+state.income.parttime||0) + (+state.income.other||0); }
+  function monthExpenses(){
+    const now = new Date();
+    return state.expenses.filter(e=>{
+      const d = new Date(e.date);
+      return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+    });
+  }
+  function totalSpentThisMonth(){ return monthExpenses().reduce((s,e)=>s+(+e.amt||0),0); }
+  function catTotals(){
+    const t = {food:0,transport:0,fun:0,subs:0,other:0};
+    monthExpenses().forEach(e=> t[e.cat] = (t[e.cat]||0) + (+e.amt||0));
+    return t;
+  }
+  function daysLeftInMonth(){
+    const now = new Date();
+    const last = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    return Math.max(last - now.getDate(), 1);
+  }
+  function totalSubsMonthly(){ return state.subs.reduce((s,x)=>s+(+x.cost||0),0); }
+
+  function computeHealthScore(){
+    const income = totalIncome();
+    const spent = totalSpentThisMonth();
+    if(income<=0) return {score:0, factors:[]};
+    let score = 0;
+    const factors = [];
+
+    // 1. spend ratio (max 40 pts)
+    const ratio = spent/income;
+    let spendPts = ratio<=0.5 ? 40 : ratio<=0.7 ? 32 : ratio<=0.9 ? 22 : ratio<=1 ? 12 : 0;
+    score += spendPts;
+    factors.push({label:"Spending within income", pts:spendPts, max:40, note: ratio<=0.7? "Healthy spend-to-income ratio":"You're spending a large share of your income"});
+
+    // 2. budget adherence (max 25 pts)
+    const cats = catTotals();
+    let overCount = 0, total=0;
+    Object.keys(state.budgets).forEach(c=>{ total++; if((cats[c]||0) > (state.budgets[c]||Infinity)) overCount++; });
+    const adherence = total? (total-overCount)/total : 1;
+    const budgetPts = Math.round(adherence*25);
+    score += budgetPts;
+    factors.push({label:"Staying within category budgets", pts:budgetPts, max:25, note: overCount===0? "All categories within budget" : overCount+" categor"+(overCount===1?"y":"ies")+" over budget"});
+
+    // 3. savings goal progress (max 20 pts)
+    let goalPts = 0;
+    if(state.goals.length){
+      const avgProg = state.goals.reduce((s,g)=> s + Math.min(g.saved/(g.target||1),1), 0) / state.goals.length;
+      goalPts = Math.round(avgProg*20);
+    } else { goalPts = 8; }
+    score += goalPts;
+    factors.push({label:"Progress toward savings goals", pts:goalPts, max:20, note: state.goals.length? "Average goal progress factored in":"No goals set yet — add one to earn more here"});
+
+    // 4. subscription load (max 15 pts)
+    const subShare = totalSubsMonthly()/income;
+    const subPts = subShare<=0.03? 15 : subShare<=0.06? 10 : subShare<=0.1? 5 : 0;
+    score += subPts;
+    factors.push({label:"Subscription load kept light", pts:subPts, max:15, note: subShare<=0.06? "Subscriptions are a small share of income":"Subscriptions are eating a notable share of income"});
+
+    return {score:Math.round(score), factors};
+  }
+
+  // ---------- RENDER: OVERVIEW ----------
+  function renderOverview(){
+    const income = totalIncome();
+    const spent = totalSpentThisMonth();
+    const left = Math.max(income-spent,0);
+    const cats = catTotals();
+    const savedThisMonth = state.goals.length ? Math.max(state.goals.reduce((s,g)=>s+ (g._addedThisMonth||0),0), Math.round(income*0.05)) : 0;
+
+    document.getElementById("ov-income").textContent = fmt(income);
+    document.getElementById("ov-spent").textContent = fmt(spent);
+    const pctSpent = income? Math.round((spent/income)*100) : 0;
+    const deltaEl = document.getElementById("ov-spent-delta");
+    deltaEl.textContent = pctSpent + "% of income spent so far";
+    deltaEl.className = "stat-delta " + (pctSpent>85 ? "down":"up");
+    document.getElementById("ov-left").textContent = fmt(left);
+    const perDay = Math.round(left/daysLeftInMonth());
+    document.getElementById("ov-left-note").textContent = fmt(perDay) + "/day remaining";
+    document.getElementById("ov-saved").textContent = fmt(savedThisMonth);
+
+    // jar
+    const pct = income? Math.min(spent/income,1) : 0;
+    const jarFill = document.getElementById("jarFill");
+    const jarHeight = 116 * pct;
+    jarFill.setAttribute("y", 150 - jarHeight);
+    jarFill.setAttribute("height", jarHeight);
+    jarFill.setAttribute("fill", pct>0.9? "var(--coral)" : pct>0.7? "var(--amber)" : "var(--mint)");
+    document.getElementById("jarPct").textContent = Math.round(pct*100)+"%";
+    document.getElementById("jarCaption").innerHTML = pct>=0.9
+      ? "<b>Almost empty.</b> You've used nearly all of this month's allowance."
+      : pct>=0.6 ? "<b>More than half gone.</b> Pace the rest of the month carefully."
+      : "<b>Looking steady.</b> Plenty of room left this month.";
+
+    document.getElementById("ov-daysleft").textContent = daysLeftInMonth() + " days";
+    document.getElementById("ov-perday").textContent = fmt(perDay);
+    const topCat = Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+    document.getElementById("ov-topcat").textContent = topCat && topCat[1]>0 ? CAT_LABEL[topCat[0]] : "—";
+    const health = computeHealthScore();
+    document.getElementById("ov-healthmini").textContent = health.score + " / 100";
+
+    // category donut-ish bar chart (simple horizontal bars, canvas-free)
+    const catchart = document.getElementById("ov-catchart");
+    catchart.innerHTML = "";
+    const maxCat = Math.max(...Object.values(cats), 1);
+    Object.keys(cats).forEach(c=>{
+      const row = document.createElement("div");
+      row.style.marginBottom = "10px";
+      row.innerHTML = `
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">
+          <span><span class="tag ${c}">${CAT_LABEL[c]}</span></span>
+          <span style="font-family:var(--font-mono);color:var(--text-dim);">${fmt(cats[c])}</span>
+        </div>
+        <div class="progress"><div style="width:${(cats[c]/maxCat*100)||0}%; background:${CAT_COLOR[c]};"></div></div>
+      `;
+      catchart.appendChild(row);
+    });
+
+    // recent activity
+    const tbody = document.querySelector("#ov-recent tbody");
+    tbody.innerHTML = "";
+    const recent = [...state.expenses].sort((a,b)=> new Date(b.date)-new Date(a.date)).slice(0,5);
+    recent.forEach(e=>{
+      tbody.innerHTML += `<tr><td>${e.date}</td><td>${escapeHtml(e.desc)}</td><td><span class="tag ${e.cat}">${CAT_LABEL[e.cat]}</span></td><td style="text-align:right; font-family:var(--font-mono);">${fmt(e.amt)}</td></tr>`;
+    });
+
+    document.getElementById("ov-topinsight").innerHTML = generateInsights()[0] || "<div class='list-empty'>Add income and expenses to see insights.</div>";
+  }
+
+  function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+  // ---------- RENDER: INCOME ----------
+  function renderIncome(){
+    document.getElementById("in-allowance").value = state.income.allowance || "";
+    document.getElementById("in-allowday").value = state.income.allowday || "";
+    document.getElementById("in-parttime").value = state.income.parttime || "";
+    document.getElementById("in-other").value = state.income.other || "";
+    const bd = document.getElementById("in-breakdown");
+    bd.innerHTML = `
+      <div class="jar-row"><span>Allowance</span><span class="v">${fmt(state.income.allowance)}</span></div>
+      <div class="jar-row"><span>Part-time / gig income</span><span class="v">${fmt(state.income.parttime)}</span></div>
+      <div class="jar-row"><span>Other income</span><span class="v">${fmt(state.income.other)}</span></div>
+    `;
+    document.getElementById("in-total").textContent = fmt(totalIncome());
+  }
+  document.getElementById("in-save").addEventListener("click", ()=>{
+    state.income.allowance = +document.getElementById("in-allowance").value || 0;
+    state.income.allowday = +document.getElementById("in-allowday").value || 1;
+    state.income.parttime = +document.getElementById("in-parttime").value || 0;
+    state.income.other = +document.getElementById("in-other").value || 0;
+    renderAll();
+  });
+
+  // ---------- RENDER: EXPENSES ----------
+  document.getElementById("ex-date").value = todayStr();
+  document.getElementById("ex-add").addEventListener("click", ()=>{
+    const desc = document.getElementById("ex-desc").value.trim();
+    const amt = +document.getElementById("ex-amt").value;
+    const cat = document.getElementById("ex-cat").value;
+    const date = document.getElementById("ex-date").value || todayStr();
+    if(!desc || !amt || amt<=0){ return; }
+    state.expenses.push({ id: nextExpId++, desc, amt, cat, date });
+    document.getElementById("ex-desc").value = "";
+    document.getElementById("ex-amt").value = "";
+    renderAll();
+  });
+  function deleteExpense(id){ state.expenses = state.expenses.filter(e=>e.id!==id); renderAll(); }
+
+  function renderExpenses(){
+    const cats = catTotals();
+    document.getElementById("ex-total").textContent = fmt(totalSpentThisMonth());
+    const bars = document.getElementById("ex-catbars");
+    bars.innerHTML = "";
+    const maxCat = Math.max(...Object.values(cats),1);
+    Object.keys(cats).forEach(c=>{
+      bars.innerHTML += `
+        <div class="budget-row">
+          <div class="top"><span><span class="tag ${c}">${CAT_LABEL[c]}</span></span><span class="amt">${fmt(cats[c])}</span></div>
+          <div class="progress"><div style="width:${(cats[c]/maxCat*100)||0}%; background:${CAT_COLOR[c]};"></div></div>
+        </div>`;
+    });
+
+    const tbody = document.querySelector("#ex-table tbody");
+    tbody.innerHTML = "";
+    const sorted = [...state.expenses].sort((a,b)=> new Date(b.date)-new Date(a.date));
+    document.getElementById("ex-empty").style.display = sorted.length? "none":"block";
+    sorted.forEach(e=>{
+      tbody.innerHTML += `<tr>
+        <td>${e.date}</td><td>${escapeHtml(e.desc)}</td>
+        <td><span class="tag ${e.cat}">${CAT_LABEL[e.cat]}</span></td>
+        <td style="text-align:right; font-family:var(--font-mono);">${fmt(e.amt)}</td>
+        <td class="no-print"><button class="icon-btn" style="width:28px;height:28px;font-size:12px;" onclick="__deleteExpense(${e.id})">✕</button></td>
+      </tr>`;
+    });
+  }
+  window.__deleteExpense = deleteExpense;
+
+  // ---------- RENDER: BUDGETS ----------
+  function renderBudgetInputs(){
+    const wrap = document.getElementById("budget-inputs");
+    wrap.innerHTML = "";
+    Object.keys(state.budgets).forEach(c=>{
+      wrap.innerHTML += `
+        <div style="margin-bottom:10px;">
+          <label>${CAT_LABEL[c]} monthly budget (₹)</label>
+          <input type="number" data-cat="${c}" class="budget-input" value="${state.budgets[c]}">
+        </div>`;
+    });
+  }
+  document.getElementById("budget-save").addEventListener("click", ()=>{
+    document.querySelectorAll(".budget-input").forEach(inp=>{
+      state.budgets[inp.dataset.cat] = +inp.value || 0;
+    });
+    renderAll();
+  });
+  function renderBudgetProgress(){
+    const cats = catTotals();
+    const wrap = document.getElementById("budget-progress");
+    wrap.innerHTML = "";
+    Object.keys(state.budgets).forEach(c=>{
+      const spent = cats[c]||0;
+      const budget = state.budgets[c]||0;
+      const pct = budget? Math.min(spent/budget*100,100) : 0;
+      const over = budget && spent>budget;
+      wrap.innerHTML += `
+        <div class="budget-row">
+          <div class="top">
+            <span><span class="tag ${c}">${CAT_LABEL[c]}</span></span>
+            <span class="amt">${fmt(spent)} / ${fmt(budget)}${over? " ⚠":""}</span>
+          </div>
+          <div class="progress"><div style="width:${pct}%; background:${over? "var(--coral)": CAT_COLOR[c]};"></div></div>
+        </div>`;
+    });
+  }
+
+  // ---------- RENDER: SUBSCRIPTIONS ----------
+  document.getElementById("sub-add").addEventListener("click", ()=>{
+    const name = document.getElementById("sub-name").value.trim();
+    const cost = +document.getElementById("sub-cost").value;
+    if(!name || !cost || cost<=0) return;
+    state.subs.push({ id: nextSubId++, name, cost });
+    document.getElementById("sub-name").value = "";
+    document.getElementById("sub-cost").value = "";
+    renderAll();
+  });
+  function deleteSub(id){ state.subs = state.subs.filter(s=>s.id!==id); renderAll(); }
+  window.__deleteSub = deleteSub;
+  function renderSubs(){
+    const total = totalSubsMonthly();
+    document.getElementById("sub-total").textContent = fmt(total) + "/mo";
+    const income = totalIncome();
+    const pct = income? Math.round(total/income*100) : 0;
+    document.getElementById("sub-pct-note").textContent = income? `That's about ${pct}% of your monthly income.` : "Set your income to see this as a percentage.";
+    const tbody = document.querySelector("#sub-table tbody");
+    tbody.innerHTML = "";
+    document.getElementById("sub-empty").style.display = state.subs.length? "none":"block";
+    state.subs.forEach(s=>{
+      tbody.innerHTML += `<tr>
+        <td>${escapeHtml(s.name)}</td>
+        <td style="text-align:right; font-family:var(--font-mono);">${fmt(s.cost)}</td>
+        <td style="text-align:right; font-family:var(--font-mono);">${fmt(s.cost*12)}</td>
+        <td class="no-print"><button class="icon-btn" style="width:28px;height:28px;font-size:12px;" onclick="__deleteSub(${s.id})">✕</button></td>
+      </tr>`;
+    });
+  }
+
+  // ---------- RENDER: GOALS ----------
+  document.getElementById("goal-add").addEventListener("click", ()=>{
+    const name = document.getElementById("goal-name").value.trim();
+    const target = +document.getElementById("goal-target").value;
+    const saved = +document.getElementById("goal-saved").value || 0;
+    const date = document.getElementById("goal-date").value || addMonths(3);
+    if(!name || !target || target<=0) return;
+    state.goals.push({ id: nextGoalId++, name, target, saved, date });
+    document.getElementById("goal-name").value = "";
+    document.getElementById("goal-target").value = "";
+    document.getElementById("goal-saved").value = "";
+    renderAll();
+  });
+  function deleteGoal(id){ state.goals = state.goals.filter(g=>g.id!==id); renderAll(); }
+  window.__deleteGoal = deleteGoal;
+  function renderGoals(){
+    const wrap = document.getElementById("goal-cards");
+    wrap.innerHTML = "";
+    if(!state.goals.length){ wrap.innerHTML = "<div class='list-empty'>No goals yet — add one above.</div>"; }
+    state.goals.forEach(g=>{
+      const pct = Math.min(g.saved/(g.target||1)*100,100);
+      const monthsLeft = Math.max(monthsBetween(new Date(), new Date(g.date)),1);
+      const neededPerMonth = Math.max((g.target-g.saved)/monthsLeft,0);
+      wrap.innerHTML += `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <h3 style="margin:0;">${escapeHtml(g.name)}</h3>
+            <button class="icon-btn no-print" style="width:26px;height:26px;font-size:11px;" onclick="__deleteGoal(${g.id})">✕</button>
+          </div>
+          <div class="progress" style="margin:10px 0 8px 0;"><div style="width:${pct}%; background:var(--mint);"></div></div>
+          <div class="hint">${fmt(g.saved)} of ${fmt(g.target)} saved (${Math.round(pct)}%)</div>
+          <div class="hint">Target date: ${g.date}</div>
+          <div class="hint">Need ≈ ${fmt(neededPerMonth)}/month to hit it</div>
+        </div>`;
+    });
+    const pace = document.getElementById("goal-pace");
+    if(!state.goals.length){ pace.innerHTML = "<div class='list-empty'>Add a goal to see pacing guidance.</div>"; return; }
+    pace.innerHTML = state.goals.map(g=>{
+      const monthsLeft = Math.max(monthsBetween(new Date(), new Date(g.date)),1);
+      const neededPerMonth = Math.max((g.target-g.saved)/monthsLeft,0);
+      const income = totalIncome();
+      const feasible = income && neededPerMonth <= income*0.3;
+      return `<div class="insight"><span class="ic">${feasible? "✓":"⚠"}</span><div><b>${escapeHtml(g.name)}:</b> saving ${fmt(neededPerMonth)}/month ${feasible? "looks achievable given your income.":"is a stretch — consider a later target date or a smaller goal."}</div></div>`;
+    }).join("");
+  }
+  function monthsBetween(a,b){ return (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth()) + (b.getDate()>=a.getDate()?1:0); }
+
+  // ---------- RENDER: CASH FLOW ----------
+  function renderCashflow(){
+    const income = totalIncome();
+    const spent = totalSpentThisMonth();
+    const net = income - spent;
+    document.getElementById("cf-in").textContent = fmt(income);
+    document.getElementById("cf-out").textContent = fmt(spent);
+    const netEl = document.getElementById("cf-net");
+    netEl.textContent = fmt(net);
+    netEl.style.color = net>=0 ? "var(--mint)" : "var(--coral)";
+
+    // simple bar-based mini chart across 4 weeks
+    const chart = document.getElementById("cashflow-chart");
+    const weeks = [0,0,0,0];
+    monthExpenses().forEach(e=>{
+      const day = new Date(e.date).getDate();
+      const w = Math.min(Math.floor((day-1)/7),3);
+      weeks[w]+= +e.amt||0;
+    });
+    const maxW = Math.max(...weeks,1);
+    chart.innerHTML = `<div style="display:flex; align-items:flex-end; gap:14px; height:160px; padding-top:10px;">` +
+      weeks.map((w,i)=>`
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-dim);">${fmt(w)}</div>
+          <div style="width:100%; max-width:60px; height:${Math.max((w/maxW*120),3)}px; background:var(--amber); border-radius:6px 6px 0 0;"></div>
+          <div style="font-size:11px; color:var(--text-faint);">Week ${i+1}</div>
+        </div>`).join("") + `</div>`;
+  }
+
+  // ---------- RENDER: HEALTH ----------
+  function renderHealth(){
+    const {score, factors} = computeHealthScore();
+    const circumference = 2*Math.PI*60;
+    const offset = circumference * (1 - score/100);
+    document.getElementById("health-arc").setAttribute("stroke-dasharray", circumference);
+    document.getElementById("health-arc").setAttribute("stroke-dashoffset", offset);
+    document.getElementById("health-arc").setAttribute("stroke", score>=70? "var(--mint)": score>=45? "var(--amber)":"var(--coral)");
+    document.getElementById("health-num").textContent = score;
+    const badge = document.getElementById("health-badge");
+    if(score>=70){ badge.textContent="Strong footing"; badge.className="health-badge health-good"; }
+    else if(score>=45){ badge.textContent="Getting there"; badge.className="health-badge health-mid"; }
+    else { badge.textContent="Needs attention"; badge.className="health-badge health-bad"; }
+    document.getElementById("health-desc").textContent = score>=70
+      ? "You're spending within your means, tracking budgets well, and making progress on goals."
+      : score>=45
+      ? "Some good habits are in place, but a few areas below are pulling your score down."
+      : "A few changes could meaningfully improve your score — see the breakdown below.";
+
+    const bd = document.getElementById("health-breakdown");
+    bd.innerHTML = factors.map(f=>`
+      <div class="budget-row">
+        <div class="top"><span>${f.label}</span><span class="amt">${f.pts} / ${f.max}</span></div>
+        <div class="progress"><div style="width:${(f.pts/f.max*100)}%; background:${f.pts/f.max>0.7?"var(--mint)":f.pts/f.max>0.4?"var(--amber)":"var(--coral)"};"></div></div>
+        <div class="hint" style="margin-top:4px;">${f.note}</div>
+      </div>`).join("") || "<div class='list-empty'>Add income and expenses to see a breakdown.</div>";
+  }
+
+  // ---------- RENDER: INSIGHTS ----------
+  function generateInsights(){
+    const income = totalIncome();
+    const spent = totalSpentThisMonth();
+    const cats = catTotals();
+    const list = [];
+
+    if(income>0){
+      const ratio = spent/income;
+      if(ratio>0.9){
+        list.push(`<div class="insight"><span class="ic">⚠</span><div>You've spent <b>${Math.round(ratio*100)}%</b> of this month's income already, with ${daysLeftInMonth()} days left. Consider pausing non-essential spending for the rest of the month.</div></div>`);
+      } else if(ratio<0.5){
+        list.push(`<div class="insight"><span class="ic">✓</span><div>You've only used <b>${Math.round(ratio*100)}%</b> of your income this month — a great time to move extra cash into a savings goal.</div></div>`);
+      }
+    } else {
+      list.push(`<div class="insight"><span class="ic">ℹ</span><div>Set up your allowance in the <b>Allowance & Income</b> tab to unlock personalized insights.</div></div>`);
+    }
+
+    Object.keys(state.budgets).forEach(c=>{
+      const spentC = cats[c]||0, budget = state.budgets[c]||0;
+      if(budget && spentC>budget){
+        list.push(`<div class="insight"><span class="ic">⚠</span><div>You're <b>${fmt(spentC-budget)}</b> over your ${CAT_LABEL[c]} budget this month. This is your most common overspending category — try setting a per-visit limit.</div></div>`);
+      }
+    });
+
+    const subTotal = totalSubsMonthly();
+    if(income && subTotal/income>0.06){
+      list.push(`<div class="insight"><span class="ic">↻</span><div>Subscriptions cost <b>${fmt(subTotal)}/month</b>, about ${Math.round(subTotal/income*100)}% of your income. Cancelling even one rarely-used subscription could free up real savings room.</div></div>`);
+    }
+
+    const topCat = Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+    if(topCat && topCat[1]>0){
+      list.push(`<div class="insight"><span class="ic">✦</span><div><b>${CAT_LABEL[topCat[0]]}</b> is your biggest expense category this month at ${fmt(topCat[1])}. A 20% cut here would be the fastest way to free up cash — try the What-If Simulator to see the effect.</div></div>`);
+    }
+
+    if(state.goals.length===0){
+      list.push(`<div class="insight"><span class="ic">★</span><div>You don't have any savings goals yet. Even a small goal helps build the habit of setting money aside before you spend it.</div></div>`);
+    }
+
+    if(list.length===0){
+      list.push(`<div class="insight"><span class="ic">✓</span><div>Everything looks steady right now — no urgent flags. Keep logging expenses to keep this accurate.</div></div>`);
+    }
+    return list;
+  }
+  function renderInsights(){
+    document.getElementById("insights-list").innerHTML = generateInsights().join("");
+  }
+
+  // ---------- SIMULATOR ----------
+  const simPct = document.getElementById("sim-pct");
+  simPct.addEventListener("input", ()=> renderSimulator());
+  document.getElementById("sim-cat").addEventListener("change", renderSimulator);
+  document.getElementById("sim-allowance").addEventListener("input", renderSimulator);
+  function renderSimulator(){
+    document.getElementById("sim-pct-label").textContent = simPct.value + "%";
+    const cat = document.getElementById("sim-cat").value;
+    const cats = catTotals();
+    const currentCat = cats[cat]||0;
+    const reduceBy = currentCat * (simPct.value/100);
+    const income = totalIncome();
+    const spent = totalSpentThisMonth();
+    const newSpent = spent - reduceBy;
+    const newLeft = income - newSpent;
+    document.getElementById("sim-output-1").innerHTML = `
+      Cutting <b>${CAT_LABEL[cat]}</b> by ${simPct.value}% saves <div class="big">${fmt(reduceBy)}/month</div>
+      New monthly leftover: <b>${fmt(newLeft)}</b> (was ${fmt(income-spent)}). Over a year that's <b>${fmt(reduceBy*12)}</b> — enough to fund most student savings goals.
+    `;
+
+    const newAllowance = +document.getElementById("sim-allowance").value;
+    const out2 = document.getElementById("sim-output-2");
+    if(newAllowance>0){
+      const currentIncome = totalIncome();
+      const otherIncome = currentIncome - (state.income.allowance||0);
+      const newTotal = newAllowance + otherIncome;
+      const diff = newTotal - currentIncome;
+      const newLeftover = newTotal - spent;
+      out2.innerHTML = `
+        New total monthly income: <div class="big">${fmt(newTotal)}</div>
+        That's a change of <b>${diff>=0?"+":""}${fmt(diff)}</b> vs today. Your projected leftover after this month's spending would be <b>${fmt(newLeftover)}</b>.
+      `;
+    } else {
+      out2.innerHTML = `<span class="hint">Enter a new allowance amount to see the effect.</span>`;
+    }
+  }
+
+  document.getElementById("calc-run").addEventListener("click", ()=>{
+    const target = +document.getElementById("calc-target").value;
+    const months = +document.getElementById("calc-months").value;
+    const out = document.getElementById("calc-output");
+    if(!target || !months || months<=0){ out.innerHTML = "<span class='hint'>Enter a target amount and number of months.</span>"; return; }
+    const perMonth = target/months;
+    const income = totalIncome();
+    const feasible = income? perMonth <= income*0.3 : null;
+    out.innerHTML = `
+      You'll need to save <div class="big">${fmt(perMonth)}/month</div>
+      ${feasible===null ? "Set your income to check feasibility." : feasible ? "This looks comfortably achievable within a typical student budget." : "This is fairly ambitious — consider stretching the timeline or trimming a category first."}
+    `;
+  });
+
+  // ---------- REPORTS ----------
+  function renderReport(){
+    const now = new Date();
+    document.getElementById("rep-month").textContent = now.toLocaleString("default",{month:"long", year:"numeric"});
+    const income = totalIncome();
+    const spent = totalSpentThisMonth();
+    const cats = catTotals();
+    const health = computeHealthScore();
+    document.getElementById("rep-content").innerHTML = `
+      <div class="grid cols-3" style="margin-bottom:16px;">
+        <div><div class="stat-label">Income</div><div class="stat-value">${fmt(income)}</div></div>
+        <div><div class="stat-label">Spent</div><div class="stat-value">${fmt(spent)}</div></div>
+        <div><div class="stat-label">Left</div><div class="stat-value">${fmt(income-spent)}</div></div>
+      </div>
+      <h3 style="font-size:13px;">Spending by category</h3>
+      <table><thead><tr><th>Category</th><th style="text-align:right">Amount</th><th style="text-align:right">Budget</th></tr></thead><tbody>
+      ${Object.keys(cats).map(c=>`<tr><td>${CAT_LABEL[c]}</td><td style="text-align:right;">${fmt(cats[c])}</td><td style="text-align:right;">${fmt(state.budgets[c])}</td></tr>`).join("")}
+      </tbody></table>
+      <div class="divider"></div>
+      <h3 style="font-size:13px;">Savings goals</h3>
+      <table><thead><tr><th>Goal</th><th style="text-align:right">Saved</th><th style="text-align:right">Target</th></tr></thead><tbody>
+      ${state.goals.map(g=>`<tr><td>${escapeHtml(g.name)}</td><td style="text-align:right;">${fmt(g.saved)}</td><td style="text-align:right;">${fmt(g.target)}</td></tr>`).join("") || "<tr><td colspan='3'>No goals set</td></tr>"}
+      </tbody></table>
+      <div class="divider"></div>
+      <h3 style="font-size:13px;">Financial health score: ${health.score}/100</h3>
+    `;
+  }
+
+  // ---------- CHECKLIST ----------
+  const CHECKLIST_ITEMS = [
+    "Log every expense from this week",
+    "Review this month's budget vs. actual spend",
+    "Move something into a savings goal",
+    "Check for unused subscriptions",
+    "Set next month's category budgets"
+  ];
+  function renderChecklist(){
+    const el = document.getElementById("checklist");
+    el.innerHTML = CHECKLIST_ITEMS.map((item,i)=>`
+      <label class="${state.checklist[i]?'done':''}">
+        <input type="checkbox" ${state.checklist[i]?"checked":""} onchange="__toggleCheck(${i})">
+        <span>${item}</span>
+      </label>`).join("");
+  }
+  window.__toggleCheck = function(i){ state.checklist[i] = !state.checklist[i]; renderChecklist(); };
+
+  // ---------- RENDER ALL ----------
+  function renderAll(){
+    renderOverview();
+    renderIncome();
+    renderExpenses();
+    renderBudgetInputs();
+    renderBudgetProgress();
+    renderSubs();
+    renderGoals();
+    renderCashflow();
+    renderHealth();
+    renderInsights();
+    renderSimulator();
+    renderReport();
+    renderChecklist();
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
