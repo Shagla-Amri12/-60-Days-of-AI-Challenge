@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow Architect — Full-Stack Portfolio Build</title>
+<style>
+:root{
+  --bg:#0e1420;
+  --bg-elev:#141b2a;
+  --bg-elev-2:#1b2436;
+  --line:#2a3448;
+  --ink:#e9e7de;
+  --ink-dim:#9aa4b8;
+  --ink-faint:#5d6885;
+  --accent:#5b8def;
+  --accent-dim:#3a5a99;
+  --amber:#f2a65a;
+  --teal:#4fb8a8;
+  --red:#e2685f;
+  --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  --sans: -apple-system, "Segoe UI", "Inter", system-ui, sans-serif;
+  --radius:10px;
+  --shadow: 0 8px 30px rgba(0,0,0,.35);
+}
+[data-theme="light"]{
+  --bg:#f5f3ec;
+  --bg-elev:#ffffff;
+  --bg-elev-2:#eeece2;
+  --line:#d9d5c6;
+  --ink:#1b2030;
+  --ink-dim:#565f78;
+  --ink-faint:#8891a5;
+  --accent:#2f5fc7;
+  --accent-dim:#c6d5f5;
+  --amber:#b5701e;
+  --teal:#227b6c;
+  --red:#b5352c;
+  --shadow: 0 8px 24px rgba(30,30,20,.08);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.5;
+  transition:background .25s ease, color .25s ease;
+}
+::selection{background:var(--accent-dim); color:var(--ink);}
+a{color:var(--accent);}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 28px;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--mono);
+  font-size:14px; letter-spacing:.04em;
+}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--teal); box-shadow:0 0 10px var(--teal);}
+.brand b{font-weight:700; color:var(--ink);}
+.brand span{color:var(--ink-faint);}
+.topbar-actions{display:flex; gap:8px; align-items:center;}
+.icon-btn{
+  background:var(--bg-elev); border:1px solid var(--line); color:var(--ink);
+  border-radius:8px; padding:8px 12px; font-family:var(--mono); font-size:12px;
+  cursor:pointer; display:flex; align-items:center; gap:6px;
+  transition:border-color .15s, transform .1s;
+}
+.icon-btn:hover{border-color:var(--accent); transform:translateY(-1px);}
+.icon-btn:active{transform:translateY(0);}
+.progress-pill{
+  font-family:var(--mono); font-size:12px; color:var(--ink-dim);
+  padding:8px 12px; border:1px solid var(--line); border-radius:8px; background:var(--bg-elev);
+}
+
+/* ---------- Hero ---------- */
+.hero{
+  padding:64px 28px 40px;
+  max-width:1180px; margin:0 auto;
+  border-bottom:1px solid var(--line);
+}
+.hero-eyebrow{
+  font-family:var(--mono); font-size:12px; color:var(--teal);
+  letter-spacing:.12em; text-transform:uppercase; margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.hero-eyebrow::before{content:"$"; color:var(--ink-faint);}
+h1.hero-title{
+  font-family:var(--mono); font-weight:700;
+  font-size:clamp(28px,4.4vw,46px);
+  line-height:1.15; margin:0 0 18px; letter-spacing:-.01em;
+}
+h1.hero-title .accent{color:var(--accent);}
+.hero-sub{
+  color:var(--ink-dim); font-size:16px; max-width:640px; margin-bottom:28px;
+}
+.hero-meta{
+  display:flex; flex-wrap:wrap; gap:10px;
+}
+.chip{
+  font-family:var(--mono); font-size:12px; padding:6px 12px;
+  border:1px solid var(--line); border-radius:999px; color:var(--ink-dim);
+  background:var(--bg-elev);
+}
+
+/* ---------- Pipeline (signature element) ---------- */
+.pipeline-wrap{
+  max-width:1180px; margin:0 auto; padding:40px 28px 10px;
+}
+.pipeline-label{
+  font-family:var(--mono); font-size:12px; color:var(--ink-faint); margin-bottom:14px;
+  text-transform:uppercase; letter-spacing:.1em;
+}
+#pipeline-svg{width:100%; height:auto; display:block;}
+.node-circle{fill:var(--bg-elev); stroke:var(--line); stroke-width:2; cursor:pointer; transition:stroke .15s, fill .15s;}
+.node-circle:hover{stroke:var(--accent);}
+.node-circle.done{fill:var(--teal); stroke:var(--teal);}
+.node-circle.active{stroke:var(--accent); stroke-width:3;}
+.node-label{font-family:var(--mono); font-size:11px; fill:var(--ink-dim); cursor:pointer;}
+.node-label.done{fill:var(--teal);}
+.branch-line{stroke:var(--line); stroke-width:2; fill:none;}
+.branch-line.fill{stroke:var(--teal); stroke-width:2; fill:none;}
+
+/* ---------- Layout ---------- */
+.layout{
+  max-width:1180px; margin:0 auto; padding:20px 28px 100px;
+  display:grid; grid-template-columns:220px 1fr; gap:32px;
+}
+@media (max-width:860px){ .layout{grid-template-columns:1fr;} }
+
+.sidebar{position:sticky; top:70px; align-self:start; height:fit-content;}
+.sidebar-title{font-family:var(--mono); font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.1em; margin-bottom:10px;}
+.stage-nav{list-style:none; margin:0 0 24px; padding:0; border-left:2px solid var(--line);}
+.stage-nav li{margin:0;}
+.stage-nav button{
+  width:100%; text-align:left; background:none; border:none; color:var(--ink-dim);
+  font-family:var(--mono); font-size:12.5px; padding:8px 0 8px 14px; margin-left:-2px;
+  border-left:2px solid transparent; cursor:pointer; transition:color .15s,border-color .15s;
+}
+.stage-nav button:hover{color:var(--ink);}
+.stage-nav button.active{color:var(--accent); border-left-color:var(--accent);}
+.stage-nav button.done::before{content:"✓ "; color:var(--teal);}
+.jump-links{display:flex; flex-direction:column; gap:6px;}
+.jump-links a{font-family:var(--mono); font-size:12px; color:var(--ink-dim); text-decoration:none;}
+.jump-links a:hover{color:var(--accent);}
+
+/* ---------- Main content ---------- */
+.main{min-width:0;}
+.stage-panel{display:none;}
+.stage-panel.active{display:block; animation:fadein .35s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.stage-head{
+  display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+  margin-bottom:6px; flex-wrap:wrap;
+}
+.stage-kicker{font-family:var(--mono); font-size:12px; color:var(--amber); text-transform:uppercase; letter-spacing:.08em;}
+.stage-title{font-family:var(--mono); font-size:26px; font-weight:700; margin:6px 0 8px;}
+.stage-time{font-family:var(--mono); font-size:12px; color:var(--ink-dim); border:1px solid var(--line); padding:6px 10px; border-radius:8px; white-space:nowrap;}
+.stage-desc{color:var(--ink-dim); margin-bottom:24px; max-width:70ch;}
+
+.stage-actions{display:flex; gap:10px; margin-bottom:28px;}
+.btn{
+  font-family:var(--mono); font-size:12px; padding:9px 14px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--line); background:var(--bg-elev); color:var(--ink); transition:all .15s;
+}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#0b1220;}
+.btn.primary:hover{filter:brightness(1.08);}
+.btn:hover{border-color:var(--accent);}
+.btn.bookmarked{border-color:var(--amber); color:var(--amber);}
+
+.card{
+  background:var(--bg-elev); border:1px solid var(--line); border-radius:var(--radius);
+  padding:20px 22px; margin-bottom:18px;
+}
+.card h3{
+  font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:.07em;
+  margin:0 0 14px; color:var(--ink-dim); display:flex; align-items:center; gap:8px;
+}
+.card h3::before{content:""; width:6px; height:6px; background:var(--accent); border-radius:50%;}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:700px){ .grid-2{grid-template-columns:1fr;} }
+
+.task-list{list-style:none; margin:0; padding:0;}
+.task-list li{
+  display:flex; align-items:flex-start; gap:10px; padding:7px 0; font-size:14px; color:var(--ink);
+  border-bottom:1px dashed var(--line);
+}
+.task-list li:last-child{border-bottom:none;}
+.task-list input[type=checkbox]{margin-top:3px; accent-color:var(--teal); width:15px; height:15px; cursor:pointer;}
+.task-list li.checked span{color:var(--ink-faint); text-decoration:line-through;}
+
+.tool-card{
+  border:1px solid var(--line); border-radius:8px; padding:14px; background:var(--bg-elev-2); margin-bottom:12px;
+}
+.tool-card:last-child{margin-bottom:0;}
+.tool-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+.tool-name{font-family:var(--mono); font-weight:700; font-size:14px;}
+.tool-tag{font-family:var(--mono); font-size:10px; padding:3px 8px; border-radius:999px; background:var(--accent-dim); color:var(--accent);}
+[data-theme="light"] .tool-tag{color:#1c3a80;}
+.tool-why{font-size:13px; color:var(--ink-dim); margin:4px 0;}
+.tool-alt{font-size:12px; color:var(--ink-faint); font-family:var(--mono);}
+
+.prompt-box{
+  background:#0a0e17; border:1px solid var(--line); border-radius:8px; padding:14px 16px;
+  font-family:var(--mono); font-size:12.5px; color:var(--teal); position:relative; margin-bottom:10px;
+  white-space:pre-wrap; line-height:1.6;
+}
+[data-theme="light"] .prompt-box{background:#12181f; color:#7fd9c7;}
+.prompt-box .copy-btn{
+  position:absolute; top:8px; right:8px; background:var(--bg-elev); border:1px solid var(--line);
+  color:var(--ink-dim); font-family:var(--mono); font-size:10px; padding:4px 8px; border-radius:6px; cursor:pointer;
+}
+.prompt-box .copy-btn:hover{color:var(--accent); border-color:var(--accent);}
+
+.mistake-row, .practice-row{display:flex; gap:10px; font-size:13.5px; padding:6px 0; align-items:flex-start;}
+.mistake-row .mark{color:var(--red); font-family:var(--mono); flex-shrink:0;}
+.practice-row .mark{color:var(--teal); font-family:var(--mono); flex-shrink:0;}
+
+.output-tag{
+  display:inline-block; font-family:var(--mono); font-size:11.5px; padding:4px 10px; border-radius:6px;
+  background:var(--bg-elev-2); border:1px solid var(--line); margin:0 6px 6px 0; color:var(--ink-dim);
+}
+
+textarea.notes{
+  width:100%; min-height:90px; background:var(--bg-elev-2); border:1px solid var(--line); border-radius:8px;
+  color:var(--ink); font-family:var(--sans); font-size:13.5px; padding:12px; resize:vertical;
+}
+textarea.notes:focus{outline:none; border-color:var(--accent);}
+
+.efficiency-tip{
+  border-left:3px solid var(--amber); background:var(--bg-elev-2); padding:12px 16px; border-radius:0 8px 8px 0;
+  font-size:13.5px; color:var(--ink);
+}
+
+/* ---------- Decision tree ---------- */
+.decision-tree{font-family:var(--mono); font-size:13px;}
+.dt-node{border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin-bottom:8px; background:var(--bg-elev-2); cursor:pointer;}
+.dt-node b{color:var(--accent);}
+.dt-children{margin-left:24px; border-left:1px dashed var(--line); padding-left:16px; display:none;}
+.dt-children.open{display:block;}
+
+/* ---------- Section headers (closing sections) ---------- */
+.section-block{max-width:1180px; margin:0 auto; padding:60px 28px; border-top:1px solid var(--line);}
+.section-block h2{
+  font-family:var(--mono); font-size:22px; margin:0 0 6px;
+}
+.section-block .section-sub{color:var(--ink-dim); margin-bottom:28px; max-width:65ch;}
+.stack-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:14px;}
+.stack-card{border:1px solid var(--line); border-radius:10px; padding:16px; background:var(--bg-elev);}
+.stack-card .role{font-family:var(--mono); font-size:11px; color:var(--amber); text-transform:uppercase; letter-spacing:.06em;}
+.stack-card .name{font-family:var(--mono); font-weight:700; margin:6px 0 4px; font-size:15px;}
+.stack-card p{font-size:12.5px; color:var(--ink-dim); margin:0;}
+
+.res-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+@media (max-width:700px){.res-grid{grid-template-columns:1fr;}}
+.res-list{list-style:none; margin:0; padding:0;}
+.res-list li{padding:8px 0; border-bottom:1px dashed var(--line); font-size:13.5px;}
+.res-list li:last-child{border-bottom:none;}
+.res-list .rlabel{font-family:var(--mono); font-size:11px; color:var(--ink-faint); display:block;}
+
+.keyword-cloud{display:flex; flex-wrap:wrap; gap:8px;}
+.keyword-cloud span{
+  font-family:var(--mono); font-size:12px; padding:6px 12px; border:1px solid var(--line); border-radius:999px;
+  color:var(--ink-dim); background:var(--bg-elev);
+}
+
+.future-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;}
+.future-card{border:1px solid var(--line); border-radius:10px; padding:16px; background:var(--bg-elev);}
+.future-card .lvl{font-family:var(--mono); font-size:10.5px; padding:3px 8px; border-radius:999px; background:var(--accent-dim); color:var(--accent);}
+[data-theme="light"] .future-card .lvl{color:#1c3a80;}
+.future-card h4{margin:10px 0 6px; font-family:var(--mono); font-size:14px;}
+.future-card p{font-size:12.5px; color:var(--ink-dim); margin:0;}
+
+footer{
+  text-align:center; padding:36px 20px 60px; font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);
+}
+
+@media print{
+  .topbar, .sidebar, .stage-actions, .icon-btn, textarea.notes, .pipeline-wrap{display:none !important;}
+  body{background:#fff; color:#111;}
+  .stage-panel{display:block !important; page-break-after:always;}
+  .layout{grid-template-columns:1fr; display:block;}
+  .card{border:1px solid #ccc; background:#fff;}
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span><b>AI Workflow Architect</b><span>/ full-stack · portfolio</span></div>
+  <div class="topbar-actions">
+    <span class="progress-pill" id="progressPill">0% complete</span>
+    <button class="icon-btn" onclick="toggleTheme()">◐ Theme</button>
+    <button class="icon-btn" onclick="window.print()">⎙ Print</button>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-eyebrow">workflow.init --domain=software-dev --track=full-stack</div>
+  <h1 class="hero-title">Ship a personal <span class="accent">full-stack portfolio</span><br>from blank repo to live URL.</h1>
+  <p class="hero-sub">An 8-stage, end-to-end build plan — not generic advice. Every stage has concrete tasks, the AI tools worth paying for, prompts you can paste directly, and the mistakes that quietly kill side projects.</p>
+  <div class="hero-meta">
+    <span class="chip">8 stages</span>
+    <span class="chip">~55–80 hrs total</span>
+    <span class="chip">Solo builder</span>
+    <span class="chip">Stack-agnostic core, opinions given</span>
+  </div>
+</section>
+
+<div class="pipeline-wrap">
+  <div class="pipeline-label">// pipeline — click a commit to jump to a stage</div>
+  <svg id="pipeline-svg" viewBox="0 0 1180 120" preserveAspectRatio="xMinYMid meet"></svg>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Stages</div>
+    <ul class="stage-nav" id="stageNav"></ul>
+    <div class="sidebar-title">Jump to</div>
+    <div class="jump-links">
+      <a href="#summary-section">Workflow summary</a>
+      <a href="#stack-section">Recommended AI stack</a>
+      <a href="#resources-section">Learning & communities</a>
+      <a href="#keywords-section">Search keywords</a>
+      <a href="#prompts-section">Bonus prompts</a>
+      <a href="#future-section">Automation roadmap</a>
+    </div>
+  </aside>
+
+  <main class="main" id="stagesContainer"></main>
+</div>
+
+<section class="section-block" id="summary-section">
+  <h2>Workflow summary</h2>
+  <p class="section-sub">The whole build in one breath: scope one project tightly, wireframe before you code, stand up backend and frontend in parallel tracks once the contract (API shape) is fixed, integrate and test continuously rather than at the end, automate deployment from day one, and treat launch as stage seven, not an afterthought.</p>
+  <div class="card">
+    <h3>Critical path</h3>
+    <p style="font-size:13.5px;color:var(--ink-dim)">Planning → Design → Backend Setup → Frontend Build → Integration & Testing → Deployment & DevOps → Launch → Maintenance. Backend and Frontend can overlap once your API contract is written in Stage 1 — this is the single biggest time-saver in the whole plan.</p>
+  </div>
+  <div class="decision-tree" id="decisionTree"></div>
+</section>
+
+<section class="section-block" id="stack-section">
+  <h2>Recommended AI stack</h2>
+  <p class="section-sub">The tools that pull the most weight across every stage, not stage-specific point solutions.</p>
+  <div class="stack-grid" id="stackGrid"></div>
+</section>
+
+<section class="section-block" id="resources-section">
+  <h2>Learning resources & communities</h2>
+  <div class="res-grid">
+    <div>
+      <h3 style="font-family:var(--mono);font-size:13px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.07em;">Learning resources</h3>
+      <ul class="res-list" id="learnList"></ul>
+    </div>
+    <div>
+      <h3 style="font-family:var(--mono);font-size:13px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.07em;">Communities</h3>
+      <ul class="res-list" id="commList"></ul>
+    </div>
+  </div>
+</section>
+
+<section class="section-block" id="keywords-section">
+  <h2>Search keywords</h2>
+  <p class="section-sub">Paste these into Google, YouTube, or GitHub search when you get stuck at a specific stage.</p>
+  <div class="keyword-cloud" id="keywordCloud"></div>
+</section>
+
+<section class="section-block" id="prompts-section">
+  <h2>Additional AI prompts</h2>
+  <p class="section-sub">Cross-stage prompts worth keeping in your back pocket.</p>
+  <div id="bonusPrompts"></div>
+</section>
+
+<section class="section-block" id="future-section">
+  <h2>Future automation opportunities</h2>
+  <p class="section-sub">Once the portfolio is live, these are the next things worth automating.</p>
+  <div class="future-grid" id="futureGrid"></div>
+</section>
+
+<footer>AI Workflow Architect — generated for a solo full-stack build · notes and progress are saved locally in your browser</footer>
+
+<script>
+/* ================= DATA ================= */
+const STAGES = [
+{
+  id:"planning", kicker:"Stage 01", title:"Planning & Scoping", time:"3–5 hrs",
+  desc:"Turn a vague idea (\"I should build a portfolio\") into a written spec: what the site proves about you, which one project gets featured, and the exact API contract between frontend and backend.",
+  objectives:[
+    "Define the single hiring narrative the site needs to prove (e.g. 'I can ship full-stack products')",
+    "Pick ONE flagship project to build/feature — resist listing five",
+    "Write a one-page spec: pages, features, tech stack, and API contract",
+    "Set a hard scope boundary and a target ship date"
+  ],
+  tasks:[
+    "Draft a 1-page project brief (audience, goal, must-have pages)",
+    "List every feature, then cut it to the smallest version that still proves the narrative",
+    "Choose stack: frontend framework, backend framework, database, hosting",
+    "Sketch the REST/GraphQL endpoints you'll need before writing any code",
+    "Create a GitHub repo with a README stub and a project board"
+  ],
+  tools:[
+    {name:"Claude", tag:"planning", why:"Best for turning a rough idea into a structured spec and pressure-testing scope in conversation — it will push back on over-scoping if you ask it to.", alt:"ChatGPT, Notion AI"},
+    {name:"Claude (Projects)", tag:"spec doc", why:"Keep the spec, API contract, and decisions in one persistent project so every later stage can reference the same source of truth.", alt:"Notion, Linear"},
+    {name:"Perplexity", tag:"research", why:"Fast, cited answers when comparing frameworks or checking what's current in the ecosystem (avoids stale training-data opinions).", alt:"Google, YouTube deep-dives"}
+  ],
+  prompts:[
+    "I want to build a personal portfolio site that proves I can ship full-stack products. My background is [X]. Help me pick ONE flagship project and write a one-page spec: goal, audience, must-have pages, and a cut-list of nice-to-haves I should defer.",
+    "Given this feature list: [paste list], help me design a minimal REST API contract — list each endpoint, method, request/response shape, and which ones are truly required for v1."
+  ],
+  practices:["Write the API contract before touching code — it lets frontend and backend work in parallel","Timebox scoping to one sitting; a spec you can rewrite later beats a perfect spec that delays start","Pick a stack you already know 70% of — don't learn three new things at once"],
+  mistakes:["Scoping five projects instead of shipping one well","Skipping the API contract and discovering mismatches mid-build","Choosing a trendy stack purely for resume keywords, not shipping speed"],
+  outputs:["One-page project brief","API contract doc","GitHub repo with board","Ranked feature cut-list"],
+  tip:"Ask Claude to role-play as a skeptical hiring manager reviewing your spec — it will surface the features that don't actually support your narrative."
+},
+{
+  id:"design", kicker:"Stage 02", title:"Design & UX", time:"5–8 hrs",
+  desc:"Move from spec to a visual system: wireframes, a small design token set, and a component inventory — before any component gets coded.",
+  objectives:[
+    "Produce low-fidelity wireframes for every page in the spec",
+    "Define a design token system: 4–6 colors, 2 type roles, spacing scale",
+    "Build a component inventory so frontend work becomes assembly, not invention",
+    "Validate mobile layout for every page before coding starts"
+  ],
+  tasks:[
+    "Wireframe home, project detail, about, and contact pages",
+    "Choose fonts, color palette, and spacing scale; write them down as tokens",
+    "List reusable components (nav, card, button, footer) and their states",
+    "Get one round of outside feedback (friend, community, forum) on wireframes"
+  ],
+  tools:[
+    {name:"Claude (with artifacts)", tag:"UI prototyping", why:"Generates working HTML/React mockups you can click through immediately, which is faster feedback than static wireframes for a solo builder.", alt:"Figma, Excalidraw"},
+    {name:"v0 by Vercel", tag:"component gen", why:"Purpose-built for turning a prompt into a real, styled React component you can drop into a Next.js project.", alt:"Claude artifacts, Galileo AI"},
+    {name:"Figma (+ FigJam AI)", tag:"wireframing", why:"Still the standard for structured wireframes and a shareable design file if you want async feedback from others.", alt:"Excalidraw, penpot"}
+  ],
+  prompts:[
+    "Act as a senior product designer. Here is my site spec: [paste]. Propose a wireframe structure (in words + ASCII layout) for the home page and project detail page, optimized for a hiring manager skimming for 30 seconds.",
+    "Generate a small design token set (colors, 2 font roles, spacing scale) for a developer portfolio that should feel [adjective, e.g. 'precise and technical'] rather than generic SaaS-default."
+  ],
+  practices:["Design mobile-first — most portfolio traffic from recruiters is on desktop, but design discipline transfers","Reuse one component system everywhere instead of one-off styling per page","Get feedback on wireframes, not finished code — cheaper to change"],
+  mistakes:["Jumping straight to code without any layout plan","Copying a generic SaaS template that doesn't reflect your actual work","Over-designing the landing page while the project case study (the actual proof) stays thin"],
+  outputs:["Wireframes for all pages","Design token sheet","Component inventory list","One round of feedback notes"],
+  tip:"Generate 2–3 competing hero-section layouts with AI and pick by asking 5 people which one makes them want to scroll — don't decide alone."
+},
+{
+  id:"backend", kicker:"Stage 03", title:"Backend Architecture & Setup", time:"6–10 hrs",
+  desc:"Stand up the server, database schema, and API endpoints defined in Stage 1 — the part frontend work will depend on.",
+  objectives:[
+    "Implement the database schema matching your API contract",
+    "Build and test each API endpoint in isolation",
+    "Set up authentication if the site needs any (admin CMS, contact form storage)",
+    "Get a working local dev environment with seed data"
+  ],
+  tasks:[
+    "Initialize backend project (Node/Express, Django, or similar) and connect a database",
+    "Write migrations for the schema from Stage 1",
+    "Implement each endpoint with basic validation and error handling",
+    "Seed the database with realistic sample data",
+    "Write minimal tests for the 2–3 endpoints most likely to break"
+  ],
+  tools:[
+    {name:"Claude Code", tag:"scaffolding", why:"Best for generating a coherent backend project structure from your API contract and iterating on it conversationally in your actual repo.", alt:"Cursor, GitHub Copilot"},
+    {name:"Cursor", tag:"IDE + AI", why:"Strong for fast, in-editor completions once the project structure exists and you're filling in endpoint logic.", alt:"Claude Code, Windsurf"},
+    {name:"Supabase / Neon (AI-assisted schema)", tag:"database", why:"AI-assisted schema design and instant Postgres hosting removes a full day of database ops for a solo project.", alt:"PlanetScale, self-hosted Postgres"}
+  ],
+  prompts:[
+    "Here is my API contract: [paste]. Scaffold a [Node/Express or Django] backend with this route structure, a matching database schema, and basic input validation for each POST/PUT endpoint.",
+    "Review this endpoint for security issues a portfolio project commonly ships with (missing validation, no rate limiting, exposed secrets): [paste code]."
+  ],
+  practices:["Match implementation exactly to the API contract — change the contract, not just the code, if it needs to shift","Add basic input validation even on a portfolio project — it signals professionalism to technical reviewers","Keep secrets in environment variables from the first commit, never hardcoded"],
+  mistakes:["Building endpoints the frontend doesn't actually need yet","Skipping error handling because 'it's just a portfolio'","No seed data, making frontend development painfully slow"],
+  outputs:["Working backend with all v1 endpoints","Database schema + migrations","Seed data script","Passing tests for critical endpoints"],
+  tip:"Ask your AI tool to generate a Postman/Thunder Client collection alongside the endpoints — it turns manual API testing into one click."
+},
+{
+  id:"frontend", kicker:"Stage 04", title:"Frontend Development", time:"12–18 hrs",
+  desc:"Build the UI from the wireframes and component inventory, wired to the backend contract — the largest single stage.",
+  objectives:[
+    "Implement the component library from Stage 2's inventory",
+    "Build every page against the real (or mocked) API",
+    "Ensure responsive behavior across breakpoints",
+    "Reach a state where the site works end-to-end locally"
+  ],
+  tasks:[
+    "Set up the frontend project (Next.js, Vite+React, etc.) and routing",
+    "Build shared components first: nav, footer, card, button",
+    "Build each page, wiring to backend endpoints (or mock data if backend isn't ready)",
+    "Add loading, empty, and error states for every data-driven view",
+    "Test responsive layout at 375px, 768px, and 1440px widths"
+  ],
+  tools:[
+    {name:"Claude Code", tag:"component build", why:"Handles multi-file React changes coherently and can run your dev server + read errors directly, cutting the copy-paste loop.", alt:"Cursor, GitHub Copilot"},
+    {name:"v0 by Vercel", tag:"UI generation", why:"Fastest path from a design token set to production-ready Tailwind/React components matching your visual system.", alt:"Claude artifacts"},
+    {name:"GitHub Copilot", tag:"inline completion", why:"Good complementary tool for fast boilerplate (types, repetitive JSX) while you drive architecture decisions yourself.", alt:"Cursor Tab, Supermaven"}
+  ],
+  prompts:[
+    "Here are my design tokens: [paste] and this API response shape: [paste]. Build a responsive project-card component in [React/Tailwind] with loading and error states.",
+    "Review this page component for accessibility issues (missing alt text, poor contrast, no keyboard nav) and fix them: [paste code]."
+  ],
+  practices:["Build loading/empty/error states as part of each component, not bolted on later","Commit in small, working chunks — don't let the branch diverge for days","Reuse the component inventory strictly; resist one-off styling"],
+  mistakes:["Wiring to a live backend before mock data proves the UI works","Ignoring mobile until the end and having to rework layouts","Skipping alt text, focus states, and semantic HTML — cheap now, expensive to retrofit"],
+  outputs:["Complete, responsive frontend","Shared component library","Loading/empty/error states for all data views","Local end-to-end working demo"],
+  tip:"Work frontend against a mocked API (JSON fixtures matching your contract) so a backend hiccup never blocks UI progress."
+},
+{
+  id:"integration", kicker:"Stage 05", title:"Integration & Testing", time:"6–9 hrs",
+  desc:"Connect frontend to the real backend, and hunt down the gap between 'works on my machine' and 'works for a stranger.'",
+  objectives:[
+    "Replace all mock data with live API calls",
+    "Test every user flow end-to-end manually",
+    "Fix cross-browser and cross-device issues",
+    "Add basic automated tests for the riskiest flows"
+  ],
+  tasks:[
+    "Swap mocked fetches for real API calls; handle auth tokens if applicable",
+    "Manually walk every page on Chrome, Safari, and one mobile device",
+    "Write 3–5 automated tests for the flows most likely to break (form submit, project load)",
+    "Fix broken states: slow network, empty database, invalid form input",
+    "Run a Lighthouse audit and fix anything under 80"
+  ],
+  tools:[
+    {name:"Claude Code", tag:"debugging", why:"Strong at reading a stack trace plus surrounding code and proposing the actual fix, not just an explanation of the error.", alt:"Cursor, ChatGPT"},
+    {name:"Playwright (+ AI test generation)", tag:"e2e testing", why:"Lets you describe a user flow in plain language and get a runnable end-to-end test back, covering the highest-risk paths fast.", alt:"Cypress"},
+    {name:"Lighthouse / PageSpeed Insights", tag:"auditing", why:"Free, fast, and gives concrete, prioritized fixes for performance and accessibility rather than vague scores.", alt:"WebPageTest"}
+  ],
+  prompts:[
+    "Here's a stack trace and the relevant component: [paste]. What's the root cause, and what's the minimal fix that doesn't introduce a regression elsewhere?",
+    "Write a Playwright test for this user flow: visit the homepage, click into a project, submit the contact form, and assert a success message appears."
+  ],
+  practices:["Test the unhappy paths deliberately: empty states, slow network, invalid input","Fix Lighthouse issues in order of impact, not order of appearance","Keep a running bug list instead of fixing ad-hoc — it prevents repeat regressions"],
+  mistakes:["Only testing on your own machine and browser","Treating automated tests as optional for a 'just a portfolio' project — one broken contact form costs you a lead","Ignoring performance until after launch"],
+  outputs:["Fully integrated frontend + backend","3–5 passing automated tests","Lighthouse scores 90+","Bug list at zero open items"],
+  tip:"Ask a non-technical friend to use the site cold, with no guidance, while you watch silently — you'll find more real bugs in 10 minutes than in an hour of self-testing."
+},
+{
+  id:"deployment", kicker:"Stage 06", title:"Deployment & DevOps", time:"4–6 hrs",
+  desc:"Get the project onto a real URL with a deployment pipeline, not a one-off manual upload.",
+  objectives:[
+    "Deploy frontend and backend to production hosting",
+    "Set up a custom domain with HTTPS",
+    "Automate deploys on push to main via CI/CD",
+    "Add basic monitoring so you know when something breaks"
+  ],
+  tasks:[
+    "Deploy frontend (Vercel/Netlify) and backend (Railway/Render/Fly.io)",
+    "Connect a custom domain and confirm HTTPS is active",
+    "Set up GitHub Actions (or platform-native CI) to deploy on push to main",
+    "Add environment variables securely on the hosting platform",
+    "Set up uptime monitoring and error logging (even a free tier)"
+  ],
+  tools:[
+    {name:"Claude Code", tag:"CI/CD config", why:"Generates correct GitHub Actions YAML and hosting config on the first pass more reliably than most snippet-search results, and can debug failed pipeline runs from the log output.", alt:"Cursor, manual docs"},
+    {name:"Vercel / Netlify", tag:"frontend hosting", why:"Zero-config deploys with preview URLs per pull request — genuinely faster than any manual pipeline for a frontend-heavy portfolio.", alt:"Cloudflare Pages"},
+    {name:"Railway / Render", tag:"backend hosting", why:"Simplest path to a production database + API with minimal DevOps overhead for a solo project.", alt:"Fly.io, a $5 VPS"}
+  ],
+  prompts:[
+    "Write a GitHub Actions workflow that runs tests, then deploys to [Vercel/Railway] only if tests pass, triggered on push to main.",
+    "Here's my deployment error log: [paste]. Diagnose the likely cause and give me the exact config change to fix it."
+  ],
+  practices:["Never commit secrets — use the platform's environment variable settings from day one","Set up preview deployments per branch so you can share work-in-progress links safely","Add uptime monitoring even if it's free-tier — a dead site during a recruiter visit is the worst possible bug"],
+  mistakes:["Manually uploading builds instead of automating deploys — it will be forgotten under deadline pressure","Forgetting to set production environment variables, breaking the live site silently","No monitoring, so downtime goes unnoticed for days"],
+  outputs:["Live site on a custom domain with HTTPS","CI/CD pipeline deploying on push","Environment variables configured securely","Basic uptime/error monitoring active"],
+  tip:"Set up the CI/CD pipeline in Stage 6, not at the very end — a broken deploy pipeline discovered the night before you share the link is a self-inflicted crisis."
+},
+{
+  id:"launch", kicker:"Stage 07", title:"Launch & Positioning", time:"3–5 hrs",
+  desc:"Turn a live URL into something people actually see and remember — writing, sharing, and packaging the story around the build.",
+  objectives:[
+    "Write a project case study that explains decisions, not just features",
+    "Prepare shareable assets (screenshots, short demo clip)",
+    "Share in the right places for your actual goal (jobs vs. visibility)",
+    "Update resume/LinkedIn/GitHub profile to point at the new site"
+  ],
+  tasks:[
+    "Write a case study: problem, constraints, key decisions, what you'd change",
+    "Record a 30–60 second screen-capture demo",
+    "Post to 2–3 relevant communities or platforms with genuine context, not just a link",
+    "Update LinkedIn, resume, and GitHub profile README to link the site",
+    "Ask 3–5 people directly for feedback, not just public posting"
+  ],
+  tools:[
+    {name:"Claude", tag:"case study writing", why:"Good at turning a rough bullet list of decisions into a clear, non-generic case study narrative — the part most portfolios get wrong.", alt:"ChatGPT, Grammarly"},
+    {name:"Loom / ScreenStudio", tag:"demo capture", why:"Fastest way to produce a clean, narrated demo clip without video editing skill, which converts far better than screenshots alone.", alt:"OBS Studio + basic editing"},
+    {name:"Claude", tag:"outreach drafting", why:"Drafts platform-appropriate share posts (LinkedIn vs. a dev community) that don't read as generic self-promotion.", alt:"Manual drafting"}
+  ],
+  prompts:[
+    "Here are my rough notes on the decisions I made building this project: [paste]. Turn this into a case study section with a problem statement, 2–3 key decisions with tradeoffs, and one thing you'd do differently.",
+    "Draft a short, non-salesy LinkedIn post announcing this project, written from the angle of what I learned, not just 'check out my project.'"
+  ],
+  practices:["Explain tradeoffs and decisions, not just tech stack — that's what differentiates a real case study","Share where your actual audience is, not everywhere at once","Ask specific people for feedback directly — public posting alone rarely gets useful signal"],
+  mistakes:["Listing tech stack with no explanation of why any choice was made","Launching only on your own social feed and calling it done","Never following up with feedback-givers or iterating on what they said"],
+  outputs:["Written case study","30–60s demo clip","2–3 platform-appropriate share posts","Updated resume/LinkedIn/GitHub links"],
+  tip:"Lead your case study with the hardest decision you made, not the tech stack list — that's the part a technical reviewer actually remembers."
+},
+{
+  id:"maintenance", kicker:"Stage 08", title:"Maintenance & Iteration", time:"Ongoing, ~1–2 hrs/mo",
+  desc:"Keep the site alive, current, and slowly better — the stage most side projects skip entirely.",
+  objectives:[
+    "Keep dependencies patched and the site secure",
+    "Review analytics to see what's actually working",
+    "Iterate based on real feedback rather than guesses",
+    "Keep content current as your skills and projects grow"
+  ],
+  tasks:[
+    "Set up lightweight analytics (privacy-respecting) to see traffic and drop-off",
+    "Run a monthly dependency update pass",
+    "Review and act on one piece of feedback per month",
+    "Refresh the featured project or add a new one every 3–6 months"
+  ],
+  tools:[
+    {name:"Claude Code", tag:"dependency triage", why:"Can review a dependency update diff and flag likely breaking changes before you blindly run an update.", alt:"Dependabot + manual review"},
+    {name:"Plausible / Simple Analytics", tag:"analytics", why:"Privacy-respecting, lightweight analytics that answer 'is anyone visiting and what do they do' without a cookie-consent mess.", alt:"GA4 (heavier, more setup)"},
+    {name:"Claude", tag:"content refresh", why:"Good for periodically rewriting stale copy or case studies as your skills and vocabulary evolve.", alt:"Manual rewrite"}
+  ],
+  prompts:[
+    "Here's my dependency update diff: [paste]. Flag anything likely to be a breaking change and summarize what to test after updating.",
+    "It's been 6 months since I wrote this case study: [paste]. Suggest specific updates given that I've since learned [new skills/technologies]."
+  ],
+  practices:["Batch maintenance into a recurring monthly calendar slot instead of reacting ad-hoc","Let real analytics — not assumptions — drive what you improve next","Treat the site as a living document tied to your actual growth, not a one-time deliverable"],
+  mistakes:["Letting dependencies rot until an update becomes a multi-day migration","Never checking analytics, so effort goes into the wrong improvements","Leaving the site frozen at 'launch day' skill level for years"],
+  outputs:["Monthly maintenance log","Current dependency versions","Updated content reflecting current skills","Analytics-informed iteration list"],
+  tip:"Put a recurring 90-minute calendar block on the same day each month — maintenance dies the moment it depends on remembering to do it."
+}
+];
+
+const DECISION_TREE = {
+  label:"Which backend framework?",
+  children:[
+    {label:"Already know JavaScript well →", children:[{label:"Node.js + Express, or Next.js API routes if frontend is also Next.js"}]},
+    {label:"Prefer Python →", children:[{label:"Django (batteries-included) or FastAPI (lighter, faster to build an API-only backend)"}]},
+    {label:"Want zero backend code →", children:[{label:"Supabase or Firebase — trades control for speed, fine for a v1 portfolio"}]}
+  ]
+};
+
+const AI_STACK = [
+  {role:"Primary coding partner", name:"Claude Code", desc:"Multi-file edits, debugging, and CI/CD config directly in your repo."},
+  {role:"UI generation", name:"v0 by Vercel", desc:"Prompt-to-component for Tailwind/React matching your design tokens."},
+  {role:"Planning & writing", name:"Claude", desc:"Spec writing, case studies, outreach copy, and scope pressure-testing."},
+  {role:"Research", name:"Perplexity", desc:"Fast, cited answers on current framework and tooling choices."},
+  {role:"Inline completion", name:"GitHub Copilot", desc:"Boilerplate and repetitive code while you drive architecture."},
+  {role:"E2E testing", name:"Playwright + AI gen", desc:"Plain-language flow descriptions turned into runnable tests."}
+];
+
+const LEARN = [
+  {label:"Full-stack roadmap", text:"roadmap.sh full-stack path — free, visual, up-to-date curriculum"},
+  {label:"Course", text:"The Odin Project — free, project-based full-stack curriculum"},
+  {label:"Video", text:"Fireship / Web Dev Simplified — fast, current framework overviews"},
+  {label:"Docs", text:"Official framework docs (Next.js, Django) — always the ground truth over tutorials"},
+  {label:"Design", text:"Refactoring UI (book) — practical, non-generic UI decision-making"}
+];
+const COMMUNITIES = [
+  {label:"Feedback", text:"r/webdev and r/reactjs — active, direct code and portfolio feedback"},
+  {label:"Real-time", text:"Frontend/Full-stack Discord servers — fast answers on specific errors"},
+  {label:"Show & tell", text:"Indie Hackers — good for launch feedback framed around building in public"},
+  {label:"Professional", text:"Dev.to and Hashnode — publish the case study, get discovered via search"},
+  {label:"Q&A", text:"Stack Overflow — still the fastest path for a specific, well-formed error"}
+];
+
+const KEYWORDS = ["site:github.com portfolio nextjs", "API contract design REST", "React loading state pattern", "Lighthouse performance checklist", "GitHub Actions deploy Vercel", "Playwright end to end test example", "case study writing developer portfolio", "Postgres schema design beginner", "Tailwind design tokens", "CI CD pipeline solo project"];
+
+const BONUS_PROMPTS = [
+  "Review my full project against this spec: [paste spec]. Identify anything I built that the spec didn't actually ask for, and anything the spec asked for that I skipped.",
+  "Act as a technical interviewer. Ask me 5 questions a hiring manager might ask about this specific project, based on the code and case study: [paste both].",
+  "Here is my current file structure: [paste]. Suggest a cleaner organization before this grows further, with reasoning for each change."
+];
+
+const FUTURE = [
+  {lvl:"Easy", h:"Auto-generated changelog", p:"Have AI draft a changelog entry from your commit messages each time you deploy."},
+  {lvl:"Easy", h:"Broken-link checks", p:"Scheduled job that checks all outbound links and flags 404s automatically."},
+  {lvl:"Medium", h:"Feedback triage bot", p:"Route contact-form submissions through an AI classifier to flag genuine leads vs. spam."},
+  {lvl:"Medium", h:"Auto-updated skills section", p:"Pull recently-used languages/frameworks from GitHub activity to keep the skills list honest."},
+  {lvl:"Advanced", h:"Self-writing case studies", p:"AI drafts a case-study skeleton from commit history and PR descriptions after each project milestone."},
+  {lvl:"Advanced", h:"Visitor-aware content", p:"Lightly personalize case study emphasis based on referral source (recruiter vs. dev community)."}
+];
+
+/* ================= STATE ================= */
+const STORAGE_KEY = "awa_v1";
+let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+state.tasks = state.tasks || {};
+state.notes = state.notes || {};
+state.bookmarks = state.bookmarks || {};
+state.theme = state.theme || "dark";
+let activeStage = state.activeStage || STAGES[0].id;
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+/* ================= RENDER ================= */
+function renderNav(){
+  const nav = document.getElementById("stageNav");
+  nav.innerHTML = "";
+  STAGES.forEach(s=>{
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    const done = isStageDone(s.id);
+    btn.textContent = s.title;
+    btn.className = (s.id===activeStage?"active ":"") + (done?"done":"");
+    btn.onclick = ()=> setActive(s.id);
+    li.appendChild(btn);
+    nav.appendChild(li);
+  });
+}
+
+function isStageDone(id){
+  const stage = STAGES.find(s=>s.id===id);
+  const t = state.tasks[id] || {};
+  return stage.tasks.every((_,i)=> t[i]);
+}
+
+function renderPipeline(){
+  const svg = document.getElementById("pipeline-svg");
+  const n = STAGES.length;
+  const w = 1180, y = 60, marginX = 60;
+  const step = (w - marginX*2) / (n-1);
+  let html = "";
+  // line
+  html += `<line class="branch-line" x1="${marginX}" y1="${y}" x2="${w-marginX}" y2="${y}"></line>`;
+  const doneCount = STAGES.filter(s=>isStageDone(s.id)).length;
+  if(doneCount>0){
+    const endX = marginX + step*(Math.max(0,doneCount-1)) + (isStageDone(STAGES[doneCount-1]?.id)?0:0);
+    html += `<line class="branch-line fill" x1="${marginX}" y1="${y}" x2="${marginX+step*(doneCount-1)}" y2="${y}"></line>`;
+  }
+  STAGES.forEach((s,i)=>{
+    const cx = marginX + step*i;
+    const done = isStageDone(s.id);
+    const active = s.id===activeStage;
+    html += `<circle class="node-circle ${done?'done':''} ${active?'active':''}" cx="${cx}" cy="${y}" r="9" data-id="${s.id}"></circle>`;
+    html += `<text class="node-label ${done?'done':''}" x="${cx}" y="${y-18}" text-anchor="middle" data-id="${s.id}">${s.kicker.replace('Stage ','')}</text>`;
+    html += `<text class="node-label ${done?'done':''}" x="${cx}" y="${y+30}" text-anchor="middle" data-id="${s.id}" style="font-size:10px">${s.title.split(' ')[0]}</text>`;
+  });
+  svg.innerHTML = html;
+  svg.querySelectorAll("[data-id]").forEach(el=>{
+    el.addEventListener("click", ()=> setActive(el.getAttribute("data-id")));
+  });
+}
+
+function renderProgress(){
+  const total = STAGES.reduce((a,s)=>a+s.tasks.length,0);
+  let done=0;
+  STAGES.forEach(s=>{
+    const t = state.tasks[s.id]||{};
+    s.tasks.forEach((_,i)=>{ if(t[i]) done++; });
+  });
+  const pct = total? Math.round(done/total*100):0;
+  document.getElementById("progressPill").textContent = pct+"% complete";
+}
+
+function stageCardHTML(s){
+  const t = state.tasks[s.id] || {};
+  const bookmarked = !!state.bookmarks[s.id];
+  const notesVal = state.notes[s.id] || "";
+  return `
+  <div class="stage-head">
+    <div>
+      <div class="stage-kicker">${s.kicker}</div>
+      <div class="stage-title">${s.title}</div>
+    </div>
+    <div class="stage-time">⏱ ${s.time}</div>
+  </div>
+  <p class="stage-desc">${s.desc}</p>
+  <div class="stage-actions">
+    <button class="btn ${bookmarked?'bookmarked':''}" data-action="bookmark" data-id="${s.id}">${bookmarked?'★ Bookmarked':'☆ Bookmark'}</button>
+    <button class="btn" data-action="reset" data-id="${s.id}">↺ Reset checklist</button>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Objectives</h3>
+      <ul class="task-list" style="list-style:disc; padding-left:18px;">
+        ${s.objectives.map(o=>`<li style="border-bottom:none;display:list-item;padding:4px 0;">${o}</li>`).join("")}
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Expected outputs</h3>
+      <div>${s.outputs.map(o=>`<span class="output-tag">${o}</span>`).join("")}</div>
+      <h3 style="margin-top:16px;">Time estimate</h3>
+      <p style="font-size:13.5px;color:var(--ink-dim);margin:0;">${s.time}</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Tasks <span style="font-weight:400;color:var(--ink-faint);text-transform:none;letter-spacing:0;">(check off as you go)</span></h3>
+    <ul class="task-list">
+      ${s.tasks.map((task,i)=>`
+        <li class="${t[i]?'checked':''}">
+          <input type="checkbox" data-task-stage="${s.id}" data-task-idx="${i}" ${t[i]?'checked':''}>
+          <span>${task}</span>
+        </li>`).join("")}
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Best AI tools for this stage</h3>
+    ${s.tools.map(tool=>`
+      <div class="tool-card">
+        <div class="tool-head"><span class="tool-name">${tool.name}</span><span class="tool-tag">${tool.tag}</span></div>
+        <div class="tool-why">${tool.why}</div>
+        <div class="tool-alt">Alternatives: ${tool.alt}</div>
+      </div>`).join("")}
+  </div>
+
+  <div class="card">
+    <h3>Prompt examples</h3>
+    ${s.prompts.map(p=>`
+      <div class="prompt-box">${p.replace(/</g,"&lt;")}<button class="copy-btn" data-copy="${encodeURIComponent(p)}">copy</button></div>
+    `).join("")}
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Best practices</h3>
+      ${s.practices.map(p=>`<div class="practice-row"><span class="mark">＋</span><span>${p}</span></div>`).join("")}
+    </div>
+    <div class="card">
+      <h3>Common mistakes</h3>
+      ${s.mistakes.map(m=>`<div class="mistake-row"><span class="mark">－</span><span>${m}</span></div>`).join("")}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Efficiency tip</h3>
+    <div class="efficiency-tip">${s.tip}</div>
+  </div>
+
+  <div class="card">
+    <h3>Your notes</h3>
+    <textarea class="notes" data-notes-id="${s.id}" placeholder="Jot down decisions, blockers, or links specific to this stage…">${notesVal}</textarea>
+  </div>
+  `;
+}
+
+function renderStages(){
+  const container = document.getElementById("stagesContainer");
+  container.innerHTML = STAGES.map(s=>`<div class="stage-panel ${s.id===activeStage?'active':''}" id="panel-${s.id}">${stageCardHTML(s)}</div>`).join("");
+  attachStageListeners();
+}
+
+function attachStageListeners(){
+  document.querySelectorAll("[data-task-stage]").forEach(cb=>{
+    cb.addEventListener("change", e=>{
+      const sid = e.target.getAttribute("data-task-stage");
+      const idx = e.target.getAttribute("data-task-idx");
+      state.tasks[sid] = state.tasks[sid] || {};
+      state.tasks[sid][idx] = e.target.checked;
+      save();
+      e.target.closest("li").classList.toggle("checked", e.target.checked);
+      renderNav(); renderPipeline(); renderProgress();
+    });
+  });
+  document.querySelectorAll('[data-action="bookmark"]').forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      const id = e.target.getAttribute("data-id");
+      state.bookmarks[id] = !state.bookmarks[id];
+      save();
+      renderStages();
+      setActive(id);
+    });
+  });
+  document.querySelectorAll('[data-action="reset"]').forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      const id = e.target.getAttribute("data-id");
+      state.tasks[id] = {};
+      save();
+      renderStages(); renderNav(); renderPipeline(); renderProgress();
+      setActive(id);
+    });
+  });
+  document.querySelectorAll("textarea.notes").forEach(ta=>{
+    ta.addEventListener("input", e=>{
+      const id = e.target.getAttribute("data-notes-id");
+      state.notes[id] = e.target.value;
+      save();
+    });
+  });
+  document.querySelectorAll(".copy-btn").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      const text = decodeURIComponent(e.target.getAttribute("data-copy"));
+      navigator.clipboard.writeText(text).then(()=>{
+        e.target.textContent = "copied!";
+        setTimeout(()=> e.target.textContent = "copy", 1200);
+      });
+    });
+  });
+}
+
+function setActive(id){
+  activeStage = id;
+  state.activeStage = id;
+  save();
+  document.querySelectorAll(".stage-panel").forEach(p=> p.classList.toggle("active", p.id === "panel-"+id));
+  renderNav();
+  renderPipeline();
+  document.getElementById("panel-"+id).scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function renderDecisionTree(){
+  const el = document.getElementById("decisionTree");
+  function node(n, depth){
+    const hasChildren = n.children && n.children.length;
+    const div = document.createElement("div");
+    const head = document.createElement("div");
+    head.className = "dt-node";
+    head.innerHTML = depth===0 ? `<b>?</b> ${n.label}` : n.label;
+    div.appendChild(head);
+    if(hasChildren){
+      const childWrap = document.createElement("div");
+      childWrap.className = "dt-children";
+      n.children.forEach(c=> childWrap.appendChild(node(c, depth+1)));
+      div.appendChild(childWrap);
+      head.addEventListener("click", ()=> childWrap.classList.toggle("open"));
+    }
+    return div;
+  }
+  el.appendChild(node(DECISION_TREE,0));
+}
+
+function renderClosingSections(){
+  document.getElementById("stackGrid").innerHTML = AI_STACK.map(t=>`
+    <div class="stack-card">
+      <div class="role">${t.role}</div>
+      <div class="name">${t.name}</div>
+      <p>${t.desc}</p>
+    </div>`).join("");
+
+  document.getElementById("learnList").innerHTML = LEARN.map(l=>`<li><span class="rlabel">${l.label}</span>${l.text}</li>`).join("");
+  document.getElementById("commList").innerHTML = COMMUNITIES.map(l=>`<li><span class="rlabel">${l.label}</span>${l.text}</li>`).join("");
+  document.getElementById("keywordCloud").innerHTML = KEYWORDS.map(k=>`<span>${k}</span>`).join("");
+
+  document.getElementById("bonusPrompts").innerHTML = BONUS_PROMPTS.map(p=>`
+    <div class="prompt-box">${p.replace(/</g,"&lt;")}<button class="copy-btn" data-copy="${encodeURIComponent(p)}">copy</button></div>`).join("");
+
+  document.getElementById("futureGrid").innerHTML = FUTURE.map(f=>`
+    <div class="future-card">
+      <span class="lvl">${f.lvl}</span>
+      <h4>${f.h}</h4>
+      <p>${f.p}</p>
+    </div>`).join("");
+
+  document.querySelectorAll("#bonusPrompts .copy-btn").forEach(btn=>{
+    btn.addEventListener("click", e=>{
+      const text = decodeURIComponent(e.target.getAttribute("data-copy"));
+      navigator.clipboard.writeText(text).then(()=>{
+        e.target.textContent = "copied!";
+        setTimeout(()=> e.target.textContent = "copy", 1200);
+      });
+    });
+  });
+}
+
+function toggleTheme(){
+  const body = document.body;
+  const next = body.getAttribute("data-theme")==="dark" ? "light" : "dark";
+  body.setAttribute("data-theme", next);
+  state.theme = next;
+  save();
+}
+
+/* ================= INIT ================= */
+document.body.setAttribute("data-theme", state.theme);
+renderNav();
+renderPipeline();
+renderStages();
+renderProgress();
+renderDecisionTree();
+renderClosingSections();
+</script>
+</body>
+</html>
