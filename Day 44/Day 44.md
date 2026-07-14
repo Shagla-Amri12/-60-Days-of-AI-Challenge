@@ -1,4 +1,4 @@
-# Day 42 of 60 — Claude AI Challenge
+# Day 44 of 60 — Claude AI Challenge
 # AI-Powered LinkedIn Optimizer
 
 Today I built an AI-Powered LinkedIn Optimizer that analyzes LinkedIn profiles like an experienced recruiter and provides actionable recommendations to improve personal branding, profile visibility, and career opportunities.
@@ -31,8 +31,8 @@ Instead of giving generic advice, it analyzes every section of the profile indiv
   
 # SCREENSHOT
 
-[linkedin_roast_and_rebuild](linkedin_roast_and_rebuild.png)
+[Linkedin Roast And Rebuild](linkedin_roast_and_rebuild.png)
 
 # HTML File:
 
-[linkedin_roast_and_rebuild](linkedin_roast_and_rebuild.html)
+[Linkedin Roast And Rebuild](linkedin_roast_and_rebuild.html)
