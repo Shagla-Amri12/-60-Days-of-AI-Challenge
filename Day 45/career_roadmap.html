@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>90-Day Roadmap :: Student → Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #0b0f0d;
+  --panel: #101512;
+  --line: rgba(126,231,135,0.14);
+  --text: #d9e3dc;
+  --dim: #6f8177;
+  --green: #7ee787;
+  --amber: #e3b341;
+  --red: #ff7b72;
+  --blue: #79c0ff;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(126,231,135,0.06), transparent 40%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Inter',system-ui,sans-serif;
+  line-height:1.6;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px;}
+
+/* header */
+header{
+  padding:64px 20px 40px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:48px;
+}
+.prompt{
+  font-family:'JetBrains Mono',monospace;
+  color:var(--green);
+  font-size:13px;
+  letter-spacing:0.5px;
+}
+.prompt::before{content:"$ ";color:var(--dim);}
+h1{
+  font-family:'JetBrains Mono',monospace;
+  font-size:clamp(28px,5vw,44px);
+  font-weight:800;
+  margin:14px 0 10px;
+  color:#fff;
+  letter-spacing:-0.5px;
+}
+.sub{color:var(--dim);font-size:15px;max-width:640px;}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;}
+.chip{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  border:1px solid var(--line);
+  padding:6px 12px;
+  border-radius:20px;
+  color:var(--dim);
+}
+.chip b{color:var(--green);font-weight:600;}
+
+/* section headers */
+.sec-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  color:var(--dim);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:56px 0 20px;
+}
+.sec-label::before{content:"//";color:var(--green);}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--line);}
+
+/* status/target */
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.dual{grid-template-columns:1fr;}}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:22px;
+}
+.card h3{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);font-family:'JetBrains Mono',monospace;}
+.card dl{margin:0;font-size:14px;}
+.card dt{color:var(--dim);font-size:12px;margin-top:10px;}
+.card dt:first-child{margin-top:0;}
+.card dd{margin:2px 0 0;color:var(--text);}
+
+/* skill gap table */
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{
+  text-align:left;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--dim);
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);}
+tr:last-child td{border-bottom:none;}
+.pri{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  padding:3px 9px;
+  border-radius:20px;
+  display:inline-block;
+  white-space:nowrap;
+}
+.pri.critical{background:rgba(255,123,114,0.12);color:var(--red);}
+.pri.high{background:rgba(255,123,114,0.10);color:#ff9d8a;}
+.pri.medhigh{background:rgba(227,179,65,0.12);color:var(--amber);}
+.pri.medium{background:rgba(121,192,255,0.12);color:var(--blue);}
+.bar-wrap{display:flex;align-items:center;gap:8px;}
+.bar{height:6px;border-radius:4px;background:rgba(255,255,255,0.08);flex:1;position:relative;overflow:hidden;min-width:60px;}
+.bar i{
+  display:block;height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--dim),var(--green));
+  width:var(--w,20%);
+  transform:scaleX(0);transform-origin:left;
+  animation:grow 0.9s ease-out forwards;
+}
+@keyframes grow{to{transform:scaleX(1);}}
+
+/* months timeline */
+.months{position:relative;padding-left:28px;border-left:1px solid var(--line);}
+.month{margin-bottom:36px;position:relative;}
+.month:last-child{margin-bottom:0;}
+.month::before{
+  content:attr(data-n);
+  position:absolute;left:-42px;top:0;
+  width:26px;height:26px;
+  border-radius:50%;
+  background:var(--panel);
+  border:1px solid var(--green);
+  color:var(--green);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.month h4{margin:2px 0 4px;font-size:16px;color:#fff;}
+.month .days{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);margin-bottom:14px;}
+.month-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:600px){.month-grid{grid-template-columns:1fr;}}
+.month-grid h5{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin:0 0 8px;font-family:'JetBrains Mono',monospace;}
+ul.plain{margin:0;padding:0;list-style:none;}
+ul.plain li{
+  font-size:13.5px;padding:6px 0 6px 18px;position:relative;color:var(--text);
+}
+ul.plain li::before{content:"▸";position:absolute;left:0;color:var(--green);}
+.project{
+  font-size:13.5px;color:var(--text);
+  padding:6px 0 6px 18px;position:relative;
+}
+.project::before{content:"◆";position:absolute;left:0;color:var(--blue);font-size:11px;}
+.project b{color:#fff;}
+
+/* networking */
+.net-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+@media(max-width:700px){.net-grid{grid-template-columns:repeat(2,1fr);}}
+.net-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;}
+.net-card h4{margin:0 0 8px;font-size:14px;color:var(--green);font-family:'JetBrains Mono',monospace;}
+.net-card p{margin:0 0 4px;font-size:12.5px;color:var(--text);}
+.net-card .freq{font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
+
+/* milestones */
+.milestone-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:700px){.milestone-grid{grid-template-columns:1fr;}}
+.milestone{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;padding:18px;}
+.milestone .range{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);margin-bottom:10px;}
+.milestone li{font-size:13px;padding:5px 0;list-style:none;color:var(--text);}
+.milestone li::before{content:"— ";color:var(--dim);}
+
+/* next actions */
+.actions{background:var(--panel);border:1px solid var(--amber);border-radius:10px;padding:24px;}
+.actions h3{margin:0 0 14px;color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:14px;}
+.step{display:flex;gap:12px;padding:8px 0;font-size:14px;align-items:flex-start;}
+.step .n{
+  font-family:'JetBrains Mono',monospace;color:var(--bg);background:var(--amber);
+  width:20px;height:20px;border-radius:4px;flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px;
+}
+.resources{display:flex;gap:24px;margin-top:20px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
+.resources b{color:var(--text);display:block;margin-bottom:6px;font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:1px;}
+
+footer{
+  text-align:center;color:var(--dim);font-size:11.5px;
+  margin-top:70px;padding-top:24px;border-top:1px solid var(--line);
+  font-family:'JetBrains Mono',monospace;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="prompt">roadmap --init --track=career</div>
+  <h1>Student → Developer</h1>
+  <p class="sub">A 90-day plan to go from academic coding foundations to a job-ready Software / Web Developer, built around Python and modern web development.</p>
+  <div class="chips">
+    <div class="chip"><b>Timeline</b> — 90 days</div>
+    <div class="chip"><b>Stack</b> — Python + Web Dev</div>
+    <div class="chip"><b>Target</b> — Junior Dev / Frontend / Full-Stack</div>
+    <div class="chip"><b>Range</b> — ₹3–8 LPA entry</div>
+  </div>
+</header>
+
+<div class="sec-label">Current vs. Target</div>
+<div class="dual">
+  <div class="card">
+    <h3>Current Position</h3>
+    <dl>
+      <dt>Status</dt><dd>Student</dd>
+      <dt>Core skills</dt><dd>Python, Web Development</dd>
+      <dt>Experience</dt><dd>Academic / personal projects</dd>
+      <dt>Strength</dt><dd>Coding foundation already in place</dd>
+    </dl>
+  </div>
+  <div class="card">
+    <h3>Target Goal</h3>
+    <dl>
+      <dt>Goal</dt><dd>Land a Software / Web Developer job</dd>
+      <dt>Timeline</dt><dd>3 months (90 days)</dd>
+      <dt>Target roles</dt><dd>Junior Dev, Frontend, Full-Stack</dd>
+      <dt>Salary range</dt><dd>Entry ₹3–8 LPA (India)</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="sec-label">Skill Gap Analysis</div>
+<table>
+  <thead>
+    <tr><th>Skill Area</th><th>Current → Required</th><th>Gap</th><th>Priority</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Python (Core)</td><td>Intermediate → Intermediate+</td><td class="bar-wrap"><div class="bar"><i style="--w:25%"></i></div></td><td><span class="pri medium">Medium</span></td></tr>
+    <tr><td>JavaScript / ES6+</td><td>Basic → Proficient</td><td class="bar-wrap"><div class="bar"><i style="--w:70%"></i></div></td><td><span class="pri high">High</span></td></tr>
+    <tr><td>React / Next.js</td><td>Unknown → Proficient</td><td class="bar-wrap"><div class="bar"><i style="--w:90%"></i></div></td><td><span class="pri high">High</span></td></tr>
+    <tr><td>REST APIs / Django</td><td>Beginner → Functional</td><td class="bar-wrap"><div class="bar"><i style="--w:65%"></i></div></td><td><span class="pri high">High</span></td></tr>
+    <tr><td>Git & GitHub</td><td>Basic → Proficient</td><td class="bar-wrap"><div class="bar"><i style="--w:55%"></i></div></td><td><span class="pri medhigh">Medium-High</span></td></tr>
+    <tr><td>DSA (Leetcode)</td><td>Unknown → Easy-Medium</td><td class="bar-wrap"><div class="bar"><i style="--w:60%"></i></div></td><td><span class="pri medhigh">Medium-High</span></td></tr>
+    <tr><td>Portfolio / Resume</td><td>None → Strong</td><td class="bar-wrap"><div class="bar"><i style="--w:95%"></i></div></td><td><span class="pri critical">Critical</span></td></tr>
+  </tbody>
+</table>
+
+<div class="sec-label">Recommended Learning Plan</div>
+<div class="months">
+
+  <div class="month" data-n="1">
+    <h4>Strengthen Foundations</h4>
+    <div class="days">Days 1–30</div>
+    <div class="month-grid">
+      <div>
+        <h5>Focus</h5>
+        <ul class="plain">
+          <li>JS ES6+, DOM, Fetch API (2 wks)</li>
+          <li>Python OOP + Flask basics (2 wks)</li>
+          <li>Git workflow, branches, PRs (ongoing)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>Project</h5>
+        <div class="project"><b>1. Personal Portfolio Website</b><br>React + CSS — your #1 job asset</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="month" data-n="2">
+    <h4>Build Core Stack</h4>
+    <div class="days">Days 31–60</div>
+    <div class="month-grid">
+      <div>
+        <h5>Focus</h5>
+        <ul class="plain">
+          <li>React fundamentals + hooks</li>
+          <li>REST API with Django REST / FastAPI</li>
+          <li>SQL basics (PostgreSQL)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>Projects</h5>
+        <div class="project"><b>2. Full-Stack Todo / Notes App</b><br>Python (FastAPI) + React frontend</div>
+        <div class="project" style="margin-top:8px;"><b>3. GitHub Repo Finder</b><br>GitHub API + JS fetch + UI filters</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="month" data-n="3">
+    <h4>Job-Ready Sprint</h4>
+    <div class="days">Days 61–90</div>
+    <div class="month-grid">
+      <div>
+        <h5>Focus</h5>
+        <ul class="plain">
+          <li>Leetcode Easy/Medium (2–3 daily)</li>
+          <li>Polish portfolio + GitHub presence</li>
+          <li>Mock interviews + resume refinement</li>
+        </ul>
+      </div>
+      <div>
+        <h5>Projects</h5>
+        <div class="project"><b>4. Weather Dashboard</b><br>OpenWeatherAPI + charts + deploy</div>
+        <div class="project" style="margin-top:8px;"><b>5. Blog / CMS (Bonus)</b><br>Django + SQLite + auth system</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sec-label">Networking Strategy</div>
+<div class="net-grid">
+  <div class="net-card">
+    <h4>LinkedIn</h4>
+    <p>Optimize profile + connect with devs & recruiters</p>
+    <div class="freq">Daily · 15 min → 50 connections/wk</div>
+  </div>
+  <div class="net-card">
+    <h4>GitHub</h4>
+    <p>Push code daily, star projects, follow OSS devs</p>
+    <div class="freq">Daily → Green streak</div>
+  </div>
+  <div class="net-card">
+    <h4>Twitter / X</h4>
+    <p>Follow #100DaysOfCode, share project updates</p>
+    <div class="freq">3x/week → Build presence</div>
+  </div>
+  <div class="net-card">
+    <h4>Communities</h4>
+    <p>Discord: Reactiflux, Python, freeCodeCamp</p>
+    <div class="freq">Weekly → Mentors + referrals</div>
+  </div>
+</div>
+
+<div class="sec-label">Monthly Milestones</div>
+<div class="milestone-grid">
+  <div class="milestone">
+    <div class="range">Month 1 · Days 1–30</div>
+    <ul>
+      <li>Complete JS & Python OOP modules</li>
+      <li>Build & deploy Project #1 (Portfolio)</li>
+      <li>GitHub: 30-day streak starts</li>
+    </ul>
+  </div>
+  <div class="milestone">
+    <div class="range">Month 2 · Days 31–60</div>
+    <ul>
+      <li>Learn React + build Project #2 & #3</li>
+      <li>First API-connected app live on Vercel</li>
+      <li>Resume v1 ready + LinkedIn optimized</li>
+    </ul>
+  </div>
+  <div class="milestone">
+    <div class="range">Month 3 · Days 61–90</div>
+    <ul>
+      <li>Start applying to 5–10 jobs/week</li>
+      <li>50+ Leetcode problems solved</li>
+      <li>3 mock interviews completed</li>
+      <li>Receive & evaluate first offer</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sec-label">Immediate Next Actions</div>
+<div class="actions">
+  <h3>This Week — Do Now</h3>
+  <div class="step"><div class="n">1</div>Set up GitHub profile + push first repo</div>
+  <div class="step"><div class="n">2</div>Update LinkedIn with skills & photo</div>
+  <div class="step"><div class="n">3</div>Enroll: freeCodeCamp JS course (free)</div>
+  <div class="step"><div class="n">4</div>Start #100DaysOfCode on Twitter/X</div>
+  <div class="step"><div class="n">5</div>List 3 project ideas in a Notion doc</div>
+
+  <div class="resources">
+    <div>
+      <b>Free Resources</b>
+      freeCodeCamp.org · The Odin Project<br>
+      cs50.harvard.edu · roadmap.sh<br>
+      Leetcode (Easy list) · Fireship (YT)
+    </div>
+    <div>
+      <b>Tools to Install Today</b>
+      VS Code · Node.js · Git · Postman
+    </div>
+  </div>
+</div>
+
+<footer>Generated from career_roadmap.pdf</footer>
+</div>
+</body>
+</html>
