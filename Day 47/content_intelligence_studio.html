@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Intelligence Studio — LinkedIn Manuscript Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12151b;
+  --ink-2:#181d26;
+  --graphite:#232936;
+  --graphite-2:#2c3341;
+  --hair:#39414f;
+  --paper:#f1ede2;
+  --paper-dim:#c9c4b5;
+  --redline:#c8432e;
+  --redline-soft:rgba(200,67,46,.14);
+  --steel:#6f93a3;
+  --steel-soft:rgba(111,147,163,.14);
+  --amber:#e2a339;
+  --amber-soft:rgba(226,163,57,.14);
+  --good:#7ea87a;
+  --good-soft:rgba(126,168,122,.14);
+  --radius:3px;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--sans);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+.bg-texture{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--hair) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hair) 1px, transparent 1px);
+  background-size:64px 64px;
+  opacity:.05;
+}
+.wrap{max-width:980px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
+
+/* ===== Header ===== */
+header.top{
+  padding:36px 0 28px;
+  border-bottom:1px solid var(--hair);
+}
+.masthead{display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.brand{display:flex;align-items:baseline;gap:12px;}
+.brand .mark{
+  font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--redline);
+  border:1px solid var(--redline);padding:3px 7px;border-radius:var(--radius);
+}
+.brand h1{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em;}
+.masthead .meta{font-family:var(--mono);font-size:11px;color:var(--paper-dim);letter-spacing:.04em;text-align:right;}
+.chipbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;}
+.chip{
+  font-family:var(--mono);font-size:11px;letter-spacing:.03em;
+  border:1px solid var(--hair);color:var(--paper-dim);
+  padding:5px 10px;border-radius:20px;background:var(--ink-2);
+}
+.chip b{color:var(--paper);font-weight:600;}
+
+section{padding:56px 0;border-bottom:1px solid var(--hair);}
+section:last-of-type{border-bottom:none;}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--redline);margin-bottom:10px;display:flex;align-items:center;gap:10px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--hair);}
+h2.section-title{font-family:var(--serif);font-weight:600;font-size:28px;margin-bottom:8px;letter-spacing:-.01em;}
+.section-sub{color:var(--paper-dim);font-size:14.5px;max-width:640px;margin-bottom:28px;}
+
+/* ===== Upload ===== */
+.upload-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;}
+@media(max-width:760px){.upload-grid{grid-template-columns:1fr;}}
+.panel{
+  background:var(--ink-2);border:1px solid var(--hair);border-radius:var(--radius);
+  padding:22px;
+}
+.panel label.field-label{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--paper-dim);margin-bottom:10px;
+}
+textarea#captionInput{
+  width:100%;min-height:180px;background:var(--ink);border:1px solid var(--hair);
+  color:var(--paper);font-family:var(--serif);font-size:16.5px;line-height:1.6;
+  padding:16px;border-radius:var(--radius);resize:vertical;
+}
+textarea#captionInput:focus, input:focus, .drop-zone:focus-within{outline:2px solid var(--steel);outline-offset:2px;}
+.char-count{font-family:var(--mono);font-size:11px;color:var(--paper-dim);margin-top:8px;text-align:right;}
+
+.drop-zone{
+  border:1.5px dashed var(--hair);border-radius:var(--radius);
+  min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;cursor:pointer;transition:border-color .2s, background .2s;padding:20px;position:relative;
+  overflow:hidden;background:var(--ink);
+}
+.drop-zone:hover{border-color:var(--steel);background:var(--ink-2);}
+.drop-zone.has-image{border-style:solid;padding:0;}
+.drop-zone img{width:100%;height:100%;object-fit:cover;max-height:260px;}
+.drop-zone .dz-icon{font-size:26px;margin-bottom:10px;opacity:.6;}
+.drop-zone .dz-text{font-size:13px;color:var(--paper-dim);}
+.drop-zone .dz-text b{color:var(--paper);}
+.remove-img{
+  position:absolute;top:8px;right:8px;background:var(--ink);border:1px solid var(--hair);
+  color:var(--paper);width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.btn{
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:13px 22px;border-radius:var(--radius);border:1px solid var(--redline);
+  background:var(--redline);color:var(--paper);cursor:pointer;transition:transform .15s, background .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover:not(:disabled){background:#a9351f;}
+.btn:active:not(:disabled){transform:scale(.98);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn.ghost{background:transparent;color:var(--paper);border-color:var(--hair);}
+.btn.ghost:hover:not(:disabled){border-color:var(--steel);color:var(--steel);}
+.btn.small{padding:9px 14px;font-size:11px;}
+.actions-row{display:flex;justify-content:space-between;align-items:center;margin-top:22px;flex-wrap:wrap;gap:14px;}
+
+/* ===== Workflow / reviewers ===== */
+#workflowSection{display:none;}
+.reviewer-list{display:flex;flex-direction:column;gap:10px;margin-bottom:26px;}
+.reviewer-row{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--ink-2);
+  border:1px solid var(--hair);border-radius:var(--radius);transition:border-color .3s;
+}
+.reviewer-row.active{border-color:var(--amber);}
+.reviewer-row.done{border-color:var(--good);}
+.reviewer-row.error{border-color:var(--redline);}
+.rstatus{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--hair);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);
+}
+.reviewer-row.active .rstatus{border-color:var(--amber);animation:pulse 1.1s infinite;}
+.reviewer-row.done .rstatus{border-color:var(--good);background:var(--good);color:var(--ink);}
+.reviewer-row.error .rstatus{border-color:var(--redline);background:var(--redline);color:var(--paper);}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--amber-soft);}50%{box-shadow:0 0 0 6px transparent;}}
+.rinfo{flex:1;}
+.rinfo .rname{font-weight:600;font-size:14.5px;}
+.rinfo .rrole{font-size:12.5px;color:var(--paper-dim);}
+.rtag{font-family:var(--mono);font-size:10.5px;color:var(--paper-dim);letter-spacing:.05em;}
+
+.log-console{
+  background:var(--ink);border:1px solid var(--hair);border-radius:var(--radius);
+  padding:16px 18px;height:170px;overflow-y:auto;font-family:var(--mono);font-size:12px;
+  color:var(--paper-dim);
+}
+.log-console .log-line{margin-bottom:6px;opacity:0;animation:fadeIn .3s forwards;}
+@keyframes fadeIn{to{opacity:1;}}
+.log-console .log-line .t{color:var(--steel);margin-right:8px;}
+.log-console::-webkit-scrollbar{width:8px;}
+.log-console::-webkit-scrollbar-thumb{background:var(--hair);border-radius:4px;}
+
+/* ===== Results ===== */
+#resultsSection{display:none;}
+.score-stamp-wrap{display:flex;gap:26px;align-items:center;margin-bottom:34px;flex-wrap:wrap;}
+.score-stamp{
+  width:132px;height:132px;border-radius:50%;border:3px solid var(--redline);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transform:rotate(-6deg);flex-shrink:0;position:relative;
+}
+.score-stamp::before{
+  content:"EDITOR'S SCORE";position:absolute;top:14px;font-family:var(--mono);font-size:8px;
+  letter-spacing:.1em;color:var(--redline);
+}
+.score-stamp .num{font-family:var(--serif);font-weight:700;font-size:46px;color:var(--redline);line-height:1;margin-top:8px;}
+.score-stamp .of{font-family:var(--mono);font-size:10px;color:var(--redline);}
+.score-meta{flex:1;min-width:240px;}
+.score-meta .verdict{font-family:var(--serif);font-size:19px;font-style:italic;margin-bottom:6px;}
+.score-meta .verdict-sub{color:var(--paper-dim);font-size:13.5px;}
+
+.category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:34px;}
+.cat-card{background:var(--ink-2);border:1px solid var(--hair);border-radius:var(--radius);padding:16px;}
+.cat-card .cname{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);margin-bottom:10px;}
+.cat-card .cscore-row{display:flex;align-items:baseline;gap:8px;margin-bottom:10px;}
+.cat-card .cscore{font-family:var(--serif);font-size:26px;font-weight:600;}
+.bar-track{height:5px;background:var(--hair);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+.bar-fill{height:100%;border-radius:3px;transition:width 1s ease;}
+.cat-card .cnote{font-size:12.5px;color:var(--paper-dim);}
+
+.manuscript{
+  background:var(--ink-2);border:1px solid var(--hair);border-radius:var(--radius);padding:24px;margin-bottom:30px;
+}
+.manuscript h3{font-family:var(--serif);font-size:16px;margin-bottom:14px;color:var(--paper);}
+.margin-note{
+  border-left:3px solid var(--redline);padding:10px 14px;margin-bottom:12px;background:var(--redline-soft);
+  border-radius:0 var(--radius) var(--radius) 0;font-size:13.5px;
+}
+.margin-note.opp{border-color:var(--steel);background:var(--steel-soft);}
+.margin-note.good{border-color:var(--good);background:var(--good-soft);}
+.margin-note b{display:block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:760px){.two-col{grid-template-columns:1fr;}}
+
+.rewrite-box{background:var(--ink-2);border:1px solid var(--hair);border-radius:var(--radius);padding:18px;}
+.rewrite-box h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);margin-bottom:10px;}
+.rewrite-box.after{border-color:var(--good);}
+.rewrite-box .body-text{font-family:var(--serif);font-size:15.5px;line-height:1.65;white-space:pre-wrap;}
+
+.hook-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.hook-list li{
+  background:var(--ink);border:1px solid var(--hair);border-radius:var(--radius);padding:11px 14px;
+  font-family:var(--serif);font-size:14.5px;display:flex;gap:10px;
+}
+.hook-list li .hn{font-family:var(--mono);color:var(--amber);font-size:12px;flex-shrink:0;}
+
+.checklist{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.checklist li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;}
+.checklist li::before{content:"☐";color:var(--steel);flex-shrink:0;font-size:15px;}
+
+.report-block{margin-bottom:26px;}
+.report-block h3{font-family:var(--serif);font-size:18px;margin-bottom:10px;}
+.report-block p{color:var(--paper-dim);font-size:14px;line-height:1.7;}
+.ai-estimate-tag{
+  display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--amber);border:1px solid var(--amber);padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;
+}
+.perf-bars{display:flex;flex-direction:column;gap:12px;margin-top:14px;}
+.perf-row .plabel{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;color:var(--paper-dim);}
+.perf-row .plabel b{color:var(--paper);}
+
+.followup-box{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.followup-box input{
+  flex:1;min-width:220px;background:var(--ink);border:1px solid var(--hair);color:var(--paper);
+  padding:12px 14px;border-radius:var(--radius);font-family:var(--sans);font-size:13.5px;
+}
+.followup-answer{
+  margin-top:14px;padding:16px;background:var(--ink);border-left:3px solid var(--steel);
+  border-radius:0 var(--radius) var(--radius) 0;font-size:13.5px;color:var(--paper-dim);white-space:pre-wrap;display:none;
+}
+
+.error-box{
+  background:var(--redline-soft);border:1px solid var(--redline);border-radius:var(--radius);
+  padding:14px 16px;font-size:13px;margin-top:14px;display:none;
+}
+.error-box button{margin-top:10px;}
+
+footer{padding:30px 0 50px;text-align:center;color:var(--paper-dim);font-family:var(--mono);font-size:11px;}
+</style>
+</head>
+<body>
+<div class="bg-texture"></div>
+<div class="wrap">
+
+  <header class="top">
+    <div class="masthead">
+      <div class="brand">
+        <span class="mark">CIS</span>
+        <h1>Content Intelligence Studio</h1>
+      </div>
+      <div class="meta">AI EDITORIAL DESK<br>LIVE CLAUDE REVIEW</div>
+    </div>
+    <div class="chipbar">
+      <div class="chip">Format: <b>LinkedIn Post</b></div>
+      <div class="chip">Goal: <b>Maximize Engagement</b></div>
+      <div class="chip">Input: <b>Text + Image</b></div>
+      <div class="chip">Review Mode: <b>Brutal / Agency-Level</b></div>
+    </div>
+  </header>
+
+  <!-- UPLOAD -->
+  <section id="uploadSection">
+    <div class="eyebrow">Manuscript intake</div>
+    <h2 class="section-title">Submit your post for review</h2>
+    <p class="section-sub">Paste your LinkedIn caption and attach the accompanying image. Five specialist reviewers will tear it apart line by line, then hand you a rewrite.</p>
+
+    <div class="upload-grid">
+      <div class="panel">
+        <label class="field-label" for="captionInput">Post copy</label>
+        <textarea id="captionInput" placeholder="Paste your LinkedIn caption here..."></textarea>
+        <div class="char-count"><span id="charCount">0</span> characters</div>
+      </div>
+      <div class="panel">
+        <label class="field-label">Post image</label>
+        <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Upload image">
+          <div class="dz-icon">＋</div>
+          <div class="dz-text"><b>Click to upload</b><br>or drag an image here</div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <span style="font-family:var(--mono);font-size:11.5px;color:var(--paper-dim)">Estimated review time: ~40–70s</span>
+      <button class="btn" id="beginBtn" disabled>Begin Review →</button>
+    </div>
+    <div class="error-box" id="uploadError"></div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section id="workflowSection">
+    <div class="eyebrow">Editorial workflow</div>
+    <h2 class="section-title">Reviewers at work</h2>
+    <p class="section-sub">Each specialist reads your post independently, then a senior editor synthesizes their notes into a final verdict.</p>
+    <div class="reviewer-list" id="reviewerList"></div>
+    <div class="log-console" id="logConsole"></div>
+    <div class="error-box" id="workflowError"></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="resultsSection">
+    <div class="eyebrow">Final verdict</div>
+    <h2 class="section-title">The editor's markup</h2>
+
+    <div class="score-stamp-wrap">
+      <div class="score-stamp"><div class="num" id="overallScore">—</div><div class="of">/ 100</div></div>
+      <div class="score-meta">
+        <div class="verdict" id="verdictLine">…</div>
+        <div class="verdict-sub" id="verdictSub"></div>
+      </div>
+    </div>
+
+    <div class="category-grid" id="categoryGrid"></div>
+
+    <div class="manuscript">
+      <h3>Margin notes</h3>
+      <div id="marginNotes"></div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:34px;">
+      <div class="rewrite-box"><h4>Before — Your Draft</h4><div class="body-text" id="beforeText"></div></div>
+      <div class="rewrite-box after"><h4>After — Claude's Rewrite</h4><div class="body-text" id="afterText"></div></div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:34px;">
+      <div class="panel">
+        <h4 style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);margin-bottom:12px;">Alternative hooks &amp; openers</h4>
+        <ul class="hook-list" id="hookList"></ul>
+      </div>
+      <div class="panel">
+        <h4 style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);margin-bottom:12px;">Publishing checklist</h4>
+        <ul class="checklist" id="checklistItems"></ul>
+      </div>
+    </div>
+
+    <div class="report-block">
+      <h3>Executive summary</h3>
+      <p id="execSummary"></p>
+    </div>
+    <div class="report-block">
+      <h3>Content health report</h3>
+      <p id="healthReport"></p>
+    </div>
+    <div class="report-block">
+      <h3>Highest-impact improvements</h3>
+      <ul class="checklist" id="impactList"></ul>
+    </div>
+    <div class="report-block">
+      <h3>Predicted performance potential <span class="ai-estimate-tag">AI estimate</span></h3>
+      <p id="perfNote"></p>
+      <div class="perf-bars" id="perfBars"></div>
+    </div>
+
+    <div class="report-block">
+      <h3>Go deeper</h3>
+      <p style="margin-bottom:4px;">Ask the editorial desk a follow-up question about this review.</p>
+      <div class="followup-box">
+        <input type="text" id="followupInput" placeholder="e.g. How do I make the hook punchier without losing credibility?">
+        <button class="btn small" id="followupBtn">Ask →</button>
+      </div>
+      <div class="followup-answer" id="followupAnswer"></div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn ghost small" id="restartBtn">↺ Review another post</button>
+    </div>
+  </section>
+
+  <footer>CONTENT INTELLIGENCE STUDIO — ALL ANALYSIS GENERATED LIVE BY CLAUDE — NO CACHED OR RULE-BASED SCORING</footer>
+</div>
+
+<script>
+const MODEL = "claude-sonnet-4-6";
+const state = { caption:"", imgBase64:null, imgMediaType:null, stageOutputs:{} };
+
+/* ---------- DOM refs ---------- */
+const captionInput = document.getElementById('captionInput');
+const charCount = document.getElementById('charCount');
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const beginBtn = document.getElementById('beginBtn');
+const uploadError = document.getElementById('uploadError');
+const workflowSection = document.getElementById('workflowSection');
+const resultsSection = document.getElementById('resultsSection');
+const reviewerList = document.getElementById('reviewerList');
+const logConsole = document.getElementById('logConsole');
+const workflowError = document.getElementById('workflowError');
+
+captionInput.addEventListener('input', ()=>{
+  state.caption = captionInput.value;
+  charCount.textContent = state.caption.length;
+  validateBegin();
+});
+
+dropZone.addEventListener('click', ()=>fileInput.click());
+dropZone.addEventListener('keypress', e=>{ if(e.key==='Enter' || e.key===' ') fileInput.click(); });
+dropZone.addEventListener('dragover', e=>{e.preventDefault(); dropZone.style.borderColor='var(--steel)';});
+dropZone.addEventListener('dragleave', ()=>{dropZone.style.borderColor='';});
+dropZone.addEventListener('drop', e=>{
+  e.preventDefault();
+  if(e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e=>{
+  if(e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+function handleFile(file){
+  if(!file.type.startsWith('image/')){ showError(uploadError,'Please upload an image file.'); return; }
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const result = reader.result;
+    state.imgMediaType = file.type;
+    state.imgBase64 = result.split(',')[1];
+    dropZone.classList.add('has-image');
+    dropZone.innerHTML = `<img src="${result}" alt="Uploaded post image"><button class="remove-img" id="removeImgBtn" aria-label="Remove image">✕</button>`;
+    document.getElementById('removeImgBtn').addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      state.imgBase64 = null; state.imgMediaType = null;
+      dropZone.classList.remove('has-image');
+      dropZone.innerHTML = `<div class="dz-icon">＋</div><div class="dz-text"><b>Click to upload</b><br>or drag an image here</div>`;
+      validateBegin();
+    });
+    validateBegin();
+  };
+  reader.readAsDataURL(file);
+}
+
+function validateBegin(){
+  beginBtn.disabled = !(state.caption.trim().length > 5);
+}
+
+function showError(el, msg, retryFn){
+  el.style.display='block';
+  el.innerHTML = escapeHtml(msg);
+  if(retryFn){
+    const btn = document.createElement('button');
+    btn.className='btn small ghost'; btn.textContent='Retry';
+    btn.onclick = retryFn;
+    el.appendChild(document.createElement('br'));
+    el.appendChild(btn);
+  }
+}
+function hideError(el){ el.style.display='none'; el.innerHTML=''; }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- Claude API ---------- */
+async function callClaude(systemPrompt, userText, includeImage, maxTokens){
+  const content = [];
+  if(includeImage && state.imgBase64){
+    content.push({ type:'image', source:{ type:'base64', media_type: state.imgMediaType, data: state.imgBase64 } });
+  }
+  content.push({ type:'text', text:userText });
+
+  const body = {
+    model: MODEL,
+    max_tokens: maxTokens || 1400,
+    system: systemPrompt,
+    messages: [{ role:'user', content }]
+  };
+
+  let lastErr;
+  for(let attempt=0; attempt<3; attempt++){
+    try{
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+      if(!res.ok){
+        const t = await res.text();
+        throw new Error('API error '+res.status+': '+t.slice(0,200));
+      }
+      const data = await res.json();
+      const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+      if(!text.trim()) throw new Error('Empty response from model');
+      return text;
+    }catch(err){
+      lastErr = err;
+      if(attempt < 2) await new Promise(r=>setTimeout(r, 700*(attempt+1)));
+    }
+  }
+  throw lastErr;
+}
+
+/* ---------- Section-tag parser (no JSON, avoids parse errors) ---------- */
+function parseSections(text){
+  const out = {};
+  const regex = /==([A-Z_]+)==/g;
+  let match; const marks=[];
+  while((match = regex.exec(text)) !== null){ marks.push({key:match[1], idx:match.index, end:regex.lastIndex}); }
+  for(let i=0;i<marks.length;i++){
+    const start = marks[i].end;
+    const stop = i+1<marks.length ? marks[i+1].idx : text.length;
+    out[marks[i].key] = text.slice(start, stop).trim();
+  }
+  return out;
+}
+function parseListLines(block){
+  if(!block) return [];
+  return block.split('\n').map(l=>l.replace(/^[-*•\d.]+\s*/,'').trim()).filter(l=>l.length>0);
+}
+
+/* ---------- Reviewer pipeline ---------- */
+const CRITICAL_TONE = "You are an elite, brutally honest editorial reviewer operating at agency-level scrutiny. Do not soften your critique, do not offer empty praise, and do not hedge. If something is weak, cliché, generic, or will underperform, say so plainly and explain exactly why. You still owe the author precise, actionable fixes, not just criticism. Never fabricate facts about the author or their business. Base every judgment strictly on what is actually in the submitted post and image.";
+
+const REVIEWERS = [
+  {
+    id:'hook', name:'Hook & Opening Line Reviewer', role:'Judges the first two lines that decide if anyone clicks "see more"',
+    system: CRITICAL_TONE + " You specialize exclusively in the opening 1-2 lines of LinkedIn posts (the part visible before 'see more'). You evaluate scroll-stopping power, curiosity gap, specificity, and whether it earns the click to expand. Respond ONLY in this exact plain-text format, no markdown, no JSON, no extra commentary outside the tags:\n==SCORE==\n(a single integer 0-100)\n==VERDICT==\n(one sharp sentence verdict)\n==STRENGTHS==\n- point\n- point\n==WEAKNESSES==\n- point\n- point\n==FIX==\n(one concrete rewrite suggestion for the opening line, 1-2 sentences)"
+  },
+  {
+    id:'visual', name:'Visual Impact Reviewer', role:'Analyzes the attached image for scroll-stopping power and message fit',
+    system: CRITICAL_TONE + " You specialize in evaluating the attached image as it will appear in the LinkedIn feed: thumb-stopping power, composition, text legibility on mobile, professionalism, brand fit, and whether it reinforces or contradicts the caption's message. If no image was provided, say so directly and score based on the missed opportunity of not having one. Respond ONLY in this exact plain-text format:\n==SCORE==\n(integer 0-100)\n==VERDICT==\n(one sharp sentence)\n==STRENGTHS==\n- point\n- point\n==WEAKNESSES==\n- point\n- point\n==FIX==\n(one concrete visual improvement)"
+  },
+  {
+    id:'structure', name:'Structure & Readability Reviewer', role:'Checks line breaks, pacing, scannability and mobile formatting',
+    system: CRITICAL_TONE + " You specialize in LinkedIn post structure: line-break rhythm, paragraph length, whitespace, scannability on mobile, use of formatting (bullets, short lines), and overall pacing toward a payoff. Respond ONLY in this exact plain-text format:\n==SCORE==\n(integer 0-100)\n==VERDICT==\n(one sharp sentence)\n==STRENGTHS==\n- point\n- point\n==WEAKNESSES==\n- point\n- point\n==FIX==\n(one concrete structural change)"
+  },
+  {
+    id:'engagement', name:'Engagement Psychology & Algorithm Fit Reviewer', role:'Evaluates comment-bait, dwell time, and LinkedIn feed mechanics',
+    system: CRITICAL_TONE + " You specialize in LinkedIn's feed algorithm and engagement psychology: whether the post invites comments (not just likes), encourages dwell time, has a clear discussion trigger or point of view, uses hashtags/tagging sensibly, and avoids engagement-bait clichés that LinkedIn now suppresses. Respond ONLY in this exact plain-text format:\n==SCORE==\n(integer 0-100)\n==VERDICT==\n(one sharp sentence)\n==STRENGTHS==\n- point\n- point\n==WEAKNESSES==\n- point\n- point\n==FIX==\n(one concrete change to drive more comments)"
+  }
+];
+
+const activeReviewerResults = {};
+
+function renderReviewerList(){
+  reviewerList.innerHTML = REVIEWERS.map(r => `
+    <div class="reviewer-row" id="row-${r.id}">
+      <div class="rstatus" id="status-${r.id}">·</div>
+      <div class="rinfo">
+        <div class="rname">${r.name}</div>
+        <div class="rrole">${r.role}</div>
+      </div>
+      <div class="rtag">PENDING</div>
+    </div>`).join('') + `
+    <div class="reviewer-row" id="row-synthesis">
+      <div class="rstatus" id="status-synthesis">·</div>
+      <div class="rinfo">
+        <div class="rname">Senior Editor — Final Synthesis</div>
+        <div class="rrole">Combines all findings into the final verdict, rewrite, and report</div>
+      </div>
+      <div class="rtag">PENDING</div>
+    </div>`;
+}
+
+function setReviewerStatus(id, status){
+  const row = document.getElementById('row-'+id);
+  const stat = document.getElementById('status-'+id);
+  const tag = row.querySelector('.rtag');
+  row.classList.remove('active','done','error');
+  if(status==='active'){ row.classList.add('active'); stat.textContent='…'; tag.textContent='REVIEWING'; }
+  if(status==='done'){ row.classList.add('done'); stat.textContent='✓'; tag.textContent='COMPLETE'; }
+  if(status==='error'){ row.classList.add('error'); stat.textContent='!'; tag.textContent='FAILED'; }
+}
+
+function logLine(msg){
+  const div = document.createElement('div');
+  div.className='log-line';
+  const time = new Date().toLocaleTimeString();
+  div.innerHTML = `<span class="t">[${time}]</span>${escapeHtml(msg)}`;
+  logConsole.appendChild(div);
+  logConsole.scrollTop = logConsole.scrollHeight;
+}
+
+async function runReviewer(r){
+  setReviewerStatus(r.id, 'active');
+  logLine(`${r.name} is reading the post...`);
+  const userText = `LINKEDIN POST CAPTION:\n"""\n${state.caption}\n"""\n\n${state.imgBase64 ? 'An image is attached to this post — analyze it as part of the review.' : 'No image was attached to this post.'}\n\nGoal of the post: maximize engagement (likes, comments, shares). Review mode: brutal, agency-level scrutiny. Give your assessment now, following the exact response format from your instructions.`;
+  const raw = await callClaude(r.system, userText, r.id==='visual', 900);
+  const parsed = parseSections(raw);
+  activeReviewerResults[r.id] = parsed;
+  setReviewerStatus(r.id, 'done');
+  logLine(`${r.name} finished — score ${parsed.SCORE || '?'}/100.`);
+}
+
+async function runSynthesis(){
+  setReviewerStatus('synthesis', 'active');
+  logLine('Senior Editor is synthesizing all reviewer notes...');
+
+  const notesDump = REVIEWERS.map(r=>{
+    const p = activeReviewerResults[r.id] || {};
+    return `### ${r.name} (score ${p.SCORE||'?'})\nVerdict: ${p.VERDICT||''}\nStrengths: ${p.STRENGTHS||''}\nWeaknesses: ${p.WEAKNESSES||''}\nFix: ${p.FIX||''}`;
+  }).join('\n\n');
+
+  const system = CRITICAL_TONE + " You are the senior editor synthesizing four specialist reviews of a LinkedIn post into one final, decisive report for the author. You must produce a rewritten version of the full post that fixes the identified problems while keeping the author's authentic voice and core message. Be specific and concrete everywhere; never use vague filler like 'could be improved.' Respond ONLY in this exact plain-text format, with no markdown, no JSON, no extra commentary outside the tags:\n==OVERALL_SCORE==\n(single integer 0-100, your own independent weighted judgment, not just an average)\n==VERDICT_LINE==\n(one punchy editorial-style verdict sentence, in italics tone)\n==VERDICT_SUB==\n(one sentence of supporting context)\n==MARGIN_NOTES==\n(4-6 lines, each starting with CRITICAL:, OPPORTUNITY:, or STRONG: followed by a specific one-sentence note referencing the actual post content)\n==REWRITE==\n(the full rewritten LinkedIn post, ready to publish, matching authentic voice)\n==HOOKS==\n(5 alternative opening hook lines, one per line, no numbering)\n==CHECKLIST==\n(6 short publishing checklist action items, one per line)\n==EXEC_SUMMARY==\n(3-4 sentence executive summary of the overall assessment)\n==HEALTH_REPORT==\n(3-4 sentences describing the overall content health: clarity, authenticity, platform fit, risk of underperformance)\n==TOP_IMPROVEMENTS==\n(3 highest-impact improvements ranked by impact, one per line)\n==PERF_NOTE==\n(2 sentences framing predicted performance as an AI estimate, not a guarantee)\n==PERF_HOOK==\n(integer 0-100 estimating hook strength)\n==PERF_SHARE==\n(integer 0-100 estimating shareability)\n==PERF_COMMENT==\n(integer 0-100 estimating comment-generation potential)\n==PERF_REACH==\n(integer 0-100 estimating algorithmic reach potential)";
+
+  const userText = `ORIGINAL POST:\n"""\n${state.caption}\n"""\n\nSPECIALIST REVIEWER NOTES:\n${notesDump}\n\nProduce the final synthesis now in the exact required format.`;
+  const raw = await callClaude(system, userText, true, 2200);
+  const parsed = parseSections(raw);
+  activeReviewerResults['synthesis'] = parsed;
+  setReviewerStatus('synthesis', 'done');
+  logLine('Final report compiled.');
+}
+
+async function runPipeline(){
+  hideError(workflowError);
+  renderReviewerList();
+  logConsole.innerHTML='';
+  logLine('Editorial desk assembled. Beginning review...');
+  try{
+    for(const r of REVIEWERS){
+      await runReviewer(r);
+    }
+    await runSynthesis();
+    renderResults();
+    workflowSection.scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>resultsSection.scrollIntoView({behavior:'smooth'}), 900);
+  }catch(err){
+    console.error(err);
+    showError(workflowError, 'The review pipeline hit an error: '+err.message, runPipeline);
+    logLine('ERROR — pipeline halted.');
+  }
+}
+
+/* ---------- Render results ---------- */
+function scoreColor(n){
+  n = Number(n)||0;
+  if(n>=75) return 'var(--good)';
+  if(n>=50) return 'var(--amber)';
+  return 'var(--redline)';
+}
+
+function renderResults(){
+  const s = activeReviewerResults.synthesis || {};
+  document.getElementById('overallScore').textContent = s.OVERALL_SCORE || '—';
+  document.getElementById('verdictLine').textContent = '"' + (s.VERDICT_LINE || '') + '"';
+  document.getElementById('verdictSub').textContent = s.VERDICT_SUB || '';
+
+  const catGrid = document.getElementById('categoryGrid');
+  catGrid.innerHTML = REVIEWERS.map(r=>{
+    const p = activeReviewerResults[r.id] || {};
+    const score = p.SCORE || 0;
+    return `<div class="cat-card">
+      <div class="cname">${r.name}</div>
+      <div class="cscore-row"><div class="cscore" style="color:${scoreColor(score)}">${score}</div><div style="color:var(--paper-dim);font-size:12px">/100</div></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${score}%;background:${scoreColor(score)}"></div></div>
+      <div class="cnote">${escapeHtml(p.VERDICT||'')}</div>
+    </div>`;
+  }).join('');
+
+  const notesLines = (s.MARGIN_NOTES||'').split('\n').map(l=>l.trim()).filter(Boolean);
+  document.getElementById('marginNotes').innerHTML = notesLines.map(line=>{
+    let cls='', label='NOTE';
+    if(/^CRITICAL:/i.test(line)){ cls=''; label='CRITICAL'; line=line.replace(/^CRITICAL:\s*/i,''); }
+    else if(/^OPPORTUNITY:/i.test(line)){ cls='opp'; label='OPPORTUNITY'; line=line.replace(/^OPPORTUNITY:\s*/i,''); }
+    else if(/^STRONG:/i.test(line)){ cls='good'; label='STRONG POINT'; line=line.replace(/^STRONG:\s*/i,''); }
+    return `<div class="margin-note ${cls}"><b>${label}</b>${escapeHtml(line)}</div>`;
+  }).join('') || '<p style="color:var(--paper-dim);font-size:13px;">No margin notes returned.</p>';
+
+  document.getElementById('beforeText').textContent = state.caption;
+  document.getElementById('afterText').textContent = s.REWRITE || '(no rewrite returned)';
+
+  const hooks = parseListLines(s.HOOKS);
+  document.getElementById('hookList').innerHTML = hooks.map((h,i)=>`<li><span class="hn">${String(i+1).padStart(2,'0')}</span>${escapeHtml(h)}</li>`).join('');
+
+  const checklist = parseListLines(s.CHECKLIST);
+  document.getElementById('checklistItems').innerHTML = checklist.map(c=>`<li>${escapeHtml(c)}</li>`).join('');
+
+  document.getElementById('execSummary').textContent = s.EXEC_SUMMARY || '';
+  document.getElementById('healthReport').textContent = s.HEALTH_REPORT || '';
+
+  const impacts = parseListLines(s.TOP_IMPROVEMENTS);
+  document.getElementById('impactList').innerHTML = impacts.map(c=>`<li>${escapeHtml(c)}</li>`).join('');
+
+  document.getElementById('perfNote').textContent = s.PERF_NOTE || '';
+  const perfMetrics = [
+    ['Hook strength', s.PERF_HOOK], ['Shareability', s.PERF_SHARE],
+    ['Comment potential', s.PERF_COMMENT], ['Algorithmic reach', s.PERF_REACH]
+  ];
+  document.getElementById('perfBars').innerHTML = perfMetrics.map(([label,val])=>{
+    val = Number(val)||0;
+    return `<div class="perf-row">
+      <div class="plabel"><span>${label}</span><b>${val}/100</b></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${val}%;background:${scoreColor(val)}"></div></div>
+    </div>`;
+  }).join('');
+
+  resultsSection.style.display='block';
+}
+
+/* ---------- Follow-up ---------- */
+document.getElementById('followupBtn').addEventListener('click', async ()=>{
+  const input = document.getElementById('followupInput');
+  const q = input.value.trim();
+  if(!q) return;
+  const answerBox = document.getElementById('followupAnswer');
+  const btn = document.getElementById('followupBtn');
+  btn.disabled = true; btn.textContent='Asking...';
+  answerBox.style.display='block';
+  answerBox.textContent = 'Consulting the editorial desk...';
+  try{
+    const s = activeReviewerResults.synthesis || {};
+    const system = CRITICAL_TONE + " You are the senior editor who already reviewed this LinkedIn post. Answer the author's follow-up question directly, specifically, and helpfully, referencing the actual post and prior review where relevant. Keep it to a tight, useful paragraph or short list. Plain text only, no markdown headers, no JSON.";
+    const userText = `ORIGINAL POST:\n"""${state.caption}"""\n\nPRIOR OVERALL SCORE: ${s.OVERALL_SCORE}\nPRIOR VERDICT: ${s.VERDICT_LINE}\n\nAUTHOR'S FOLLOW-UP QUESTION:\n${q}`;
+    const raw = await callClaude(system, userText, false, 600);
+    answerBox.textContent = raw;
+  }catch(err){
+    answerBox.textContent = 'Could not reach the editorial desk: '+err.message;
+  }finally{
+    btn.disabled=false; btn.textContent='Ask →';
+  }
+});
+
+/* ---------- Controls ---------- */
+beginBtn.addEventListener('click', ()=>{
+  hideError(uploadError);
+  document.getElementById('uploadSection').style.display='none';
+  workflowSection.style.display='block';
+  runPipeline();
+});
+
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  location.reload();
+});
+</script>
+</body>
+</html>
