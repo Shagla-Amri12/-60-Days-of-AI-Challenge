@@ -58,8 +58,8 @@ By allowing specialized AI reviewers to independently analyze hook quality, read
 
 # SCREENSHOT
 
-[content_intelligence_studio](content_intelligence_studio.png)
+[Content Intelligence Studio](content_intelligence_studio.png)
 
 # HTML File
 
-[content_intelligence_studio](content_intelligence_studio.html)
+[Content Intelligence Studio](content_intelligence_studio.html)
