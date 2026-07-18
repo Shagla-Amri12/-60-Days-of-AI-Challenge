@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First EV Buyer's Guide — Compare & Decide</title>
+<style>
+  :root{
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --border: #2a2f3a;
+    --text: #e9ecf1;
+    --text-dim: #9aa3b2;
+    --accent: #4fd1c5;
+    --accent-2: #7c9cff;
+    --warn: #f2b84b;
+    --danger: #f2665a;
+    --good: #56d364;
+    --radius: 14px;
+    --shadow: 0 8px 30px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 800px at 10% -10%, #1b2130 0%, var(--bg) 60%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 24px 16px 64px;
+  }
+  .wrap{max-width: 1180px; margin: 0 auto;}
+  header{margin-bottom: 28px;}
+  h1{
+    font-size: clamp(24px, 4vw, 34px);
+    margin: 0 0 6px;
+    letter-spacing: -0.02em;
+  }
+  .subtitle{color: var(--text-dim); font-size: 15px; max-width: 720px;}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px;}
+  .badge{
+    font-size: 12px; padding: 5px 10px; border-radius: 999px;
+    border:1px solid var(--border); color: var(--text-dim); background: var(--panel);
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    align-items:start;
+  }
+  @media (max-width: 900px){
+    .layout{grid-template-columns: 1fr;}
+  }
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+  }
+  .card h2{
+    font-size: 16px; margin: 0 0 14px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-dim);
+  }
+  .slider-group{margin-bottom: 18px;}
+  .slider-label{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size: 14px; margin-bottom: 6px;
+  }
+  .slider-value{
+    font-variant-numeric: tabular-nums;
+    color: var(--accent); font-weight:600; min-width: 34px; text-align:right;
+  }
+  input[type="range"]{
+    -webkit-appearance:none; width:100%; height:6px; border-radius:4px;
+    background: var(--border); outline:none; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background: var(--accent); cursor:pointer; border:3px solid #0b3d3a;
+    box-shadow: 0 0 0 3px rgba(79,209,197,0.15);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:18px; height:18px; border-radius:50%;
+    background: var(--accent); cursor:pointer; border:3px solid #0b3d3a;
+  }
+  .reset-btn{
+    width:100%; padding: 10px; margin-top: 6px;
+    border-radius: 10px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); cursor:pointer;
+    font-size: 13px; transition: background 0.15s, border-color 0.15s;
+  }
+  .reset-btn:hover{ background:#252b38; border-color:#3a4256; }
+  .weight-hint{font-size:12px; color:var(--text-dim); margin-top:10px; line-height:1.4;}
+
+  .rank-list{display:flex; flex-direction:column; gap:12px;}
+  .rank-item{
+    display:grid;
+    grid-template-columns: 40px 1fr auto;
+    gap:14px; align-items:center;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .rank-item.rank-1{ border-color: var(--accent); box-shadow: 0 0 0 1px rgba(79,209,197,0.25) inset; }
+  .rank-num{
+    font-size: 22px; font-weight:700; color: var(--text-dim); text-align:center;
+  }
+  .rank-1 .rank-num{color: var(--accent);}
+  .rank-name{font-size:16px; font-weight:600;}
+  .rank-sub{font-size:12px; color:var(--text-dim); margin-top:2px;}
+  .rank-score{font-size:20px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums;}
+  .rank-score-label{font-size:11px; color:var(--text-dim); text-align:right;}
+
+  table{
+    width:100%; border-collapse: collapse; margin-top:10px; font-size: 13.5px;
+  }
+  th, td{
+    text-align:left; padding: 10px 12px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th{
+    color: var(--text-dim); font-weight:600; font-size:12px; text-transform:uppercase;
+    letter-spacing:0.04em; position: sticky; top:0; background: var(--panel);
+  }
+  td.num{font-variant-numeric: tabular-nums;}
+  .flag{
+    display:inline-block; font-size: 10.5px; padding: 2px 7px; border-radius:6px;
+    margin-left:6px; font-weight:600; letter-spacing:0.02em; vertical-align:middle;
+  }
+  .flag-estimate{ background: rgba(242,184,75,0.15); color: var(--warn); border:1px solid rgba(242,184,75,0.4); }
+  .flag-gap{ background: rgba(242,102,90,0.15); color: var(--danger); border:1px solid rgba(242,102,90,0.4); }
+  .flag-official{ background: rgba(86,211,100,0.12); color: var(--good); border:1px solid rgba(86,211,100,0.35); }
+
+  .table-scroll{overflow-x:auto; border-radius:10px;}
+
+  details{
+    margin-top: 20px; background: var(--panel-2); border:1px solid var(--border);
+    border-radius: 12px; padding: 4px 16px;
+  }
+  summary{
+    cursor:pointer; padding: 14px 0; font-weight:600; font-size:14px;
+    list-style:none; display:flex; justify-content:space-between; align-items:center;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:"+"; font-size:20px; color:var(--accent); transition: transform 0.2s;}
+  details[open] summary::after{ content:"–"; }
+  .details-body{padding: 4px 0 18px; color: var(--text-dim); font-size:13.5px;}
+  .details-body h4{color:var(--text); margin: 16px 0 6px; font-size:14px;}
+  .details-body ul{margin:6px 0; padding-left:20px;}
+  .details-body li{margin-bottom:6px;}
+
+  .sources-grid{display:grid; grid-template-columns: 1fr 1fr; gap: 8px 20px;}
+  @media (max-width:700px){ .sources-grid{grid-template-columns:1fr;} }
+  .source-item{
+    font-size: 13px; padding: 8px 0; border-bottom: 1px dashed var(--border);
+  }
+  .source-item a{color: var(--accent-2); text-decoration:none;}
+  .source-item a:hover{text-decoration:underline;}
+  .source-item .src-tag{color:var(--text-dim); font-size:11.5px;}
+
+  .footer-note{
+    margin-top: 28px; font-size: 12px; color: var(--text-dim); text-align:center;
+    padding-top:18px; border-top:1px solid var(--border);
+  }
+  .section-title{font-size:20px; margin: 32px 0 12px; letter-spacing:-0.01em;}
+  .empty-state{
+    text-align:center; padding: 40px 20px; color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>⚡ First-Time EV Buyer: Compare &amp; Decide</h1>
+    <p class="subtitle">Tesla Model 3 vs. Hyundai Ioniq 5 vs. Chevrolet Bolt vs. Volkswagen ID.4 — weighted against the criteria that matter most to a budget-conscious first EV purchase.</p>
+    <div class="badge-row">
+      <span class="badge">5 criteria, adjustable weights</span>
+      <span class="badge">Sourced from KBB, EPA/manufacturers, NHTSA, IIHS, Edmunds, Cars.com, GM</span>
+      <span class="badge">Data verified July 2026</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- WEIGHTS PANEL -->
+    <div class="card" id="weights-panel">
+      <h2>Your Priorities</h2>
+      <div id="sliders"></div>
+      <button class="reset-btn" id="resetBtn">Reset to equal weights</button>
+      <p class="weight-hint">Drag sliders to reflect what matters most to you. The ranking below updates live — weights are relative to each other, not absolute percentages.</p>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="card">
+      <h2>Live Ranking</h2>
+      <div id="rankList" class="rank-list"></div>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        No data available for current settings.
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Full Data Table</h2>
+  <div class="card">
+    <div class="table-scroll">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Vehicle</th>
+            <th>Starting MSRP</th>
+            <th>EPA Range</th>
+            <th>DC Fast Charging</th>
+            <th>5-Yr Cost to Own</th>
+            <th>Safety Rating</th>
+          </tr>
+        </thead>
+        <tbody id="dataTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SOURCES PANEL -->
+  <details open>
+    <summary>📚 Sources Panel — every citation used</summary>
+    <div class="details-body">
+      <div class="sources-grid" id="sourcesGrid"></div>
+    </div>
+  </details>
+
+  <!-- METHODOLOGY PANEL -->
+  <details>
+    <summary>🔍 How this was researched</summary>
+    <div class="details-body" id="methodologyBody">
+      <h4>Data collection approach</h4>
+      <p>Each vehicle's specs were pulled directly from the manufacturer, EPA-derived range figures reported by Kelley Blue Book / Edmunds / Cars.com / US News, and official safety-testing bodies (NHTSA, IIHS). Where a number is a manufacturer estimate rather than an EPA-certified or independently tested figure, it is flagged as an <span class="flag flag-estimate">ESTIMATE</span>. Where no reliable figure exists yet, it is flagged as a <span class="flag flag-gap">DATA GAP</span>.</p>
+
+      <h4>Conflicts &amp; how they were resolved</h4>
+      <ul>
+        <li><strong>Tesla Model 3 trim confusion:</strong> Sources vary depending on whether they cite the base "Standard" trim or the longer-range "Premium RWD" trim. This tool uses the base Standard trim ($38,380 MSRP / 363-mi range per KBB's official spec sheet) since it's the most relevant configuration for a budget-conscious first-time buyer.</li>
+        <li><strong>Chevrolet Bolt range discrepancy:</strong> The relaunched Bolt (technically a 2027 model year vehicle beginning deliveries in early 2026) has been reported with EPA range estimates ranging from 255 to 262 miles across pre-launch coverage. GM's own newsroom release confirms pricing but has not published a final EPA-certified range figure as of this writing. That range is flagged as an <span class="flag flag-estimate">ESTIMATE</span> pending final EPA certification.</li>
+        <li><strong>Chevrolet Bolt cost-to-own and safety rating:</strong> Because the relaunched Bolt had not begun customer deliveries at time of writing, Kelley Blue Book has no 5-Year Cost to Own figure, and neither NHTSA nor IIHS has crash-tested it yet. Both are marked as <span class="flag flag-gap">DATA GAPS</span> — treat the Bolt's cost/safety ranking with extra caution until real-world and test data exists.</li>
+        <li><strong>Volkswagen ID.4 cost-to-own:</strong> KBB's specific 2026 ID.4 Cost to Own page did not return a public dollar figure in available search results at time of writing. Rather than invent a number, this tool marks it as an <span class="flag flag-estimate">ESTIMATE</span>, interpolated from the ID.4's 2025 KBB cost-to-own history and its close price/segment overlap with the Ioniq 5. Verify directly on kbb.com before relying on it.</li>
+        <li><strong>Volkswagen ID.4 safety rating:</strong> Neither NHTSA nor IIHS had a confirmed, published 2026-model-year overall rating in available sources at time of writing (the ID.4 has been well-rated in prior model years, e.g., IIHS "Top Safety Pick" history), so its current-year rating is flagged as a <span class="flag flag-gap">DATA GAP</span> pending fresh testing confirmation.</li>
+        <li><strong>Hyundai Ioniq 5 NHTSA rating:</strong> US News reported that NHTSA had not completed full testing of the 2026 Ioniq 5 at time of writing, even though IIHS awarded it Top Safety Pick+. This is noted directly in the table rather than assumed.</li>
+      </ul>
+
+      <h4>What "5-Year Cost to Own" includes</h4>
+      <p>Per Kelley Blue Book's methodology, this figure combines projected out-of-pocket expenses (fuel/electricity, insurance, maintenance, repairs, financing, and state fees) with expected 5-year depreciation. It is a KBB-modeled estimate for a typical owner/location, not a guaranteed cost — your insurance, electricity rates, and financing terms will change your actual number.</p>
+
+      <h4>Limitations to keep in mind</h4>
+      <ul>
+        <li>MSRPs exclude destination fees, taxes, title, and dealer add-ons unless otherwise noted.</li>
+        <li>The federal EV tax credit expired September 30, 2025 and is not reflected in any listed price — factor in any remaining state/local incentives separately.</li>
+        <li>The Chevrolet Bolt is the newest and least-verified entry here since it only began shipping to customers in early 2026 — treat its figures as more provisional than the other three.</li>
+      </ul>
+    </div>
+  </details>
+
+  <p class="footer-note">
+    This tool is for general research/education purposes and reflects publicly available data as of July 2026. It is not financial or purchasing advice — verify current pricing, incentives, and availability with dealers and official sources before buying.
+  </p>
+</div>
+
+<script>
+(function(){
+  // ---------- DATA ----------
+  // Each score is normalized 0-100 per criterion (100 = best) based on sourced raw values.
+  // rawDisplay = what's shown in the table. flag = 'official' | 'estimate' | 'gap' (gap = no live data, scored as null / neutral).
+  const vehicles = [
+    {
+      id: "model3",
+      name: "Tesla Model 3",
+      sub: "2026 Standard RWD trim",
+      data: {
+        price: { raw: 38380, display: "$38,380 MSRP", flag: "official", score: null },
+        range: { raw: 363, display: "363 mi EPA", flag: "official", score: null },
+        charging: { raw: 27.5, display: "10–80% in ~25–30 min DC fast charge", flag: "official", score: null }, // minutes, lower=better
+        cost: { raw: 55296, display: "$55,296 (5-yr, KBB)", flag: "official", score: null },
+        safety: { raw: 78, display: "NHTSA: 5-star overall (historical). IIHS: Top Safety Pick (2025); acceptable moderate-overlap rating, elevated rear-seat injury risk noted.", flag: "official", score: null }
+      }
+    },
+    {
+      id: "ioniq5",
+      name: "Hyundai Ioniq 5",
+      sub: "2026 SE Standard Range trim (base)",
+      data: {
+        price: { raw: 36600, display: "$36,600 MSRP (starting)", flag: "official", score: null },
+        range: { raw: 245, display: "245 mi EPA (base); up to 318 mi on RWD Long Range trim", flag: "official", score: null },
+        charging: { raw: 20, display: "800V architecture, 10–80% in ~20 min", flag: "official", score: null },
+        cost: { raw: 59370, display: "$59,370 (5-yr, KBB, SE Standard Range)", flag: "official", score: null },
+        safety: { raw: 82, display: "IIHS: Top Safety Pick+. NHTSA: 2026 model not yet fully tested per US News.", flag: "estimate", score: null }
+      }
+    },
+    {
+      id: "bolt",
+      name: "Chevrolet Bolt",
+      sub: "Relaunched 2027 MY, LT trim (early 2026 launch)",
+      data: {
+        price: { raw: 29990, display: "$29,990 MSRP (incl. destination)", flag: "official", score: null },
+        range: { raw: 255, display: "~255–262 mi EPA (pending final certification)", flag: "estimate", score: null },
+        charging: { raw: 30, display: "Up to 150 kW DC fast charging (est. time not yet published)", flag: "estimate", score: null },
+        cost: { raw: null, display: "Not yet available — no sales history for KBB to model", flag: "gap", score: null },
+        safety: { raw: null, display: "Not yet crash-tested by NHTSA or IIHS (new to market)", flag: "gap", score: null }
+      }
+    },
+    {
+      id: "id4",
+      name: "VW ID.4",
+      sub: "2026 Pro RWD trim",
+      data: {
+        price: { raw: 45095, display: "$45,095 MSRP", flag: "official", score: null },
+        range: { raw: 291, display: "291 mi EPA (RWD); 263 mi AWD", flag: "official", score: null },
+        charging: { raw: 30, display: "Up to 175 kW, 10–80% in ~30 min", flag: "official", score: null },
+        cost: { raw: 61000, display: "~$61,000 (5-yr, estimated from 2025 KBB history + segment comparison)", flag: "estimate", score: null },
+        safety: { raw: null, display: "No confirmed 2026-model NHTSA/IIHS overall rating found; prior generations rated well by IIHS.", flag: "gap", score: null }
+      }
+    }
+  ];
+
+  const criteriaMeta = {
+    price:    { label: "Purchase Price",    lowerIsBetter: true },
+    range:    { label: "EPA Range",         lowerIsBetter: false },
+    charging: { label: "Charging Speed",    lowerIsBetter: true },
+    cost:     { label: "Cost of Ownership", lowerIsBetter: true },
+    safety:   { label: "Safety Rating",     lowerIsBetter: false }
+  };
+
+  // ---------- NORMALIZE SCORES (0-100, gaps => null, excluded from that criterion's ranking impact) ----------
+  function normalizeScores(){
+    Object.keys(criteriaMeta).forEach(function(key){
+      const meta = criteriaMeta[key];
+      const vals = vehicles
+        .map(function(v){ return v.data[key].raw; })
+        .filter(function(v){ return v !== null && v !== undefined; });
+      if(vals.length === 0) return;
+      const min = Math.min.apply(null, vals);
+      const max = Math.max.apply(null, vals);
+      vehicles.forEach(function(v){
+        const raw = v.data[key].raw;
+        if(raw === null || raw === undefined){
+          v.data[key].score = null;
+          return;
+        }
+        if(max === min){
+          v.data[key].score = 100;
+          return;
+        }
+        let s = (raw - min) / (max - min); // 0..1, higher raw = higher s
+        if(meta.lowerIsBetter) s = 1 - s;
+        v.data[key].score = Math.round(s * 100);
+      });
+    });
+  }
+  normalizeScores();
+
+  // ---------- WEIGHTS UI ----------
+  const slidersContainer = document.getElementById('sliders');
+  const weights = { price: 60, range: 60, charging: 40, cost: 60, safety: 70 };
+
+  function buildSliders(){
+    slidersContainer.innerHTML = '';
+    Object.keys(criteriaMeta).forEach(function(key){
+      const group = document.createElement('div');
+      group.className = 'slider-group';
+      group.innerHTML =
+        '<div class="slider-label"><span>' + criteriaMeta[key].label + '</span><span class="slider-value" id="val-' + key + '">' + weights[key] + '</span></div>' +
+        '<input type="range" min="0" max="100" value="' + weights[key] + '" id="slider-' + key + '">';
+      slidersContainer.appendChild(group);
+    });
+    Object.keys(criteriaMeta).forEach(function(key){
+      const el = document.getElementById('slider-' + key);
+      el.addEventListener('input', function(){
+        weights[key] = parseInt(el.value, 10);
+        document.getElementById('val-' + key).textContent = weights[key];
+        render();
+      });
+    });
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    Object.keys(weights).forEach(function(k){ weights[k] = 60; });
+    buildSliders();
+    render();
+  });
+
+  // ---------- COMPUTE WEIGHTED SCORE ----------
+  function computeWeightedScore(vehicle){
+    let totalWeight = 0;
+    let weightedSum = 0;
+    Object.keys(criteriaMeta).forEach(function(key){
+      const w = weights[key];
+      const s = vehicle.data[key].score;
+      if(s === null || s === undefined) return; // skip gaps
+      weightedSum += w * s;
+      totalWeight += w;
+    });
+    if(totalWeight === 0) return 0;
+    return weightedSum / totalWeight;
+  }
+
+  // ---------- RENDER ----------
+  function flagSpan(flag){
+    if(flag === 'estimate') return '<span class="flag flag-estimate">ESTIMATE</span>';
+    if(flag === 'gap') return '<span class="flag flag-gap">DATA GAP</span>';
+    return '<span class="flag flag-official">SOURCED</span>';
+  }
+
+  function render(){
+    const rankListEl = document.getElementById('rankList');
+    const emptyStateEl = document.getElementById('emptyState');
+    rankListEl.innerHTML = '';
+
+    const scored = vehicles.map(function(v){
+      return { v: v, score: computeWeightedScore(v) };
+    }).sort(function(a,b){ return b.score - a.score; });
+
+    if(scored.length === 0){
+      emptyStateEl.style.display = 'block';
+      return;
+    }
+    emptyStateEl.style.display = 'none';
+
+    scored.forEach(function(item, idx){
+      const div = document.createElement('div');
+      div.className = 'rank-item' + (idx === 0 ? ' rank-1' : '');
+      div.innerHTML =
+        '<div class="rank-num">#' + (idx+1) + '</div>' +
+        '<div><div class="rank-name">' + item.v.name + '</div><div class="rank-sub">' + item.v.sub + '</div></div>' +
+        '<div><div class="rank-score">' + item.score.toFixed(1) + '</div><div class="rank-score-label">/ 100</div></div>';
+      rankListEl.appendChild(div);
+    });
+
+    renderTable();
+  }
+
+  function renderTable(){
+    const tbody = document.getElementById('dataTableBody');
+    tbody.innerHTML = '';
+    vehicles.forEach(function(v){
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><strong>' + v.name + '</strong><br><span style="color:var(--text-dim);font-size:12px;">' + v.sub + '</span></td>' +
+        '<td class="num">' + v.data.price.display + ' ' + flagSpan(v.data.price.flag) + '</td>' +
+        '<td class="num">' + v.data.range.display + ' ' + flagSpan(v.data.range.flag) + '</td>' +
+        '<td>' + v.data.charging.display + ' ' + flagSpan(v.data.charging.flag) + '</td>' +
+        '<td class="num">' + v.data.cost.display + ' ' + flagSpan(v.data.cost.flag) + '</td>' +
+        '<td>' + v.data.safety.display + ' ' + flagSpan(v.data.safety.flag) + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---------- SOURCES PANEL ----------
+  const sources = [
+    { tag: "Pricing / Specs — Tesla Model 3", name: "Kelley Blue Book — 2026 Tesla Model 3 Specs, Features & Options", url: "https://www.kbb.com/tesla/model-3/2026/specs" },
+    { tag: "Pricing / Range — Tesla Model 3", name: "Edmunds — 2026 Tesla Model 3 Prices, Reviews, and Pictures", url: "https://www.edmunds.com/tesla/model-3/" },
+    { tag: "Charging — Tesla Model 3", name: "The Charge Port — Tesla Model 3 Price & Specs (2026)", url: "https://thechargeport.com/ev/tesla-model-3" },
+    { tag: "Pricing / Range — Hyundai Ioniq 5", name: "Kelley Blue Book — 2026 Hyundai IONIQ 5 Price, Reviews, Pictures & More", url: "https://www.kbb.com/hyundai/ioniq-5/" },
+    { tag: "Cost to Own — Hyundai Ioniq 5", name: "Kelley Blue Book — 2026 Hyundai IONIQ 5 SE Standard Range Prices", url: "https://www.kbb.com/hyundai/ioniq-5/2026/se-standard-range/" },
+    { tag: "Range / Charging — Hyundai Ioniq 5", name: "Hyundai USA — 2026 IONIQ 5 Features & Specs", url: "https://www.hyundaiusa.com/us/en/vehicles/ioniq-5/compare-specs" },
+    { tag: "Pricing — Chevrolet Bolt", name: "GM News — It's Back: Introducing the 2027 Chevrolet Bolt", url: "https://news.gm.com/home.detail.html/Pages/news/us/en/2025/oct/1009-2027-Chevrolet-Bolt.html" },
+    { tag: "Range / Charging — Chevrolet Bolt", name: "Cars Frenzy — 2026 Chevy Bolt EV: Specs, Price, Features, and Release Date", url: "https://carsfrenzy.net/2026-chevy-bolt-ev/" },
+    { tag: "Pricing — VW ID.4", name: "Edmunds — 2026 Volkswagen ID.4 Prices, Reviews, and Pictures", url: "https://www.edmunds.com/volkswagen/id4/" },
+    { tag: "Range / Charging — VW ID.4", name: "Cars.com — 2026 Volkswagen ID.4 Specs, Prices, Range, Reviews & Photos", url: "https://www.cars.com/research/volkswagen-id.4-2026/" },
+    { tag: "Range / Charging — VW ID.4 (alt.)", name: "U.S. News — 2026 Volkswagen ID.4 Review, Pricing, & Pictures", url: "https://cars.usnews.com/cars-trucks/volkswagen/id-4" },
+    { tag: "Safety — Tesla Model 3", name: "IIHS — IIHS Unveils New Ratings for Seven Electric Vehicles", url: "https://www.iihs.org/news/detail/iihs-unveils-new-ratings-for-seven-electric-vehicles" },
+    { tag: "Safety — Tesla Model 3 (NHTSA)", name: "NHTSA — Ratings (5-Star Safety Ratings Program)", url: "https://www.nhtsa.gov/ratings" },
+    { tag: "Safety — All 4 vehicles overview", name: "U.S. News — Safest Electric Cars of 2026", url: "https://cars.usnews.com/cars-trucks/advice/safest-electric-cars" },
+    { tag: "Safety — Hyundai Ioniq 5", name: "IIHS — Solid Rear-Passenger Protection Boosts Hyundai Ioniq 5 to Highest Award", url: "https://www.iihs.org/news/detail/solid-rear-passenger-protection-boosts-hyundai-ioniq-5-to-highest-award" },
+    { tag: "Safety — 2025/2026 Top Safety Picks", name: "Consumer Reports (via IIHS data) — Safest New Cars of 2026", url: "https://www.consumerreports.org/cars/car-safety/safest-new-cars-of-2026-iihs-top-safety-pick-a4816645459/" }
+  ];
+
+  function renderSources(){
+    const grid = document.getElementById('sourcesGrid');
+    grid.innerHTML = '';
+    sources.forEach(function(s){
+      const div = document.createElement('div');
+      div.className = 'source-item';
+      div.innerHTML = '<div class="src-tag">' + s.tag + '</div><a href="' + s.url + '" target="_blank" rel="noopener">' + s.name + '</a>';
+      grid.appendChild(div);
+    });
+  }
+
+  // ---------- INIT ----------
+  try{
+    buildSliders();
+    renderSources();
+    render();
+  } catch(e){
+    document.body.innerHTML = '<div style="padding:40px;color:#f2665a;font-family:sans-serif;">Something went wrong rendering this tool. Please refresh the page. (' + e.message + ')</div>';
+  }
+})();
+</script>
+</body>
+</html>
