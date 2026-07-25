@@ -39,52 +39,10 @@ Implemented AI-powered document summarization and document-grounded chat using G
 - Learned debugging of API integration and environment variables
 
 ## Screenshots
-(Add today's screenshots here.)
 
-## Repository
-Project Repo:
-# Day 55 – AI Summarization & Chat / Q&A
-
-## Objective
-Implemented AI-powered document summarization and document-grounded chat using Gemini 2.5 Flash.
-
-## Features Completed
-- PDF Upload
-- Text Extraction
-- AI TL;DR Summary
-- Detailed Summary
-- Key Insights
-- Chat with uploaded document
-- Grounded responses
-- Hallucination prevention
-- Empty message validation
-- Loading indicator while AI responds
-- Double-send prevention
-
-## Testing
-✅ Upload successful
-
-✅ Text extraction successful
-
-✅ AI summary generated
-
-✅ Chat answered document-based questions
-
-✅ Questions outside the document returned "information not found"
-
-✅ Empty messages blocked
-
-✅ Double-send prevented
-
-## Key Learnings
-- Integrated Gemini 3.5 Flash API
-- Built AI summarization workflow
-- Implemented document-grounded Q&A
-- Improved frontend state management
-- Learned debugging of API integration and environment variables
-
-## Screenshots
-(Add today's screenshots here.)
+[pdf-upload-success](pdf-upload-success.png)
+[summary.png](summary.png.png)
+[chat.png](chat.png.png)
 
 ## Repository
 Project Repo:
