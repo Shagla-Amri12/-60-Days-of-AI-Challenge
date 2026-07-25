@@ -41,8 +41,10 @@ Implemented AI-powered document summarization and document-grounded chat using G
 ## Screenshots
 
 [pdf-upload-success](pdf-upload-success.png)
-[summary.png](summary.png.png)
-[chat.png](chat.png.png)
+
+[summary](summary.png)
+
+[chat](chat.png)
 
 ## Repository
 Project Repo:
