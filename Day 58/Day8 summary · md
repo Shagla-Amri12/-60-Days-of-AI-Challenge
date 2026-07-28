@@ -1,0 +1,32 @@
+# PaperMind — Day 8 Summary (Testing, Debugging & Production Optimization)
+
+## What Was Completed Today
+
+Conducted a senior QA/security/performance review of the live application and fixed six real production-readiness issues:
+
+1. **Fixed blocking event loop** — `/analyze` and `/chat` no longer freeze the entire server while waiting on Gemini; calls now run in a threadpool.
+2. **Fixed encrypted-PDF handling** — password-protected PDFs now return a clear, specific error instead of a generic failure.
+3. **Added rate limiting** — max 15 AI calls per 10 minutes, protecting the shared free Gemini quota from being exhausted by abuse now that the app is public.
+4. **Bounded chat history memory** — capped at 40 messages per session instead of growing indefinitely.
+5. **Hardened CORS origin parsing** — trailing-slash mistakes (which already broke the app once during Day 7 deployment) are now auto-corrected instead of silently failing.
+6. **Added client-side request timeouts** — a hung request now fails gracefully with a clear message instead of leaving the user stuck indefinitely.
+
+Documented all of this in `docs/BUGS.md`, along with an explicit decision to **skip the section-highlighting stretch feature** (reasoning: prioritizing core stability on a now-public app over optional scope, consistent with the Blueprint's own "cut it if it risks destabilizing the core" guidance) and a "Known Limitations" list (Render cold starts, global rather than per-user rate limiting, 100k-character truncation for very long documents, single shared session).
+
+## ⚠️ What's Still Outstanding (Not Yet Done)
+
+Being transparent about the actual state — the following Blueprint Day 8 tasks have **not** been completed or confirmed yet:
+
+- **Redeploy confirmation**: I don't have confirmation that today's fixes were pushed to GitHub and successfully redeployed to Render/Vercel.
+- **Live-site stress testing**: the core Day 8 task — running the full flow across 5-6 diverse real PDFs (short, long, academic, casual notes, tables/charts, scanned) against the **live production site** — has not happened yet in this session.
+- **Verification of known error paths in production**: bad file type, oversized file, and scanned-PDF rejection haven't been re-confirmed live since today's changes.
+
+## 🎯 What This Means for Tomorrow (or Later Today)
+
+Before this can honestly be called "tested and production-ready" per the Blueprint's own end-of-day checklist, we still need to:
+1. Push and redeploy today's fixes
+2. Run the actual diverse-PDF test set against the live site
+3. Fix anything that surfaces during that testing
+4. Update `docs/BUGS.md` with real test results
+
+I'd rather flag this clearly now than mark today "done" when the actual verification step — the whole point of Day 8 — hasn't happened yet.
