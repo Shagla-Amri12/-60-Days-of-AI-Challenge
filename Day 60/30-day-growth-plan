@@ -1,0 +1,41 @@
+# PaperMind — 30-Day Growth Plan
+
+A realistic, one-milestone-per-day roadmap taking PaperMind from its current v1.0 (single-session, in-memory, Gemini free tier, Render + Vercel) toward the "Next 3-6 Months" goals in `future-scope.md`. Each day builds on the previous — skipping a day just delays the next one, nothing here assumes parallel work.
+
+## Week 1: Testing Foundation & Quality (Days 1-7)
+1. Set up `pytest` + `httpx` for backend testing; write tests for `/health` and `/upload` happy paths.
+2. Write tests for `/upload` edge cases: wrong file type, oversized file, empty file, encrypted PDF.
+3. Write tests for `pdf_utils.py` directly: valid text PDF, scanned/no-text PDF, corrupted file.
+4. Write tests for `/analyze` and `/chat` using a mocked Gemini client (no real API calls in CI).
+5. Add a GitHub Actions workflow that runs the test suite on every push to `main`.
+6. Pin `requirements.txt` versions again, now that the dependency conflict is understood — test the pinned versions still build cleanly on Render.
+7. Write a `CONTRIBUTING.md` documenting the test workflow for future contributors.
+
+## Week 2: Session Persistence (Days 8-14)
+8. Wire the frontend to call `GET /session` on page load, restoring in-progress state after a refresh (endpoints existed since Day 3 but were never connected to the UI).
+9. Add a "Start Over" button using the existing `DELETE /session` endpoint, replacing the current upload-only reset path.
+10. Sync session state to `localStorage` as a client-side cache layer, so a Render cold-start restart doesn't fully lose an in-progress session from the user's perspective.
+11. Add a toast/banner notification when the backend session doesn't match cached local state (detects the cold-start-wiped-memory case) instead of silently showing stale data.
+12. Write tests for the session-restore flow (mocked `GET /session` responses).
+13. Add a loading skeleton for the initial session-check request, so app startup doesn't flash an empty state before resolving.
+14. Manual QA pass: test the full restore flow across a real Render cold start.
+
+## Week 3: Streaming & Multi-Document (Days 15-21)
+15. Research Gemini's streaming API (`generate_content_stream` or equivalent in `google-genai`) and prototype it against `/chat` only.
+16. Convert `/chat` to a streaming response (Server-Sent Events or chunked response) with a corresponding frontend change to render tokens as they arrive.
+17. Add a "Stop generating" button, now that streaming makes mid-response cancellation meaningful.
+18. Extend `current_document` (backend) into a small in-memory list to support 2-3 documents per session.
+19. Update `/upload` to append rather than always replace, with a document-switcher UI on the frontend.
+20. Update the chat prompt to clarify which document(s) are in context when multiple are loaded.
+21. Full regression test of the single-document flow to confirm multi-document support didn't break the original v1.0 behavior.
+
+## Week 4: Real Persistence & Auth Groundwork (Days 22-30)
+22. Create a free-tier Supabase project; design the actual database schema based on `docs/SCHEMA.md`'s original in-memory model.
+23. Add Supabase client to the backend; write a data-access layer that mirrors the current in-memory dict's interface (minimizing changes to route code).
+24. Migrate document storage from in-memory to Supabase, behind a feature flag so the in-memory version remains the fallback during transition.
+25. Migrate chat history storage the same way.
+26. Add Supabase Auth (magic-link email) for a minimal login flow — no full account management UI yet, just identity.
+27. Scope all stored documents/chat history to the logged-in user's ID.
+28. Replace the global in-memory rate limiter with a per-user limiter now that user identity exists.
+29. Full end-to-end test: sign in, upload, chat, sign out, sign back in, confirm document/chat history persisted correctly.
+30. Deploy the authenticated version to a staging URL (keep the current free demo live and unauthenticated as a fallback), write up what changed, and plan the next 30 days.
