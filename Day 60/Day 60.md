@@ -61,7 +61,7 @@ These 60 days significantly improved my confidence in building full-stack AI app
 
 # CERTIFICATE
 
-[certificate](certificate.pdf)
+[certificate](certificate_60_day_claude_ai_challenges.pdf)
 
 ## 🙏 Thank You
 
